@@ -12,6 +12,41 @@
   </head>
 
   <body>
+     <script src="http://code.jquery.com/jquery-1.8.3.min.js"></script>
+    <script src="js/jsencrypt.min.js"></script>
+    <script type="text/javascript">
+
+      // Call this code when the page is done loading.
+      $(function encrypt() {
+
+        // Run a quick encryption/decryption when they click.
+        //$('#').click(function() {
+
+          // Encrypt with the public key...
+          var encrypt = new JSEncrypt();
+          encrypt.setPublicKey($('#pubkey').val());
+          var encrypted = encrypt.encrypt($('#input').val());
+
+          $("#encrypt_text").html(encrypted)
+
+          // Decrypt wit
+          h the private key...
+          //var decrypt = new JSEncrypt();
+          //decrypt.setPrivateKey($('#privkey').val());
+          //var uncrypted = decrypt.decrypt(encrypted);
+
+          // Now a simple check to see if the round-trip worked.
+          if (uncrypted == $('#input').val()) {
+            //alert('It works!!!');
+          }
+          else {
+            //alert('Something went wrong....');
+          }
+        //});
+
+      });
+    </script>
+
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
       <a class="navbar-brand" href="https://genobank.io/">
         <img src="/images/genobank.png" width="30" height="30" class="d-inline-block align-top" alt="">RxWallet
@@ -42,7 +77,7 @@
             <tbody>
               <tr>
                 <td > Size: </td>
-                <td> # bytes</td>
+                <td><a id = "encrypt_text" value="10 bytes"> </a></td>
               </tr>
               <tr>
                 <td>Hash:</td>
@@ -69,7 +104,18 @@
         </div>
       </div>
     </div>
-
+    <div id="result"></div>
+    <script>
+      // Check browser support
+      if (typeof(Storage) !== "undefined") {
+      // Store
+        localStorage.setItem("lastname", "Hola");
+      // Retrieve
+        document.getElementById("result").innerHTML = localStorage.getItem("lastname");
+      } else {
+        document.getElementById("result").innerHTML = "Sorry, your browser does not support Web Storage...";
+      }
+    </script>
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
