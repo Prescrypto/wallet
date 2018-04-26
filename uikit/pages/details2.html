@@ -12,6 +12,41 @@
   </head>
 
   <body>
+     <script src="http://code.jquery.com/jquery-1.8.3.min.js"></script>
+    <script src="js/jsencrypt.min.js"></script>
+    <script type="text/javascript">
+
+      // Call this code when the page is done loading.
+      $(function encrypt() {
+
+        // Run a quick encryption/decryption when they click.
+        //$('#').click(function() {
+
+          // Encrypt with the public key...
+          var encrypt = new JSEncrypt();
+          encrypt.setPublicKey($('#pubkey').val());
+          var encrypted = encrypt.encrypt($('#input').val());
+
+          $("#encrypt_text").html(encrypted)
+
+          // Decrypt wit
+          h the private key...
+          //var decrypt = new JSEncrypt();
+          //decrypt.setPrivateKey($('#privkey').val());
+          //var uncrypted = decrypt.decrypt(encrypted);
+
+          // Now a simple check to see if the round-trip worked.
+          if (uncrypted == $('#input').val()) {
+            //alert('It works!!!');
+          }
+          else {
+            //alert('Something went wrong....');
+          }
+        //});
+
+      });
+    </script>
+
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
       <a class="navbar-brand" href="https://genobank.io/">
         <img src="/images/genobank.png" width="30" height="30" class="d-inline-block align-top" alt="">SequentiaWallet
@@ -31,44 +66,51 @@
     <div class="container">
       <div class="row">
         <div class="col-md-6 offset-md-3">
-          <h6 class="text-center"> Transactions </h6>
+          <h6 class="text-center"> Details of Transactions </h6>
           <table class="table table-striped">
             <thead>
               <tr>
-                <th scope="col">#</th>
-                <th scope="col"> Hash </th>
-                <th scope="col">When</th>
+                <th scope="col"> Details </th>
+                <th scope="col"> </th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <th scope="row">1</th>
-                <td > <a href="/pages/details.html">Hash_1</a></td>
-                <td>fecha_1</td>
+                <td > Size: </td>
+                <td><a id = "encrypt_text" value="10 bytes"> 25 bytes</a></td>
               </tr>
               <tr>
-                <th scope="row">2</th>
+                <td>Hash:</td>
+                <td>Hash_3</td>
+              </tr>
+              <tr>
+                <td>Previous Hash:</td>
                 <td><a href="/pages/details1.html">Hash_2</a></td>
-                <td>fecha_2</td>
               </tr>
               <tr>
-                <th scope="row">3</th>
-                <td><a href="/pages/details2.html">Hash_3</a></td>
-                <td>fecha_3</td>
+                <td > Date Time: </td>
+                <td> 02/04/2018 08:14:00</td>
+              </tr>
+              <tr>
+                <td>Files:</td>
+                <td>MAP</td>
+              </tr>
+              <tr>
+                <td>Merkle Root</td>
+                <td>Merkle_Root_3</td>
               </tr>
             </tbody>
           </table>
         </div>
       </div>
     </div>
+    <div id="result"></div>
 
+    </script>
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
-    <script src="/js/localforage.min.js"></script>
-    <script src="/js/wallet.js"></script>
   </body>
-
 </html>
