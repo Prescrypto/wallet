@@ -31,12 +31,25 @@
     <div class="container">
       <div class="row">
         <div class="col-md-6 offset-md-3">
+          <div id="result"></div>
           <h6 class="text-center"> Welcome to Genobank Wallet </h6>
-          <h6 class="text-center"> Please, choose an option to enter your key </h6>
-          <p class="text-center">
-            <a class="btn btn-primary" href="/pages/upload.html" title="Select a file from your computer">Use local key</a>
-            <a class="btn btn-secondary" href="/pages/paste_key.html" title="Copy your key and paste here"> Copy/Paste key</a>
-          </p>
+          <h6 class="text-center"> Please: </h6>
+
+          <h6 class="text-center"> Enter Private Key </h6>
+          <textarea id ="privkey" name="private_key" class="form-control" rows="2" placeholder="Paste your key here or create new key"></textarea>
+
+          <h6 class="text-center"> Enter Public Key </h6>
+          <textarea id="pubkey" name="public_key" class="form-control" rows="2" placeholder="Paste your key here or create new key"></textarea>
+          <h6> </h6>
+        </div>
+        <div class="col-md-6 offset-md-3 text-center">
+          <button id="button_load" class="btn btn-primary btn-lg active center-block"> Load Keys</button>
+          <h6> </h6>
+          <div id="next_button"></div>
+          <h6> </h6>
+          <h6> Or </h6>
+          <h6> </h6>
+          <button id="button_create" class="btn btn-primary btn-lg active center-block"> Create New Keys </button>
         </div>
       </div>
     </div>
@@ -46,5 +59,10 @@
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
+    <script src="/js/localforage.min.js"></script>
+    <script src="http://code.jquery.com/jquery-1.8.3.min.js"></script>
+    <script src="/js/jsencrypt.min.js"></script>
+    <script src="/js/wallet.js"></script>
+
   </body>
 </html>

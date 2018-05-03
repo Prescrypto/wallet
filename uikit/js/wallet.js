@@ -54,8 +54,12 @@ function save_key(){
     }
   }
 
+$("#button_load").click(function(){
+  validate_keys();
+});
+
 function validate_keys(){
-  save_key()
+  save_key();
 
   if (validate_privkey() && validate_pubkey()){
     // Encrypt with the public key
@@ -106,6 +110,17 @@ var encrypted_size = encrypt.encrypt(size_data);
 document.getElementById('encrypt_text').innerHTML=encrypted_size;
 }
 
+$('#button_test').click(function() {
+  $.get("http://mockbin.org/bin/cd8810c2-9274-442e-a5d4-4de191e13202/", function(data) {
+    console.log("Success")
+    console.log(data)
+    $("#test").html(data);
+  },"json");
+});
+
+//function test_get(data){
+//
+//}
 //function show_publickey(){
 //  localforage.getItem('publickey', function(err, value){
   // Run this code once the value has been
