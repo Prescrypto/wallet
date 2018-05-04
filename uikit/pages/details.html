@@ -37,8 +37,8 @@
       <div class="row">
         <div class="col-md-6 offset-md-3">
           <aside class="d-none">
-            <textarea id="pub_key"></textarea>
-            <textarea id="priv_key"></textarea>
+            <textarea title="pub_key" id="pub_key"></textarea>
+            <textarea title="priv_key" id="priv_key"></textarea>
           </aside>
           <h6 class="text-center"> Details of Transactions </h6>
           <table class="table table-striped">
@@ -100,6 +100,25 @@
     <script src="/js/localforage.min.js"></script>
     <script src="http://code.jquery.com/jquery-1.8.3.min.js"></script>
     <script src="/js/jsencrypt.min.js"></script>
+    <script>
+      $(document).ready(function() {
+        // aqui va el codigo que se ejecuta despues de que cargue la pagina
+        (function ($, localforage){
+          // set the keys on textarea onload page
+          function setKeys(){
+            localforage.getItem('privatekey', function(err, value){
+              console.log(value);
+              $('#priv_key').val(value);
+            });
+            localforage.getItem('publickey', function(err, value){
+              console.log(value);
+              $('#pub_key').val(value);
+            });
+          };
+          setKeys();
+        })($, localforage);
+      });
+    </script>
     <script src="/js/wallet.js"></script>
   </body>
 </html>

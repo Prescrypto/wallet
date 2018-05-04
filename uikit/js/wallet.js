@@ -112,28 +112,20 @@ function decrypt_fields(){
   $("#location").html(uncrypted);
   var uncrypted = decrypt.decrypt($("#sender").text().trim());
   $("#sender").html(uncrypted);
-  var uncrypted = decrypt.decrypt($("#receiver").text().trim());
+  var uncrypted = decrypt.decrypt($("#receiver").tesxt().trim());
   $("#receiver").html(uncrypted);
 }
 
-$('#button_encrypt').click(function () {
-  encrypt_fields();
-});
-
-function encrypt_fields(){
+$('#button_encrypt').click(function(){
+  // Encrypt function
   var encrypt_object = new JSEncrypt();
-  localforage.getItem('publickey', function(err, value){
-    PUBLIC_KEY = value;
-  });
-  encrypt_object.setPublicKey(PUBLIC_KEY);
-
-
-  var location_text = $("#location").text().trim();
+  encrypt_object.setPublicKey($('#pub_key').val());
+  var location_text = $("#location").html().trim();
   location_text = encrypt_object.encrypt(location_text);
   $("#location").html(location_text);
   console.log("Resultado "+ location_text);
+});
 
- }
 
 $('#button_test').click(function() {
   $.get("http://mockbin.org/bin/cd8810c2-9274-442e-a5d4-4de191e13202/", function(data) {
