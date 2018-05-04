@@ -27,16 +27,10 @@ var please_wait_template = '\
       </button> \
     </div>'
 
-var button_next = '\
-    <a id="next_button" href="/pages/list_tx.html">\
-      <button id="button_next" class="btn btn-primary btn-lg active"> Next </button>\
-    </a>'
-
 function save_key(){
   localforage.setItem('privatekey', $("#privkey").val());
   localforage.setItem('publickey', $("#pubkey").val());
   console.log("Set keys on Localstorage");
-//$("#result").html(alert_success_template);
 }
 
   function validate_pubkey(){
@@ -59,7 +53,6 @@ $("#button_load").click(function(){
 });
 
 function validate_keys(){
-  save_key();
 
   if (validate_privkey() && validate_pubkey()){
     // Encrypt with the public key
@@ -73,42 +66,74 @@ function validate_keys(){
     var uncrypted = decrypt.decrypt(encrypted);
     if(uncrypted === test){
       $('#result').html(alert_success_template);
-      $("#next_button").html(button_next);
+      save_key();
     }else{
-      localforage.clear('publickey');
-      localforage.clear('privatekey');
       $('#result').html(alert_error_template);
     }
   }else{
-    localforage.clear('publickey');
-    localforage.clear('privatekey');
     $('#result').html(alert_error_template);
   }
 }
 
 $('#button_create').click(function() {
+  $('#result').html(please_wait_template);
   create_keys();
+
 });
 
 function create_keys(){
-  $('#result').html(please_wait_template);
   console.log("Start genereting keys");
   var crypt = new JSEncrypt({default_key_size: 2048});
   crypt.getKey();
   $("#privkey").val(crypt.getPrivateKey());
   $("#pubkey").val(crypt.getPublicKey());
   console.log("Finish");
+  save_key();
+  window.setTimeout(change_page(), 20000);
 }
 
-function encrypted_fields(){
-  var encrypt = new JSEncrypt();
-  localforage.getItem('publickey', function(err, value){
-  PUBLIC_KEY = value;
-});
-encrypt.setPublicKey(PUBLIC_KEY);
-var encrypted_size = encrypt.encrypt(size_data);
-document.getElementById('encrypt_text').innerHTML=encrypted_size;
+function change_page(){
+  window.location = ("/pages/list_tx.html");
 }
+
+$('#button_decrypt').click(function () {
+  decrypt_fields();
+});
+
+function decrypt_fields(){
+  var decrypt = new JSEncrypt();
+  localforage.getItem('privatekey', function(err, value){
+  PRIVATE_KEY = value;
+  });
+  decrypt.setPrivateKey(PRIVATE_KEY);
+  var uncrypted = decrypt.decrypt($('#location').text().trim());
+  console.log("Resultado "+ uncrypted);
+
+  $("#location").html(uncrypted);
+  var uncrypted = decrypt.decrypt($("#sender").text().trim());
+  $("#sender").html(uncrypted);
+  var uncrypted = decrypt.decrypt($("#receiver").text().trim());
+  $("#receiver").html(uncrypted);
+}
+
+$('#button_encrypt').click(function () {
+  encrypt_fields();
+});
+
+function encrypt_fields(){
+  var encrypt_object = new JSEncrypt();
+  localforage.getItem('publickey', function(err, value){
+    PUBLIC_KEY = value;
+  });
+  encrypt_object.setPublicKey(PUBLIC_KEY);
+
+
+  var location_text = $("#location").text().trim();
+  location_text = encrypt_object.encrypt(location_text);
+  $("#location").html(location_text);
+  console.log("Resultado "+ location_text);
+
+ }
 
 $('#button_test').click(function() {
   $.get("http://mockbin.org/bin/cd8810c2-9274-442e-a5d4-4de191e13202/", function(data) {
