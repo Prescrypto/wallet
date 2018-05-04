@@ -96,25 +96,20 @@ function change_page(){
   window.location = ("/pages/list_tx.html");
 }
 
+function decrypt_fields(){
+  // descrypt function
+  var decrypt = new JSEncrypt();
+  decrypt.setPrivateKey($('#priv_key').val());
+
+  var uncrypted = decrypt.decrypt($('#location').html());
+  $("#location").html(uncrypted);
+  console.log("Resultado "+ uncrypted);
+}
+
 $('#button_decrypt').click(function () {
   decrypt_fields();
 });
 
-function decrypt_fields(){
-  var decrypt = new JSEncrypt();
-  localforage.getItem('privatekey', function(err, value){
-  PRIVATE_KEY = value;
-  });
-  decrypt.setPrivateKey(PRIVATE_KEY);
-  var uncrypted = decrypt.decrypt($('#location').text().trim());
-  console.log("Resultado "+ uncrypted);
-
-  $("#location").html(uncrypted);
-  var uncrypted = decrypt.decrypt($("#sender").text().trim());
-  $("#sender").html(uncrypted);
-  var uncrypted = decrypt.decrypt($("#receiver").tesxt().trim());
-  $("#receiver").html(uncrypted);
-}
 
 $('#button_encrypt').click(function(){
   // Encrypt function
