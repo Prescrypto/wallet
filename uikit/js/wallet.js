@@ -176,9 +176,31 @@ $('#button_encrypt').click(function(){
   $("#button_encrypt").attr("disabled", true);
 });
 
-$("#button_send").click(function(){
-  $("#forms").html(forms);
+$("#button_make_tx").click(function(){
+  //$("#forms").html(forms);
   $("#sender_text_form").html($("#sender").html().trim());
+});
+
+function encrypt_tx(){
+// Encrypt function
+  var encrypt_object = new JSEncrypt();
+  encrypt_object.setPublicKey($('#pub_key').val());
+
+  var location_text = $("#location_text_form").html().trim();
+  location_text = encrypt_object.encrypt(location_text);
+  console.log("Resultado "+ location_text);
+
+  var sender_text = $("#sender_text_form").html().trim();
+  sender_text = encrypt_object.encrypt(sender_text);
+  console.log("Resultado "+ sender_text);
+
+  var receiver_text = $("#receiver_text_form").html().trim();
+  receiver_text = encrypt_object.encrypt(receiver_text);
+  console.log("Resultado "+ receiver_text);
+}
+
+$('#button_send_tx').click(function(){
+  encrypt_tx();
 });
 //$('#myLink').addClass('disabled');
 
