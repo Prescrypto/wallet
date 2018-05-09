@@ -34,6 +34,7 @@
     </nav>
 
     <div class="container">
+    <div id="result"> </div>
       <div class="row">
         <div class="col-md-6 offset-md-3">
           <div id="forms"></div>
@@ -93,51 +94,54 @@
     </div>
 
     <div class="modal fade" id="modalContactForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
+      <div id="result"></div>
+      <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <div class="modal-header text-center">
-                <h4 class="modal-title w-100 font-weight-bold">Make Tx</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body mx-2">
-                <div class="md-form">
-                  <label data-error="wrong" data-success="right" for="form34">Sender Name</label>
-                  <textarea class="form-control" id="sender_text_form" rows="1" placeholder="Name of the sender"></textarea>
-                </div>
+          <div class="modal-header text-center">
+            <h4 class="modal-title w-100 font-weight-bold">Make Tx</h4>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body mx-2">
+            <form action="" method="POST">
+              <div class="md-form">
+                <label data-error="wrong" data-success="right" for="sender_text_form">Sender Name</label>
+                <textarea class="form-control" id="sender_text_form" rows="1" placeholder="Name of the sender" required></textarea>
+              </div>
 
-                <div class="md-form mb-2">
-                  <label data-error="wrong" data-success="right" for="form34">Receiver Name</label>
-                  <textarea class="form-control" id="receiver_text_form" rows="1" placeholder="Name of the receiver"></textarea>
-                </div>
+              <div class="md-form mb-2">
+                <label data-error="wrong" data-success="right" for="receiver_text_form">Receiver Name</label>
+                <textarea class="form-control" id="receiver_text_form" rows="1" placeholder="Name of the receiver" required></textarea>
+              </div>
 
-                <div class="md-form mb-2">
-                  <label data-error="wrong" data-success="right" for="form34">Location </label>
-                  <textarea class="form-control" id="location_text_form" rows="1" placeholder="Location"></textarea>
-                </div>
+              <div class="md-form mb-2">
+                <label data-error="wrong" data-success="right" for="location_text_form">Location </label>
+                <textarea class="form-control" id="location_text_form" rows="1" placeholder="Location" required></textarea>
+              </div>
 
-                <div class="md-form mb-2">
-                  <label data-error="wrong" data-success="right" for="form34"> Public Key of Receiver </label>
-                  <textarea class="form-control" id="public_key_receiver_form" rows="2" placeholder="Enter the public key of the receiver"></textarea>
-                </div>
+              <div class="md-form mb-2">
+                <label data-error="wrong" data-success="right" for="public_key_receiver_form"> Public Key of Receiver </label>
+                <textarea class="form-control" id="public_key_receiver_form" rows="2" placeholder="Enter the public key of the receiver" required></textarea>
+              </div>
 
-                <div class="md-form mb-2">
-                  <label>Map file input</label>
-                  <input type="file" class="form-control-file" id="file_map">
-                </div>
+              <div class="md-form mb-2">
+                <label>Map file input</label>
+                <input type="file" class="form-control-file" id="file_map">
+              </div>
 
-                <div class="md-form mb-2">
-                  <label>Ped file input</label>
-                  <input type="file" class="form-control-file" id="file_ped">
-                </div>
-            </div>
-            <div class="modal-footer d-flex justify-content-center">
-              <button id="button_send_tx" class="btn btn-unique">Send <i class="fa fa-paper-plane-o ml-1"></i></button>
-            </div>
+              <div class="md-form mb-2">
+                <label>Ped file input</label>
+                <input type="file" class="form-control-file" id="file_ped">
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer d-flex justify-content-center">
+            <button id="button_send_tx" class="btn btn-unique">Send <i class="fa fa-paper-plane-o ml-1"></i></button>
+          </div>
         </div>
+      </div>
     </div>
-</div>
 
 <div class="text-center">
     <!--<a href="" class="btn btn-default btn-rounded mb-4" data-toggle="modal" data-target="#modalContactForm">Make Tx</a>-->

@@ -1,6 +1,6 @@
 var PUBLIC_KEY;
 var PRIVATE_KEY;
-var size_data = "10 bits";
+var TODAY = new Date();
 
 // alert sucess templating
 var alert_success_template = '\
@@ -19,10 +19,26 @@ var please_wait_template = '\
       </button> \
     </div>'
 
+var tx_success = '\
+    <div class="alert alert-success alert-dismissible fade show" role="alert"> \
+      <strong>Successful TX!</strong>\
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close"> \
+        <span aria-hidden="true">&times;</span> \
+      </button> \
+    </div>'
+
 // alert error template
 var alert_error_template = '\
     <div class="alert alert-danger alert-dismissible fade show" role="alert"> \
       <strong>ERROR!</strong> Please, check your keys! \
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close"> \
+        <span aria-hidden="true">&times;</span> \
+      </button> \
+    </div>'
+
+var tx_error = '\
+    <div class="alert alert-danger alert-dismissible fade show" role="alert"> \
+      <strong>ERROR!</strong> An error ocurred when making the Tx. \
       <button type="button" class="close" data-dismiss="alert" aria-label="Close"> \
         <span aria-hidden="true">&times;</span> \
       </button> \
@@ -33,28 +49,6 @@ var button_next = '\
   <a id="next_button" href="/pages/list_tx.html">\
     <button id="button_next" class="btn btn-primary btn-lg active"> NEXT </button>\
   <\a>'
-
-var forms = '\
-  <div class="alert alert-success alert-dismissible fade show" role="alert"> \
-  <form>\
-  <div class="form-group">\
-    <label> Sender</label>\
-    <textarea class="form-control" id="sender_text_form" rows="2" placeholder="Name of the sender"></textarea>\
-    <label> Receiver </label>\
-    <textarea class="form-control" id="receiver_text_form" rows="2" placeholder="Name of the receiver"></textarea>\
-    <label> Location </label>\
-    <textarea class="form-control" id="location_text_form" rows="2" placeholder="Location"></textarea>\
-    <label> Public Key of Receiver </label>\
-    <textarea class="form-control" id="public_key_receiver" rows="2" placeholder="Enter the public key of the receiver"></textarea>\
-    <label>Map file input</label>\
-    <input type="file" class="form-control-file" id="file_map">\
-    <label>Ped file input</label>\
-    <input type="file" class="form-control-file" id="file_ped">\
-  </div>\
-  <button type="submit" class="btn btn-primary">Submit</button>\
-</form>\
-</div>'
-
 
 
 function save_key(){
@@ -105,10 +99,6 @@ function validate_keys(){
   }
 }
 
-function change_page(){
-  window.location = ("/pages/list_tx.html");
-}
-
 function create_keys(){
   console.log("Start genereting keys");
   var crypt = new JSEncrypt({default_key_size: 2048});
@@ -123,6 +113,11 @@ $('#button_create').click(function() {
   $('#result').html(please_wait_template);
   create_keys();
   $('#next_button').html(button_next);
+});
+
+
+$('#next_button').click(function (){
+
 });
 
 function decrypt_fields(){
@@ -184,7 +179,7 @@ $("#button_make_tx").click(function(){
 function encrypt_tx(){
 // Encrypt function
   var encrypt_object = new JSEncrypt();
-  encrypt_object.setPublicKey($('#pub_key').val());
+  encrypt_object.setPublicKey($('#public_key_receiver_form').val());
 
   var location_text = $("#location_text_form").html().trim();
   location_text = encrypt_object.encrypt(location_text);
@@ -197,11 +192,40 @@ function encrypt_tx(){
   var receiver_text = $("#receiver_text_form").html().trim();
   receiver_text = encrypt_object.encrypt(receiver_text);
   console.log("Resultado "+ receiver_text);
+
+  var public_key_receiver_form = $('#public_key_receiver_form').val();
+  date_tx = TODAY.toISOString();
+
+  var posting = $.post("https://genobank-dev-pr-1.herokuapp.com/api/v1/rx-endpoint/",
+                  {
+                    "public_key": public_key_receiver_form,
+                    "patient_name": receiver_text,
+                    "medic_hospital": location_text,
+                    "timestamp": "2018-02-05T07:46:12.576196",
+                    "medic_name": sender_text,
+                    //"timestamp": date_tx,
+                  }, "json");
+
+  posting.done(function(data, text_status){
+    console.log(data);
+    console.log(text_status);
+  });
+  posting.fail(function(xhr, textStatus, errorThrown){
+    //alert(xhr.responseText);
+    $("#result").html(tx_error);
+    console.log(xhr.responseText);
+  });
+  posting.always(function(){
+    console.log("Finish POST!");
+  });
+
 }
 
 $('#button_send_tx').click(function(){
   encrypt_tx();
 });
+
+
 //$('#myLink').addClass('disabled');
 
 //$('#button_test').click(function() {
