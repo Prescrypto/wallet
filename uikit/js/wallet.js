@@ -11,9 +11,9 @@ var alert_success_template = '\
       </button> \
     </div>'
 
-var please_wait_template = '\
+var message_template = '\
     <div class="alert alert-success alert-dismissible fade show" role="alert"> \
-      <strong>Success Key Saved!</strong> Please click on NEXT to continue.\
+      <strong>Success Key Saved!</strong> Please click on NEXT to continue. Also, we recommend saving your keys in .pem files \
       <button type="button" class="close" data-dismiss="alert" aria-label="Close"> \
         <span aria-hidden="true">&times;</span> \
       </button> \
@@ -72,10 +72,6 @@ function save_key(){
     }
   }
 
-$("#button_load").click(function(){
-  validate_keys();
-});
-
 function validate_keys(){
 
   if (validate_privkey() && validate_pubkey()){
@@ -91,6 +87,7 @@ function validate_keys(){
     if(uncrypted === test){
       $('#result').html(alert_success_template);
       save_key();
+      $('#next_button').html(button_next);
     }else{
       $('#result').html(alert_error_template);
     }
@@ -98,6 +95,10 @@ function validate_keys(){
     $('#result').html(alert_error_template);
   }
 }
+
+$("#button_load_copy").click(function(){
+  validate_keys();
+});
 
 function create_keys(){
   console.log("Start genereting keys");
@@ -109,8 +110,8 @@ function create_keys(){
   save_key();
 }
 
-$('#button_create').click(function() {
-  $('#result').html(please_wait_template);
+$('#button_load_new_keys').click(function() {
+  $('#result').html(message_template);
   create_keys();
   $('#next_button').html(button_next);
 });
@@ -218,13 +219,62 @@ function encrypt_tx(){
   posting.always(function(){
     console.log("Finish POST!");
   });
-
 }
 
 $('#button_send_tx').click(function(){
   encrypt_tx();
 });
 
+// function mostrarContenido(contenido) {
+//   var elemento = $('#privkey');
+//   elemento.innerHTML = contenido;
+// }
+
+// function read_file(e) {
+//   var archivo = e.target.files[0];
+//   if (!archivo) {
+//     return;
+//   }
+//   var lector = new FileReader();
+//   lector.onload = function(e) {
+//     var contenido = e.target.result;
+//     mostrarContenido(contenido);
+//   };
+//   lector.readAsText(archivo);
+// }
+
+// $('#private_key_file').addEventListener('change', read_file, false);
+
+// function leerArchivo(e) {
+//   var archivo = e.target.files[0];
+//   if (!archivo) {
+//     return;
+//   }
+//   var lector = new FileReader();
+//   lector.onload = function(e) {
+//     var contenido = e.target.result;
+//     mostrarContenido(contenido);
+//   };
+//   lector.readAsText(archivo);
+// }
+
+// function mostrarContenido(contenido) {
+//   var elemento = document.getElementById('privkey');
+//   elemento.innerHTML = contenido;
+// }
+
+// document.getElementById('file-input')
+//   .addEventListener('change', leerArchivo, false);
+
+
+// $(document).on('ready', function() {
+//     $("#input-b6").fileinput({
+//         showUpload: false,
+//         dropZoneEnabled: false,
+//         maxFileCount: 10,
+//         mainClass: "input-group-lg"
+//     });
+// });
 
 //$('#myLink').addClass('disabled');
 
