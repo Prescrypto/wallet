@@ -67,7 +67,7 @@ $("#button_load_copy").click(function(){
 
 function create_keys(){
   console.log("Start genereting keys");
-  var crypt = new JSEncrypt({default_key_size: 2048});
+  var crypt = new JSEncrypt({default_key_size: 512});
   crypt.getKey();
   $("#privkey").val(crypt.getPrivateKey());
   $("#pubkey").val(crypt.getPublicKey());
