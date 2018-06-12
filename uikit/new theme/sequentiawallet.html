@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Sequentia Wallet</title>
+  <link rel="stylesheet" type="text/css" href="sequentiawallet.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.5/css/uikit.min.css" />
+  <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed:700" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.5/js/uikit.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.5/js/uikit-icons.min.js"></script>
+</head>
+<body>
+<!-- Main menu -->
+<nav class="uk-navbar-container" uk-navbar>
+  <div class="uk-navbar-left">
+  	<ul class="uk-navbar-nav">
+  	  <li><a class="uk-navbar-item uk-logo" href="#">SequentiaWallet</a></li>
+    </ul>
+  </div>
+  <div class="uk-navbar-right">
+    <ul class="uk-navbar-nav">
+      <li><a href="#">Contact</a></li>
+      <li>
+        <form class="uk-search uk-search-default">
+          <span class="uk-search-icon-flip" uk-search-icon></span>
+          <input class="uk-search-input" type="search" placeholder="Search...">
+        </form> 
+      </li>   
+    </ul>
+  </div>
+</nav>
+<!-- Closing Main menu -->
+
+<div class="uk-grid-medium" align="center">
+  <h1 class="welcome"><span style="font-size:50px ">Welcome to</span><br>Genobank</h1>
+  <p>Access your personal genomic information</p>
+  <br>
+  <a class="uk-button uk-button-default uk-width-1-1 uk-margin-small-bottom" href="enterkeys.html">Enter your keys</a>
+  <a class="uk-button uk-button-default uk-width-1-1 uk-margin-small-bottom" href="#modal-example" uk-toggle>Create new keys</a>
+
+<!-- Move mouse for 5 secs -->
+<div id="modal-example" uk-modal>
+  <div class="uk-modal-dialog uk-modal-body">
+    <h2 class="uk-modal-title">Almost there!</h2>
+    <p id="greytxt">Please move your mouse cursor for 5 seconds.</p>
+    <p class="uk-text-right">
+    <img src="media/mouse.png">
+    <a class="uk-button uk-button-default" href="createkeys.html">Next</a>
+    </p>
+  </div>
+</div>
+</div>
+</body>
+</html>

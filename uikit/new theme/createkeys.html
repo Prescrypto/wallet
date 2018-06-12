@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Sequentia Wallet</title>
+  <link rel="stylesheet" type="text/css" href="sequentiawallet.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.5/css/uikit.min.css" />
+  <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed:700" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.5/js/uikit.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.5/js/uikit-icons.min.js"></script>
+</head>
+<body>
+<!-- Main menu -->
+<nav class="uk-navbar-container" uk-navbar>
+  <div class="uk-navbar-left">
+  	<ul class="uk-navbar-nav">
+  	  <li><a class="uk-navbar-item uk-logo" href="#">SequentiaWallet</a></li>
+    </ul>
+  </div>
+  <div class="uk-navbar-right">
+    <ul class="uk-navbar-nav">
+      <li><a href="#">Contact</a></li>
+      <li>
+        <form class="uk-search uk-search-default">
+          <span class="uk-search-icon-flip" uk-search-icon></span>
+          <input class="uk-search-input" type="search" placeholder="Search...">
+        </form> 
+      </li>   
+    </ul>
+  </div>
+</nav>
+<!-- Closing Main menu -->
+
+<div class="uk-grid-medium" align="center">
+  <form class="uk-form-horizontal uk-margin-large">
+    <div class="uk-margin">
+      <label class="uk-form-label" for="form-horizontal-text">Private Keys</label>
+        <div class="uk-form-controls">
+          <input class="uk-input" id="form-horizontal-text" type="text" placeholder="Generate keys">
+        </div>
+    </div>
+    <div class="uk-margin">
+      <label class="uk-form-label" for="form-horizontal-text">Public Keys</label>
+        <div class="uk-form-controls">
+          <input class="uk-input" id="form-horizontal-text" type="text" placeholder="Generate keys">
+        </div>
+    </div>
+   <button class="uk-button uk-button-default" id="whitebutton">Create</button>
+   <a class="uk-button uk-button-default" id="whitebutton" href="genometrics.html">Next</a>
+  </form>
+</div>
+</body>
+</html>
