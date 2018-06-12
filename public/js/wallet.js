@@ -11,6 +11,12 @@ $('#create_entropy').on('click', function() {
   }, 1000);
 });
 
+$('#button_entropy_next').on('click', function() {
+  // go to generate keys
+  document.location.href = 'createkeys.html';
+
+});
+
 function save_key(){
   localforage.setItem('privatekey', $("#privkey").val());
   localforage.setItem('publickey', $("#pubkey").val());
