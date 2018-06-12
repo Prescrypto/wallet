@@ -2,6 +2,9 @@ var PUBLIC_KEY;
 var PRIVATE_KEY;
 var TODAY = new Date();
 
+var next_button = '\
+  <a class="uk-button uk-button-default" href="genometrics.html"> Next </a>'
+
 $('#create_entropy').on('click', function() {
   UIkit.modal($("#modal-example")).show();
   setInterval(function(){
@@ -22,23 +25,22 @@ function save_key(){
   console.log("Set keys on Localstorage");
 }
 
-  function validate_pubkey(){
-    if ($("#pubkey").val().length===0){
+function validate_pubkey(){
+  if ($("#pubkey").val().length===0){
+    return false
+  }else{
+    return true
+  }
+}
+function validate_privkey(){
+  if($("#privkey").val().lengthh===0){
       return false
-    }else{
+  }else{
       return true
-    }
   }
-  function validate_privkey(){
-    if($("#privkey").val().lengthh===0){
-        return false
-    }else{
-        return true
-    }
-  }
+}
 
 function validate_keys(){
-
   if (validate_privkey() && validate_pubkey()){
     // Encrypt with the public key
     var encrypt = new JSEncrypt();
@@ -50,19 +52,24 @@ function validate_keys(){
     decrypt.setPrivateKey($("#privkey").val());
     var uncrypted = decrypt.decrypt(encrypted);
     if(uncrypted === test){
-      $('#result').html(alert_success_template);
+      //$('#result').html(alert_success_template);
+      console.log("Valid Keys");
       save_key();
-      $('#next_button').html(button_next);
+      console.log("Saved Keys");
+      //$('#next_button').html(button_next);
     }else{
-      $('#result').html(alert_error_template);
+      console.log("Error");
     }
   }else{
-    $('#result').html(alert_error_template);
+    console.log("Error");
   }
 }
 
-$("#button_load_copy").click(function(){
+$('#verify_keys').on('click', function(e) {
+  e.preventDefault();
+  console.log("Click saved keys");
   validate_keys();
+  $('#next_button').html(next_button);
 });
 
 function create_keys(){
@@ -73,7 +80,6 @@ function create_keys(){
   $("#pubkey").val(crypt.getPublicKey());
   console.log("Finish");
 }
-
 
 $('#create_keys').on('click', function(e) {
   e.preventDefault();

@@ -35,15 +35,22 @@
     <div class="uk-margin">
       <label class="uk-form-label" for="form-horizontal-text">Private Keys</label>
         <div class="uk-form-controls">
-          <input class="uk-input" id="form-horizontal-text" type="text" placeholder="Paste keys">
+          <input id="privkey" name="privkey" class="uk-input" type="text" placeholder="Paste keys">
         </div>
     </div>
     <div class="uk-margin">
       <label class="uk-form-label" for="form-horizontal-text">Public Keys</label>
         <div class="uk-form-controls">
-          <input class="uk-input" id="form-horizontal-text" type="text" placeholder="Paste keys">
+          <input id="pubkey" name="pubkey" class="uk-input" type="text" placeholder="Paste keys">
         </div>
     </div>
+    <div id="next_button">
+      <button class="uk-button uk-button-default" id="verify_keys"> Verify </button>
+    </div>
+
+
+  </form>
+</div>
 <!--Upload section-->
 <!--<div class="js-upload uk-placeholder uk-text-center">
   <span uk-icon="icon: cloud-upload"></span>
@@ -57,10 +64,13 @@
 <progress id="js-progressbar" class="uk-progress" value="0" max="100" hidden></progress>-->
 
 <!-- Closing upload section-->
-   <a class="uk-button uk-button-default" id="whitebutton" href="createkeys.html">Next</a>
-  </form>
-</div>
+
+
 
 <script type="text/javascript" src="js/enterkeys.js"></script>
+<script src="/js/localforage.min.js"></script>
+<script src="http://code.jquery.com/jquery-1.8.3.min.js"></script>
+<script src="/js/jsencrypt.js"></script>
+<script src="/js/wallet.js"></script>
 </body>
 </html>
