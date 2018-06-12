@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Sequentia Wallet</title>
+  <link rel="stylesheet" type="text/css" href="css/sequentiawallet.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.5/css/uikit.min.css" />
+  <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed:700" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.5/js/uikit.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.5/js/uikit-icons.min.js"></script>
+</head>
+<body>
+<!-- Main menu -->
+<nav class="uk-navbar-container" uk-navbar>
+  <div class="uk-navbar-left">
+  	<ul class="uk-navbar-nav">
+  	  <li><a class="uk-navbar-item uk-logo" href="#">SequentiaWallet</a></li>
+    </ul>
+  </div>
+  <div class="uk-navbar-right">
+    <ul class="uk-navbar-nav">
+      <li><a href="#">Contact</a></li>
+      <li>
+        <form class="uk-search uk-search-default">
+          <span class="uk-search-icon-flip" uk-search-icon></span>
+          <input class="uk-search-input" type="search" placeholder="Search...">
+        </form>
+      </li>
+    </ul>
+  </div>
+</nav>
+<!-- Closing Main menu -->
+
+<div class="uk-grid-medium" align="center">
+  <form class="uk-form-horizontal uk-margin-large">
+    <div id="privkey" class="uk-margin">
+      <label class="uk-form-label" for="form-horizontal-text">Private Keys</label>
+        <div id="privkey" class="uk-form-controls">
+          <input id="privkey" class="uk-input" type="text" placeholder="Generate keys">
+        </div>
+    </div>
+    <div id="pubkey" class="uk-margin">
+      <label class="uk-form-label" for="form-horizontal-text">Public Keys</label>
+        <div id="pubkey" class="uk-form-controls">
+          <input id="pubkey" class="uk-input" type="text" placeholder="Generate keys">
+        </div>
+    </div>
+   <button class="uk-button uk-button-default" id="create_keys">Create</button>
+   <a class="uk-button uk-button-default" id="button_get" href="genometrics.html">Next</a>
+  </form>
+</div>
+
+<script src="/js/localforage.min.js"></script>
+<script src="http://code.jquery.com/jquery-1.8.3.min.js"></script>
+<script src="/js/jsencrypt.js"></script>
+<script src="/js/wallet.js"></script>
+
+</body>
+</html>

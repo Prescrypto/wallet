@@ -1,0 +1,67 @@
+body{
+  background: #5c258d; /* fallback for old browsers */
+  background: -webkit-linear-gradient(to right, #5c258d, #4389a2); /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(to right, #5c258d, #4389a2); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+  height : 100vh;
+}
+div.uk-grid-medium{
+  text-align: left;
+  padding-top: 150px;
+  width:40%;
+  margin: auto;
+}
+.welcome{
+  color:white;
+  font-family: 'Roboto Condensed', sans-serif;
+  font-size: 60px;
+}
+form.uk-search.uk-search-default{
+  margin : 1em;
+}
+p{
+  color:white;
+  font-family: 'Arial Narrow';
+  font-size: 18px;
+}
+a.uk-button.uk-button-default.uk-width-1-1.uk-margin-small-bottom{
+	color:white;
+	font-family: 'Arial Black';
+	border-radius: 6px;
+}
+label.uk-form-label{
+  color: white;
+  font-family: 'Arial Narrow';
+  font-size: 18px;
+  font-weight: 800;
+}
+div.js-upload.uk-placeholder.uk-text-center{
+  color: white;
+}
+span.uk-link{
+  color : #BBB;
+}
+input#form-horizontal-text.uk-input{
+  color:#BBB;
+  background-color: transparent;
+  border : 1px solid white;
+  border-radius: 6px;
+}
+#whitebutton{
+  background-color: white;
+  color : black;
+  font-family: 'Arial Narrow';
+  font-weight: 600;
+  border:0;
+  margin-top: 1em;
+}
+img{
+  margin-bottom: 1em;
+}
+h2.uk-modal-title{
+  color : #583490;
+  font-family: 'Arial Black';
+}
+#greytxt{
+  color: #595959;
+  font-family: 'Arial Italic';
+}
