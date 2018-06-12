@@ -14,7 +14,6 @@ $('#create_entropy').on('click', function() {
 $('#button_entropy_next').on('click', function() {
   // go to generate keys
   document.location.href = 'createkeys.html';
-
 });
 
 function save_key(){
@@ -70,13 +69,15 @@ function create_keys(){
   console.log("Start genereting keys");
   var crypt = new JSEncrypt({default_key_size: 2048});
   crypt.getKey();
-  s("#privkey").val(crypt.getPrivateKey());
+  $("#privkey").val(crypt.getPrivateKey());
   $("#pubkey").val(crypt.getPublicKey());
   console.log("Finish");
-  save_key();
 }
 
-$('#create_keys').click(function() {
+
+$('#create_keys').on('click', function(e) {
+  e.preventDefault();
+  console.log("Click genereting keys");
   create_keys();
 });
 
