@@ -71,6 +71,7 @@ function create_keys(){
   crypt.getKey();
   $("#privkey").val(crypt.getPrivateKey());
   $("#pubkey").val(crypt.getPublicKey());
+  save_key();
   console.log("Finish");
 }
 
