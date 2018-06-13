@@ -13,7 +13,7 @@
 <nav class="uk-navbar-container" uk-navbar>
   <div class="uk-navbar-left">
   	<ul class="uk-navbar-nav">
-  	  <li><a class="uk-navbar-item uk-logo" href="index.html"> SequentiaWallet </a></li>
+  	  <li><a class="uk-navbar-item uk-logo" href="index.html">SequentiaWallet</a></li>
     </ul>
   </div>
   <div class="uk-navbar-right">
@@ -31,29 +31,27 @@
 <!-- Closing Main menu -->
 
 <div class="uk-grid-medium" align="center">
-  <h1 class="welcome"><span style="font-size:50px ">Welcome to</span><br>Genobank</h1>
-  <p>Access your personal genomic information</p>
-  <br>
-  <a class="uk-button uk-button-default uk-width-1-1 uk-margin-small-bottom" href="enterkeys.html">Enter your keys</a>
-  <a id="create_entropy" class="uk-button uk-button-default uk-width-1-1 uk-margin-small-bottom" >Create new keys</a>
-
-<!-- Move mouse for 5 secs -->
-<div id="modal-example" uk-modal>
-  <div class="uk-modal-dialog uk-modal-body">
-    <h2 class="uk-modal-title">Create your keys!</h2>
-    <p id="greytxt">Please move your mouse cursor, to activate the button "Create"</p>
-    <p class="uk-text-right">
-    <img src="media/mouse.png">
-    <button id="create_keys" class="uk-button uk-button-default" href="createkeys.html" disabled>Create</button>
-    </p>
-  </div>
-</div>
-
+  <form class="uk-form-horizontal uk-margin-large">
+    <div class="uk-margin">
+      <label class="uk-form-label" for="form-horizontal-text">Private Keys</label>
+        <div class="uk-form-controls">
+          <textarea id="privkey" name="privkey" class="uk-input" type="text" placeholder="Generate keys"></textarea>
+        </div>
+    </div>
+    <div class="uk-margin">
+      <label class="uk-form-label" for="form-horizontal-text">Public Keys</label>
+        <div class="uk-form-controls">
+          <textarea id="pubkey" name="pubkey" class="uk-input" type="text" placeholder="Generate keys"></textarea>
+        </div>
+    </div>
+   <a class="uk-button uk-button-default" href="genometrics.html">Next</a>
+  </form>
 </div>
 
 <script src="js/localforage.min.js"></script>
 <script src="https://code.jquery.com/jquery-1.8.3.min.js"></script>
 <script src="js/jsencrypt.js"></script>
 <script src="js/wallet.js"></script>
+
 </body>
 </html>

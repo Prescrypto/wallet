@@ -2,54 +2,17 @@ var PUBLIC_KEY;
 var PRIVATE_KEY;
 var TODAY = new Date();
 
-// alert sucess templating
-var alert_success_template = '\
-    <div class="alert alert-success alert-dismissible fade show" role="alert"> \
-      <strong>Success Key Saved!</strong> You can go to the next page safety! \
-      <button type="button" class="close" data-dismiss="alert" aria-label="Close"> \
-        <span aria-hidden="true">&times;</span> \
-      </button> \
-    </div>'
+var next_button = '\
+  <a class="uk-button uk-button-default" href="genometrics.html"> Next </a>'
 
-var message_template = '\
-    <div class="alert alert-success alert-dismissible fade show" role="alert"> \
-      <strong>Success Key Saved!</strong> Please click on NEXT to continue. Also, we recommend saving your keys in .pem files \
-      <button type="button" class="close" data-dismiss="alert" aria-label="Close"> \
-        <span aria-hidden="true">&times;</span> \
-      </button> \
-    </div>'
-
-var tx_success = '\
-    <div class="alert alert-success alert-dismissible fade show" role="alert"> \
-      <strong>Successful TX!</strong>\
-      <button type="button" class="close" data-dismiss="alert" aria-label="Close"> \
-        <span aria-hidden="true">&times;</span> \
-      </button> \
-    </div>'
-
-// alert error template
-var alert_error_template = '\
-    <div class="alert alert-danger alert-dismissible fade show" role="alert"> \
-      <strong>ERROR!</strong> Please, check your keys! \
-      <button type="button" class="close" data-dismiss="alert" aria-label="Close"> \
-        <span aria-hidden="true">&times;</span> \
-      </button> \
-    </div>'
-
-var tx_error = '\
-    <div class="alert alert-danger alert-dismissible fade show" role="alert"> \
-      <strong>ERROR!</strong> An error ocurred when making the Tx. \
-      <button type="button" class="close" data-dismiss="alert" aria-label="Close"> \
-        <span aria-hidden="true">&times;</span> \
-      </button> \
-    </div>'
-
-// buttons
-var button_next = '\
-  <a id="next_button" href="/pages/list_tx.html">\
-    <button id="button_next" class="btn btn-primary btn-lg active"> NEXT </button>\
-  <\a>'
-
+$('#create_entropy').on('click', function() {
+  UIkit.modal($("#modal-example")).show();
+  setInterval(function(){
+    if(document.entropy >= 500){
+      $("#create_keys").removeAttr("disabled");
+    }
+  }, 1000);
+});
 
 function save_key(){
   localforage.setItem('privatekey', $("#privkey").val());
@@ -57,27 +20,26 @@ function save_key(){
   console.log("Set keys on Localstorage");
 }
 
-  function validate_pubkey(){
-    if ($("#pubkey").val().length===0){
+function validate_pubkey(){
+  if ($("#pubkey").val().length===0){
+    return false
+  }else{
+    return true
+  }
+}
+function validate_privkey(){
+  if($("#privkey").val().lengthh===0){
       return false
-    }else{
+  }else{
       return true
-    }
   }
-  function validate_privkey(){
-    if($("#privkey").val().lengthh===0){
-        return false
-    }else{
-        return true
-    }
-  }
+}
 
 function validate_keys(){
-
   if (validate_privkey() && validate_pubkey()){
     // Encrypt with the public key
     var encrypt = new JSEncrypt();
-    var test = 'This a test'
+    var test = 'This a test';
     encrypt.setPublicKey($("#pubkey").val());
     var encrypted = encrypt.encrypt(test);
     // Decrypt with the private key
@@ -85,40 +47,43 @@ function validate_keys(){
     decrypt.setPrivateKey($("#privkey").val());
     var uncrypted = decrypt.decrypt(encrypted);
     if(uncrypted === test){
-      $('#result').html(alert_success_template);
+      console.log("Valid Keys");
       save_key();
-      $('#next_button').html(button_next);
+      console.log("Saved Keys");
+      $('#next_button').html(next_button);
     }else{
-      $('#result').html(alert_error_template);
+      console.log("Error");
     }
   }else{
-    $('#result').html(alert_error_template);
+    console.log("Error");
   }
 }
 
-$("#button_load_copy").click(function(){
+$('#verify_keys').on('click', function(e) {
+  e.preventDefault();
+  console.log("Click saved keys");
   validate_keys();
 });
 
 function create_keys(){
   console.log("Start genereting keys");
-  var crypt = new JSEncrypt({default_key_size: 2048});
+  var crypt = new JSEncrypt({default_key_size: 512});
   crypt.getKey();
   $("#privkey").val(crypt.getPrivateKey());
   $("#pubkey").val(crypt.getPublicKey());
+  save_key();
   console.log("Finish");
   save_key();
 }
 
-$('#button_load_new_keys').click(function() {
-  $('#result').html(message_template);
+$('#create_keys').on('click', function(e) {
+  document.location.href = 'createkeys.html';
+  e.preventDefault();
+  console.log("Click genereting keys");
   create_keys();
-  $('#next_button').html(button_next);
 });
 
-
 $('#next_button').click(function (){
-
 });
 
 // function decrypt_fields(){

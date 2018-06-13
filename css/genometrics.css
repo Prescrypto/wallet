@@ -1,0 +1,50 @@
+body{
+  background-color: #EAEAEA;
+  min-height: 100vh;
+}
+form.uk-search.uk-search-default{
+  margin : 1em;
+}
+div.uk-grid-medium{
+  text-align: left;
+  padding-top: 150px;
+  width:400px;
+  margin: auto;
+  padding-right: 20px;
+}
+h2{
+  color:#3F3F3F !important; 
+  font-family: 'Arial black' !important;
+}
+#genotitle{
+   color:#583490 !important;
+   font-family: 'Arial black' !important;
+   font-size: 1em;
+   font-style: normal;
+}
+p{
+  color:#595959;
+  font-family: 'Arial';
+  font-style: italic;
+  margin:0 !important;
+}
+a:hover{
+  text-decoration: none !important;
+}
+
+div.uk-child-width-expand.uk-grid{ 
+  margin: 20px;
+}
+.uk-card.uk-card-default.uk-card-body{
+  margin:10px;
+}
+#backbtn{
+  background-color: #666666;
+  font-family: 'Arial black' !important;
+  color: white;
+}
+#decryptbtn{
+  background-color: #583490;
+  font-family: 'Arial black' !important;
+  color: white;
+}
