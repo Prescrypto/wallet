@@ -33,13 +33,13 @@
 <div class="uk-grid-medium" align="center">
   <form class="uk-form-horizontal uk-margin-large">
     <div class="uk-margin">
-      <label class="uk-form-label" for="form-horizontal-text">Private Keys</label>
+      <label class="uk-form-label" for="form-horizontal-text">Private Key</label>
         <div class="uk-form-controls">
           <textarea id="privkey" name="privkey" class="uk-input" type="text" placeholder="Generate keys"></textarea>
         </div>
     </div>
     <div class="uk-margin">
-      <label class="uk-form-label" for="form-horizontal-text">Public Keys</label>
+      <label class="uk-form-label" for="form-horizontal-text">Public Key</label>
         <div class="uk-form-controls">
           <textarea id="pubkey" name="pubkey" class="uk-input" type="text" placeholder="Generate keys"></textarea>
         </div>
@@ -54,21 +54,19 @@
 <script src="js/wallet.js"></script>
 <script>
     $(document).ready(function() {
-      // aqui va el codigo que se ejecuta despues de que cargue la pagina
-      (function ($){
-        // set the keys on textarea onload page
-        function create_keys(){
-          console.log("Start genereting keys");
-          var crypt = new JSEncrypt({default_key_size: 512});
-          crypt.getKey();
-          $("#privkey").val(crypt.getPrivateKey());
-          $("#pubkey").val(crypt.getPublicKey());
-          save_key();
-          console.log("Finish");
+      (function ($, localforage){
+        //Get the keys from localforage
+        function setKeys(){
+          localforage.getItem('privatekey', function(err, value){
+            $('#privkey').val(value);
+          });
+          localforage.getItem('publickey', function(err, value){
+            $('#pubkey').val(value);
+          });
         };
-        create_keys();
-      })($);
+        setKeys();
+      })($, localforage);
     });
-  </script>
+</script>
 </body>
 </html>
