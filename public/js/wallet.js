@@ -39,7 +39,7 @@ function validate_keys(){
   if (validate_privkey() && validate_pubkey()){
     // Encrypt with the public key
     var encrypt = new JSEncrypt();
-    var test = 'This a test'
+    var test = 'This a test';
     encrypt.setPublicKey($("#pubkey").val());
     var encrypted = encrypt.encrypt(test);
     // Decrypt with the private key
@@ -47,11 +47,10 @@ function validate_keys(){
     decrypt.setPrivateKey($("#privkey").val());
     var uncrypted = decrypt.decrypt(encrypted);
     if(uncrypted === test){
-      //$('#result').html(alert_success_template);
       console.log("Valid Keys");
       save_key();
       console.log("Saved Keys");
-      //$('#next_button').html(button_next);
+      $('#next_button').html(next_button);
     }else{
       console.log("Error");
     }
@@ -64,7 +63,6 @@ $('#verify_keys').on('click', function(e) {
   e.preventDefault();
   console.log("Click saved keys");
   validate_keys();
-  $('#next_button').html(next_button);
 });
 
 function create_keys(){
