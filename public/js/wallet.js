@@ -9,14 +9,9 @@ $('#create_entropy').on('click', function() {
   UIkit.modal($("#modal-example")).show();
   setInterval(function(){
     if(document.entropy >= 500){
-      $("#button_entropy_next").removeAttr("disabled");
+      $("#create_keys").removeAttr("disabled");
     }
   }, 1000);
-});
-
-$('#button_entropy_next').on('click', function() {
-  // go to generate keys
-  document.location.href = 'createkeys.html';
 });
 
 function save_key(){
@@ -79,17 +74,17 @@ function create_keys(){
   $("#privkey").val(crypt.getPrivateKey());
   $("#pubkey").val(crypt.getPublicKey());
   console.log("Finish");
+  save_key();
 }
 
 $('#create_keys').on('click', function(e) {
+  document.location.href = 'createkeys.html';
   e.preventDefault();
   console.log("Click genereting keys");
   create_keys();
 });
 
-
 $('#next_button').click(function (){
-
 });
 
 // function decrypt_fields(){
