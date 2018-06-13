@@ -5,6 +5,7 @@ var TODAY = new Date();
 var next_button = '\
   <a class="uk-button uk-button-default" href="genometrics.html"> Next </a>'
 
+
 $('#create_entropy').on('click', function() {
   UIkit.modal($("#modal-example")).show();
   setInterval(function(){
@@ -15,12 +16,14 @@ $('#create_entropy').on('click', function() {
 });
 
 function save_key(){
+  //Save keys in localforage
   localforage.setItem('privatekey', PRIVATE_KEY);
   localforage.setItem('publickey', PUBLIC_KEY);
   console.log("Set keys on Localstorage");
 }
 
 function validate_pubkey(){
+  //Verify if the field pubkey is empty
   if ($("#pubkey").val().length===0){
     return false
   }else{
@@ -28,6 +31,7 @@ function validate_pubkey(){
   }
 }
 function validate_privkey(){
+  //Verify if the field privkey is empty
   if($("#privkey").val().lengthh===0){
       return false
   }else{
@@ -36,6 +40,7 @@ function validate_privkey(){
 }
 
 function validate_keys(){
+  //Is a small test for validate the keys
   if (validate_privkey() && validate_pubkey()){
     // Encrypt with the public key
     var encrypt = new JSEncrypt();
@@ -52,9 +57,11 @@ function validate_keys(){
       console.log("Saved Keys");
       $('#next_button').html(next_button);
     }else{
+      //$('#alert').html(alert);
       console.log("Error");
     }
   }else{
+    //$('#alert').html(alert);
     console.log("Error");
   }
 }
@@ -82,8 +89,25 @@ $('#create_keys').on('click', function(e) {
   create_keys();
 });
 
-$('#next_button').click(function (){
+$('#create_new').on('click', function(e){
+  e.preventDefault();
+  e.target.blur();
+  UIkit.modal.prompt('Name:','Your name').then(function(name){
+     console.log('Prompted:', name)
+  });
 });
+
+
+//     UIkit.util.on('#js-modal-prompt', 'click', function (e) {
+//            e.preventDefault();
+//            e.target.blur();
+//            UIkit.modal.prompt('Name:', 'Your name').then(function (name) {
+//                console.log('Prompted:', name)
+//            });
+//        });
+
+// $('#next_button').click(function (){
+// });
 
 // function decrypt_fields(){
 //   // descrypt function
