@@ -30,9 +30,16 @@
 </nav>
 <!-- Closing Main menu -->
 
+<!-- Hidden keys -->
+<aside style="display:none;">
+  <textarea id="pub_key"></textarea>
+  <textarea id="priv_key"></textarea>
+</aside>
+<!--End Hidden keys  -->
+
 <div class="uk-grid-medium" align="center">
   <h2>Your Genometrics</h2>
-  <div class="uk-child-width-1-1@s" uk-grid>
+  <section class="uk-child-width-1-1@s" uk-grid>
     <div>
       <div id="genocontent" uk-sortable="group: sortable-group">
 
@@ -81,10 +88,42 @@
         </a>
       </div>
     </div>
-  </div>
+  </section>
   <button type="button" onclick="addFunc()" id="add" uk-icon="icon:plus">Add genometrics </button>
 </div>
 <br>
-<script type="text/javascript" src="js/genometrics.js"></script>
+
+  <!-- Script block -->
+  <script type="text/javascript" src="js/genometrics.js"></script>
+  <script src="js/localforage.min.js"></script>
+  <script src="https://code.jquery.com/jquery-1.8.3.min.js"></script>
+  <script>
+    $(document).ready(function() {
+      // aqui va el codigo que se ejecuta despues de que cargue la pagina
+      (function ($, localforage){
+        // set the keys on textarea onload page
+        function setKeys(){
+          localforage.getItem('privatekey', function(err, value){
+            $('#priv_key').val(value);
+          });
+          localforage.getItem('publickey', function(err, value){
+            $('#pub_key').val(value);
+            // Get Txs when load page!
+            var list_rx = [];
+            var pubkey_uri= encodeURI(value);
+            var url = "https://genobank.herokuapp.com/api/v1/rx-endpoint/?public_key=" + pubkey_uri;
+            console.log(value);
+            console.log("URL: "+ url);
+            $.get(url, function(data) {
+              console.log(data);
+              console.log("Finish get!");
+            });
+          });
+
+        };
+        setKeys();
+      })($, localforage);
+    });
+  </script>
 </body>
 </html>
