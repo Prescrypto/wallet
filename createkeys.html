@@ -52,6 +52,23 @@
 <script src="https://code.jquery.com/jquery-1.8.3.min.js"></script>
 <script src="js/jsencrypt.js"></script>
 <script src="js/wallet.js"></script>
-
+<script>
+    $(document).ready(function() {
+      // aqui va el codigo que se ejecuta despues de que cargue la pagina
+      (function ($){
+        // set the keys on textarea onload page
+        function create_keys(){
+          console.log("Start genereting keys");
+          var crypt = new JSEncrypt({default_key_size: 512});
+          crypt.getKey();
+          $("#privkey").val(crypt.getPrivateKey());
+          $("#pubkey").val(crypt.getPublicKey());
+          save_key();
+          console.log("Finish");
+        };
+        create_keys();
+      })($);
+    });
+  </script>
 </body>
 </html>
