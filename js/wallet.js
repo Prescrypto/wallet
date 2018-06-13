@@ -8,15 +8,15 @@ var next_button = '\
 $('#create_entropy').on('click', function() {
   UIkit.modal($("#modal-example")).show();
   setInterval(function(){
-    if(document.entropy >= 500){
+    if(document.entropy >= 1500){
       $("#create_keys").removeAttr("disabled");
     }
   }, 1000);
 });
 
 function save_key(){
-  localforage.setItem('privatekey', $("#privkey").val());
-  localforage.setItem('publickey', $("#pubkey").val());
+  localforage.setItem('privatekey', PRIVATE_KEY);
+  localforage.setItem('publickey', PUBLIC_KEY);
   console.log("Set keys on Localstorage");
 }
 
@@ -69,11 +69,10 @@ function create_keys(){
   console.log("Start genereting keys");
   var crypt = new JSEncrypt({default_key_size: 512});
   crypt.getKey();
-  $("#privkey").val(crypt.getPrivateKey());
-  $("#pubkey").val(crypt.getPublicKey());
+  PRIVATE_KEY = crypt.getPrivateKey();
+  PUBLIC_KEY = crypt.getPublicKey();
   save_key();
   console.log("Finish");
-  save_key();
 }
 
 $('#create_keys').on('click', function(e) {
