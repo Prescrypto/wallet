@@ -5,6 +5,10 @@ var TODAY = new Date();
 var next_button = '\
   <a class="uk-button uk-button-default" href="genometrics.html"> Next </a>'
 
+var alert = '<div  class="uk-alert-danger" uk-alert>\
+  <a class="uk-alert-close" uk-close></a>\
+  <p id="alert">Error. You have entered invalid data. Please try again.</p>\
+  </div>'
 
 $('#create_entropy').on('click', function() {
   UIkit.modal($("#modal-example")).show();
@@ -57,11 +61,11 @@ function validate_keys(){
       console.log("Saved Keys");
       $('#next_button').html(next_button);
     }else{
-      //$('#alert').html(alert);
+      $('#alert').html(alert);
       console.log("Error");
     }
   }else{
-    //$('#alert').html(alert);
+    $('#alert').html(alert);
     console.log("Error");
   }
 }
