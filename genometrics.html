@@ -2,7 +2,7 @@
 <html>
 <head>
   <title>Sequentia Wallet</title>
-  <link rel="stylesheet" type="text/css" href="css/genometrics.css">
+  <link rel="stylesheet" type="text/css" href="genometrics.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.5/css/uikit.min.css" />
   <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed:700" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.5/js/uikit.min.js"></script>
@@ -12,8 +12,8 @@
 <!-- Main menu -->
 <nav class="uk-navbar-container" uk-navbar>
   <div class="uk-navbar-left">
-  	<ul class="uk-navbar-nav">
-  	  <li><a class="uk-navbar-item uk-logo" href="index.html">SequentiaWallet</a></li>
+    <ul class="uk-navbar-nav">
+      <li><a class="uk-navbar-item uk-logo" href="#">SequentiaWallet</a></li>
     </ul>
   </div>
   <div class="uk-navbar-right">
@@ -30,26 +30,19 @@
 </nav>
 <!-- Closing Main menu -->
 
-<!-- Hidden keys -->
-<aside style="display:none;">
-  <textarea id="pub_key"></textarea>
-  <textarea id="priv_key"></textarea>
-</aside>
-<!--End Hidden keys  -->
-
 <div class="uk-grid-medium" align="center">
   <h2>Your Genometrics</h2>
-  <section class="uk-child-width-1-1@s" uk-grid>
+  <div class="uk-child-width-1-1@s" uk-grid>
     <div>
       <div id="genocontent" uk-sortable="group: sortable-group">
 
         <a id="genome" href="genodetails.html">
         <div class="uk-margin">
           <div class="uk-card uk-card-default uk-card-body uk-card-small">
-          	<div class="uk-column-1-2">
-          	  <img align="center" src="media/dna-icon.png">
-          	  <p><span id="genotitle">Genome</span><br>Family and Gene</p>
-          	</div>
+            <div class="uk-column-1-2">
+              <img align="center" src="media/dna-icon.png">
+              <p><span id="genotitle">Genome</span><br>Family and Gene</p>
+            </div>
           </div>
         </div>
         </a>
@@ -57,10 +50,10 @@
         <a id="phenome" href="genodetails.html">
         <div class="uk-margin">
           <div class="uk-card uk-card-default uk-card-body uk-card-small">
-          	<div class="uk-column-1-2">
-          	  <img align="center" src="media/phenome-icon.png">
-          	  <p><span id="genotitle">Phenome</span><br>Biometrics</p>
-          	</div>
+            <div class="uk-column-1-2">
+              <img align="center" src="media/phenome-icon.png">
+              <p><span id="genotitle">Phenome</span><br>Biometrics</p>
+            </div>
           </div>
         </div>
         </a>
@@ -68,10 +61,10 @@
         <a id="proteome" href="genodetails.html">
         <div class="uk-margin">
           <div class="uk-card uk-card-default uk-card-body uk-card-small">
-          	<div class="uk-column-1-2">
-          	  <img align="center" src="media/proteome-icon.png">
-          	  <p><span id="genotitle">Proteome</span><br>Lab Tests</p>
-          	</div>
+            <div class="uk-column-1-2">
+              <img align="center" src="media/proteome-icon.png">
+              <p><span id="genotitle">Proteome</span><br>Lab Tests</p>
+            </div>
           </div>
         </div>
         </a>
@@ -79,20 +72,54 @@
         <a id="clinome" href="genodetails.html">
         <div class="uk-margin">
           <div class="uk-card uk-card-default uk-card-body uk-card-small">
-          	<div class="uk-column-1-2">
-          	  <img align="center" src="media/clinome-icon.png">
-          	  <p><span id="genotitle">Clinome</span><br>Diagnostics</p>
-          	</div>
+            <div class="uk-column-1-2">
+              <img align="center" src="media/clinome-icon.png">
+              <p><span id="genotitle">Clinome</span><br>Diagnostics</p>
+            </div>
           </div>
         </div>
         </a>
       </div>
     </div>
-  </section>
-  <button type="button" onclick="addFunc()" id="add" uk-icon="icon:plus">Add genometrics </button>
+  </div>
+<!-- Menu on Add Genometrics-->
+<button class="uk-button uk-button-default" type="button" uk-icon="icon:plus">Add Genometrics  </button>
+<div uk-dropdown>
+  <ul class="uk-nav uk-dropdown-nav">
+    <li class="uk-nav-header">Choose new Genometrics from list</li>
+    <li class="uk-nav-divider"></li>
+    <li><a onclick="addFunc()">Genome</a></li>
+    <li><a onclick="addFunc()">Phenome</a></li>
+    <li><a onclick="addFunc()">Proteome</a></li>
+    <li><a onclick="addFunc()">Clinome</a></li>
+  </ul>
 </div>
-<br>
+<!-- Closing Menu Add Genometrics-->
+<!-- Menu Create form -->
+<button class="uk-button uk-button-default" type="button">Create</button>
+<div uk-dropdown>
+  <div id="formcontent">
+    <ul id="inputGroup" class="uk-nav uk-dropdown-nav">
+     <form id="inputGroup" class="uk-grid-small" uk-grid action="" method="post">
+      <div class="uk-width-1-2@s">
+        <input class="uk-input" type="text" placeholder="Country">
+      </div>
+      <div class="uk-width-1-2@s">
+        <input class="uk-input" type="text" placeholder="Percentage">
+      </div>
+     </form>
+    </ul>
+  </div>
+  <div id="formButtons">
+    <button class="uk-button uk-button-default" type="button" onclick="addForm()" uk-icon="icon:plus">Add New  </button>
+    <button class="uk-button uk-button-default" type="button" onclick="removeForm()" uk-close>Remove  </button>
+    <button class="uk-button uk-button-default" type="submit">Submit</button>
+  </div>
+</div>
+<!-- Closing create form-->
+</div>
 
+<br>
   <!-- Script block -->
   <script type="text/javascript" src="js/genometrics.js"></script>
   <script src="js/localforage.min.js"></script>
