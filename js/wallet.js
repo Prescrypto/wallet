@@ -7,7 +7,7 @@ var next_button = '\
 
 var alert = '<div  class="uk-alert-danger" uk-alert>\
   <a class="uk-alert-close" uk-close></a>\
-  <p id="alert">Error. You have entered invalid data. Please try again.</p>\
+  <p id="alert">Error. You have entered invalid keys; Please try again.</p>\
   </div>'
 
 $('#create_entropy').on('click', function() {
@@ -34,6 +34,7 @@ function validate_pubkey(){
     return true
   }
 }
+
 function validate_privkey(){
   //Verify if the field privkey is empty
   if($("#privkey").val().lengthh===0){
@@ -101,6 +102,21 @@ $('#create_new').on('click', function(e){
   });
 });
 
+function addForm(){
+  formcontent.innerHTML += `<ul>${document.getElementById("inputGroup").innerHTML}</ul>`;
+}
+
+$('#add_field').on('click', function(){
+
+});
+
+function addFunc(){
+    genocontent.innerHTML += `<a>${document.getElementById("genome").innerHTML}</a>`
+}
+
+$('#add_field').on('click', function(){
+
+});
 
 //     UIkit.util.on('#js-modal-prompt', 'click', function (e) {
 //            e.preventDefault();

@@ -1,7 +1,7 @@
-var add = document.getElementById ("addButton");
+//var add = document.getElementById ("addButton");
 
 function addFunc(){
-        genocontent.innerHTML += `<a>${document.getElementById("genome").innerHTML}</a>`
+    genocontent.innerHTML += `<a>${document.getElementById("genome").innerHTML}</a>`
 }
 
 function addForm(){

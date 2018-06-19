@@ -13,7 +13,7 @@ div.uk-grid-medium{
   padding-right: 20px;
 }
 h2{
-  color:#3F3F3F !important; 
+  color:#3F3F3F !important;
   font-family: 'Arial black' !important;
 }
 #genotitle{
@@ -32,7 +32,7 @@ a:hover{
   text-decoration: none !important;
 }
 
-div.uk-child-width-expand.uk-grid{ 
+div.uk-child-width-expand.uk-grid{
   margin: 20px;
 }
 .uk-card.uk-card-default.uk-card-body{
@@ -47,4 +47,10 @@ div.uk-child-width-expand.uk-grid{
   background-color: #583490;
   font-family: 'Arial black' !important;
   color: white;
+}
+.uk-button-default{
+  margin-bottom: 20px !important;
+}
+#formButtons{
+  margin-top:10px;
 }
