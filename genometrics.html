@@ -30,6 +30,13 @@
   </nav>
   <!-- Closing Main menu -->
 
+  <!-- BEGIN Aside pub and private keys -->
+  <aside style="display:none;">
+    <textarea id="pub_key"></textarea>
+    <textarea id="priv_key"></textarea>
+  </aside>
+  <!-- END Aside pub and private keys -->
+
   <div class="uk-grid-medium" align="center">
     <h2>Your Genometrics</h2>
     <div class="uk-child-width-1-1@s" uk-grid>
@@ -119,17 +126,19 @@
             // Get Txs when load page!
             var list_rx = [];
             var pubkey_uri= encodeURIComponent(value_b64).replace(/'/g,"%27").replace(/"/g,"%22");
-
-            var url = "https://genobank-dev-pr-4.herokuapp.com/api/v1/rx-endpoint/?public_key=" + pubkey_uri;
+            var pubkey_uri_test = "MIGeMA0GCSqGSIb3DQEBAQUAA4GMADCBiAKBgH7YXT4ZgPDvGei%2Bi%2FIcIbGteVCR%2BVemkPJWiTShUgDC7P3K69VXowXZOYnQiRHeGzmM5llsHBkf4xVCDJKvclGoBZgaCZONebEGVBWOaY3vtzaQ400tYZpGjaObqBKn6TgM18vRbGI6xbt0VjKc0K%2FoGDKyzFXwPcxcN9IA6AuvAgMBAAE%3D"
+            var url = "https://genobank-dev-pr-4.herokuapp.com/api/v1/rx-endpoint/?public_key=" + pubkey_uri_test;
             //console.log(value);
             //console.log("URL: "+ url);
             $.get(url, function(data) {
               // get data from server
               if (data.results.length == 0){
+                // render no tx label
                 $("#genocontent").html("<span id='non-item'>Without Txs :( Start creating new one!</span>");
               }else{
                 data.results.forEach(function(item) {
                   console.log(item); // remove later
+                  // add tx to template
                   add_tx_markup(item);
                 });
               }
