@@ -1,6 +1,7 @@
 var PUBLIC_KEY;
 var PRIVATE_KEY;
 var TODAY = new Date();
+var LIST = [];
 
 var next_button = '\
   <a class="uk-button uk-button-default" href="genometrics.html"> Next </a>'
@@ -102,22 +103,100 @@ $('#create_new').on('click', function(e){
   });
 });
 
-function addForm(){
-  formcontent.innerHTML += `<ul>${document.getElementById("inputGroup").innerHTML}</ul>`;
-}
-
-$('#add_field').on('click', function(){
-
-});
-
 function addFunc(){
     genocontent.innerHTML += `<a>${document.getElementById("genome").innerHTML}</a>`
 }
 
-$('#add_field').on('click', function(){
-
+$('#add').on('click', function(){
+  addFunc();
 });
 
+function add_field(){
+  $('#table_fields tr:last').after('\
+    <tr>\
+      <td>\
+        <input class="uk-input" type="text" placeholder=" Country" required>\
+      </td>\
+      <td>\
+        <input class="uk-input" type="number" placeholder="   Percentage (Only numbers)" required>\
+      </td>\
+    </tr>');
+}
+
+$('#add_field').on('click', function(){
+  add_field();
+});
+
+function remove_field(){
+  $('#table_fields tr:last').remove();
+}
+
+$('#remove_field').on('click',function(){
+  var length_table = $('#table_fields tr').length;
+  if(length_table >= 3){
+    remove_field();
+  }else{
+    console.log('No puede borrar');
+  }
+});
+
+function read_input(){
+  $.each($('#table_fields td').children(), function(){
+    value_input = $(this).val();
+    LIST.push(value_input);
+  });
+  console.log("Read input");
+  return list_input=LIST;
+}
+
+function create_payload(){
+  var index = 1;
+  var data_payload = [];
+  var payload = new Object();
+  var encrypt = new JSEncrypt();
+
+  for (index; index<list_input.length; index++){
+    if (index%2){
+      data_payload.push({"country_name":list_input[index-1],"percentage":list_input[index]});
+    }
+  }
+
+  var times = TODAY.toISOString();
+  payload.timestamp = times;
+
+  localforage.getItem('publickey', function(err, value){
+    encrypt.setPublicKey(value);
+    payload.public_key = encrypt.getPublicKeyB64();
+
+    payload.data = JSON.stringify(data_payload);
+
+    payload.location = "Mexico";
+
+    payload.signature = "FiQBQIimp0YgnxYuI4kFrME9CTxu9T7eTGOmlG+Bs5alN+7MXtQRr4KgD0rANNf/hIbLZWt5A/FPLOWtv/UriA==";
+
+    console.log("Create payload: ");
+    console.log(payload);
+
+    var posting = $.post("https://genobank-dev-pr-4.herokuapp.com/api/v1/rx-endpoint/",
+                    payload);
+
+    posting.done(function(data, text_status){
+      console.log(data);
+      console.log(text_status);
+    });
+    posting.fail(function(xhr, textStatus, errorThrown){
+      console.log(xhr.responseText);
+    });
+    posting.always(function(){
+      console.log("Finish POST!");
+    });
+  });
+}
+
+$('#send_data').on('click', function(){
+  read_input();
+  create_payload();
+});
 //     UIkit.util.on('#js-modal-prompt', 'click', function (e) {
 //            e.preventDefault();
 //            e.target.blur();

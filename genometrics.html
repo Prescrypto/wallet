@@ -83,8 +83,9 @@
     </div>
   </div>
 <!-- Menu on Add Genometrics-->
-<button class="uk-button uk-button-default" type="button" uk-icon="icon:plus"> Add Genometrics  </button>
-<div uk-dropdown>
+<!--<button class="uk-button uk-button-default" type="button" uk-icon="icon:plus"> Add Genometrics  </button>-->
+<button type="button" id="add" uk-icon="icon:plus"> Add genometrics </button>
+<!--<div uk-dropdown>
   <ul class="uk-nav uk-dropdown-nav">
     <li class="uk-nav-header">Choose new Genometrics from list</li>
     <li class="uk-nav-divider"></li>
@@ -93,27 +94,37 @@
     <li><a onclick="addFunc()">Proteome</a></li>
     <li><a onclick="addFunc()">Clinome</a></li>
   </ul>
-</div>
+</div>-->
 <!-- Closing Menu Add Genometrics-->
 <!-- Menu Create form -->
 <button class="uk-button uk-button-default" type="button">Create</button>
-<div uk-dropdown>
+<div id='fields' uk-dropdown>
   <div id="formcontent">
-    <ul id="inputGroup" class="uk-nav uk-dropdown-nav">
-     <form id="inputGroup" class="uk-grid-small" uk-grid action="" method="post">
-      <div class="uk-width-1-2@s">
-        <input class="uk-input" type="text" placeholder="Country">
-      </div>
-      <div class="uk-width-1-2@s">
-        <input class="uk-input" type="text" placeholder="Percentage">
-      </div>
-     </form>
-    </ul>
+    <div id="inputGroup1" class="uk-nav uk-dropdown-nav">
+      <form id="inputGroup" class="uk-grid-small" uk-grid action="" method="post">
+        <table id="table_fields" class="uk-table uk-table-responsive">
+          <thead>
+            <tr>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <input class="uk-input" type="text" placeholder=" Country" required>
+              </td>
+              <td>
+                <input class="uk-input" type="number" placeholder="Percentage (Only numbers)" required>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </form>
+    </div>
   </div>
   <div id="formButtons">
     <button name="add_field" id="add_field" class="uk-button uk-button-default" type="button" uk-icon="icon:plus"> Add New  </button>
-    <button class="uk-button uk-button-default" type="button" onclick="removeForm()" uk-close> Remove  </button>
-    <button class="uk-button uk-button-default" type="submit">Submit</button>
+    <button name="remove_field" id="remove_field" class="uk-button uk-button-default" type="button" uk-close> Remove  </button>
+    <button id="send_data" class="uk-button uk-button-default" type="submit"> Submit </button>
   </div>
 </div>
 <!-- Closing create form-->
@@ -123,22 +134,27 @@
 <!--<script type="text/javascript" src="js/genometrics.js"></script>-->
   <script src="js/localforage.min.js"></script>
   <script src="https://code.jquery.com/jquery-1.8.3.min.js"></script>
+  <script src="js/jsencrypt.js"></script>
   <script src="js/wallet.js"></script>
   <script>
     $(document).ready(function() {
       // aqui va el codigo que se ejecuta despues de que cargue la pagina
       (function ($, localforage){
         // set the keys on textarea onload page
+        var encrypt = new JSEncrypt();
         function setKeys(){
           localforage.getItem('privatekey', function(err, value){
             $('#priv_key').val(value);
           });
           localforage.getItem('publickey', function(err, value){
             $('#pub_key').val(value);
+            encrypt.setPublicKey(value);
+            value_b64 = encrypt.getPublicKeyB64();
             // Get Txs when load page!
             var list_rx = [];
-            var pubkey_uri= encodeURI(value);
-            var url = "https://genobank.herokuapp.com/api/v1/rx-endpoint/?public_key=" + pubkey_uri;
+            var pubkey_uri= encodeURIComponent(value_b64).replace(/'/g,"%27").replace(/"/g,"%22");
+            var url = "https://genobank-dev-pr-4.herokuapp.com/api/v1/rx-endpoint/?public_key=" + pubkey_uri;
+            console.log(url);
             //console.log(value);
             //console.log("URL: "+ url);
             $.get(url, function(data) {
