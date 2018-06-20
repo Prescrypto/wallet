@@ -9,134 +9,100 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.5/js/uikit-icons.min.js"></script>
 </head>
 <body>
-<!-- Main menu -->
-<nav class="uk-navbar-container" uk-navbar>
-  <div class="uk-navbar-left">
-    <ul class="uk-navbar-nav">
-      <li><a class="uk-navbar-item uk-logo" href="index.html">SequentiaWallet</a></li>
-    </ul>
-  </div>
-  <div class="uk-navbar-right">
-    <ul class="uk-navbar-nav">
-      <li><a href="#">Contact</a></li>
-      <li>
-        <form class="uk-search uk-search-default">
-          <span class="uk-search-icon-flip" uk-search-icon></span>
-          <input class="uk-search-input" type="search" placeholder="Search...">
-        </form>
-      </li>
-    </ul>
-  </div>
-</nav>
-<!-- Closing Main menu -->
+  <!-- Main menu -->
+  <nav class="uk-navbar-container" uk-navbar>
+    <div class="uk-navbar-left">
+      <ul class="uk-navbar-nav">
+        <li><a class="uk-navbar-item uk-logo" href="index.html">SequentiaWallet</a></li>
+      </ul>
+    </div>
+    <div class="uk-navbar-right">
+      <ul class="uk-navbar-nav">
+        <li><a href="#">Contact</a></li>
+        <li>
+          <form class="uk-search uk-search-default">
+            <span class="uk-search-icon-flip" uk-search-icon></span>
+            <input class="uk-search-input" type="search" placeholder="Search...">
+          </form>
+        </li>
+      </ul>
+    </div>
+  </nav>
+  <!-- Closing Main menu -->
 
-<div class="uk-grid-medium" align="center">
-  <h2>Your Genometrics</h2>
-  <div class="uk-child-width-1-1@s" uk-grid>
-    <div>
-      <div id="genocontent" uk-sortable="group: sortable-group">
-
-        <a id="genome" href="genodetails.html">
-        <div class="uk-margin">
-          <div class="uk-card uk-card-default uk-card-body uk-card-small">
-            <div class="uk-column-1-2">
-              <img align="center" src="media/dna-icon.png">
-              <p><span id="genotitle">Genome</span><br>Family and Gene</p>
-            </div>
-          </div>
+  <div class="uk-grid-medium" align="center">
+    <h2>Your Genometrics</h2>
+    <div class="uk-child-width-1-1@s" uk-grid>
+      <div>
+        <div id="genocontent" uk-sortable="group: sortable-group">
+          <!-- Initial Items -->
         </div>
-        </a>
-
-        <a id="phenome" href="genodetails.html">
-        <div class="uk-margin">
-          <div class="uk-card uk-card-default uk-card-body uk-card-small">
-            <div class="uk-column-1-2">
-              <img align="center" src="media/phenome-icon.png">
-              <p><span id="genotitle">Phenome</span><br>Biometrics</p>
-            </div>
-          </div>
-        </div>
-        </a>
-
-        <a id="proteome" href="genodetails.html">
-        <div class="uk-margin">
-          <div class="uk-card uk-card-default uk-card-body uk-card-small">
-            <div class="uk-column-1-2">
-              <img align="center" src="media/proteome-icon.png">
-              <p><span id="genotitle">Proteome</span><br>Lab Tests</p>
-            </div>
-          </div>
-        </div>
-        </a>
-
-        <a id="clinome" href="genodetails.html">
-        <div class="uk-margin">
-          <div class="uk-card uk-card-default uk-card-body uk-card-small">
-            <div class="uk-column-1-2">
-              <img align="center" src="media/clinome-icon.png">
-              <p><span id="genotitle">Clinome</span><br>Diagnostics</p>
-            </div>
-          </div>
-        </div>
-        </a>
       </div>
     </div>
-  </div>
-<!-- Menu on Add Genometrics-->
-<!--<button class="uk-button uk-button-default" type="button" uk-icon="icon:plus"> Add Genometrics  </button>-->
-<button type="button" id="add" uk-icon="icon:plus"> Add genometrics </button>
-<!--<div uk-dropdown>
-  <ul class="uk-nav uk-dropdown-nav">
-    <li class="uk-nav-header">Choose new Genometrics from list</li>
-    <li class="uk-nav-divider"></li>
-    <li><a onclick="addFunc()">Genome</a></li>
-    <li><a onclick="addFunc()">Phenome</a></li>
-    <li><a onclick="addFunc()">Proteome</a></li>
-    <li><a onclick="addFunc()">Clinome</a></li>
-  </ul>
-</div>-->
-<!-- Closing Menu Add Genometrics-->
-<!-- Menu Create form -->
-<button class="uk-button uk-button-default" type="button">Create</button>
-<div id='fields' uk-dropdown>
-  <div id="formcontent">
-    <div id="inputGroup1" class="uk-nav uk-dropdown-nav">
-      <form id="inputGroup" class="uk-grid-small" uk-grid action="" method="post">
-        <table id="table_fields" class="uk-table uk-table-responsive">
-          <thead>
-            <tr>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>
-                <input class="uk-input" type="text" placeholder=" Country" required>
-              </td>
-              <td>
-                <input class="uk-input" type="number" placeholder="Percentage (Only numbers)" required>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </form>
+
+  <!-- Closing Menu Add Genometrics-->
+  <!-- Menu Create form -->
+  <button class="uk-button uk-button-default" type="button">Create</button>
+  <div id='fields' uk-dropdown>
+    <div id="formcontent">
+      <div id="inputGroup1" class="uk-nav uk-dropdown-nav">
+        <form id="inputGroup" class="uk-grid-small" uk-grid action="" method="post">
+          <table id="table_fields" class="uk-table uk-table-responsive">
+            <thead>
+              <tr>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <input class="uk-input" type="text" placeholder=" Country" required>
+                </td>
+                <td>
+                  <input class="uk-input" type="number" placeholder="Percentage (Only numbers)" required>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </form>
+      </div>
+    </div>
+    <div id="formButtons">
+      <button name="add_field" id="add_field" class="uk-button uk-button-default" type="button" uk-icon="icon:plus"> Add New  </button>
+      <button name="remove_field" id="remove_field" class="uk-button uk-button-default" type="button" uk-close> Remove  </button>
+      <button id="send_data" class="uk-button uk-button-default" type="submit"> Submit </button>
     </div>
   </div>
-  <div id="formButtons">
-    <button name="add_field" id="add_field" class="uk-button uk-button-default" type="button" uk-icon="icon:plus"> Add New  </button>
-    <button name="remove_field" id="remove_field" class="uk-button uk-button-default" type="button" uk-close> Remove  </button>
-    <button id="send_data" class="uk-button uk-button-default" type="submit"> Submit </button>
+  <!-- Closing create form-->
   </div>
-</div>
-<!-- Closing create form-->
-</div>
 
-<br>
-<!--<script type="text/javascript" src="js/genometrics.js"></script>-->
+  <br>
+  <!--<script type="text/javascript" src="js/genometrics.js"></script>-->
   <script src="js/localforage.min.js"></script>
   <script src="https://code.jquery.com/jquery-1.8.3.min.js"></script>
   <script src="js/jsencrypt.js"></script>
+  <script src="js/underscore-min.js"></script>
   <script src="js/wallet.js"></script>
   <script>
+    // Tx template
+    var tx_template = '<a id="genome" href="genodetails.html?tx_id=<%= tx.id %>"> \
+        <div class="uk-margin"> \
+          <div class="uk-card uk-card-default uk-card-body uk-card-small"> \
+            <div class="uk-column-1-2"> \
+              <img align="center" src="media/dna-icon.png"> \
+              <p><span id="genotitle"><%= tx.timestamp %></span><br><%= tx.rxid %></p> \
+            </div> \
+          </div> \
+        </div> \
+        </a>'
+
+    function add_tx_markup(data){
+      // a tx data provided compile and render item
+      $('#non-item').remove();
+      var _template = _.template(tx_template);
+      var _compiled = _template({"tx":data});
+      $('#genocontent').append(_compiled);
+    }
+
     $(document).ready(function() {
       // aqui va el codigo que se ejecuta despues de que cargue la pagina
       (function ($, localforage){
@@ -153,12 +119,20 @@
             // Get Txs when load page!
             var list_rx = [];
             var pubkey_uri= encodeURIComponent(value_b64).replace(/'/g,"%27").replace(/"/g,"%22");
+
             var url = "https://genobank-dev-pr-4.herokuapp.com/api/v1/rx-endpoint/?public_key=" + pubkey_uri;
-            console.log(url);
             //console.log(value);
             //console.log("URL: "+ url);
             $.get(url, function(data) {
-              //console.log(data);
+              // get data from server
+              if (data.results.length == 0){
+                $("#genocontent").html("<span id='non-item'>Without Txs :( Start creating new one!</span>");
+              }else{
+                data.results.forEach(function(item) {
+                  console.log(item); // remove later
+                  add_tx_markup(item);
+                });
+              }
               console.log("Finish get!");
             });
           });

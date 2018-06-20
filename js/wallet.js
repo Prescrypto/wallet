@@ -103,14 +103,6 @@ $('#create_new').on('click', function(e){
   });
 });
 
-function addFunc(){
-    genocontent.innerHTML += `<a>${document.getElementById("genome").innerHTML}</a>`
-}
-
-$('#add').on('click', function(){
-  addFunc();
-});
-
 function add_field(){
   $('#table_fields tr:last').after('\
     <tr>\
