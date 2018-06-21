@@ -10,26 +10,35 @@
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 </head>
 <body>
-<!-- Main menu -->
-<nav class="uk-navbar-container" uk-navbar>
-  <div class="uk-navbar-left">
-  	<ul class="uk-navbar-nav">
-  	  <li><a class="uk-navbar-item uk-logo" href="index.html">SequentiaWallet</a></li>
-    </ul>
-  </div>
-  <div class="uk-navbar-right">
-    <ul class="uk-navbar-nav">
-      <li><a href="#">Contact</a></li>
-      <li>
-        <form class="uk-search uk-search-default">
-          <span class="uk-search-icon-flip" uk-search-icon></span>
-          <input class="uk-search-input" type="search" placeholder="Search...">
-        </form>
-      </li>
-    </ul>
-  </div>
-</nav>
-<!-- Closing Main menu -->
+  <!-- Main menu -->
+  <nav class="uk-navbar-container" uk-navbar>
+    <div class="uk-navbar-left">
+    	<ul class="uk-navbar-nav">
+    	  <li><a class="uk-navbar-item uk-logo" href="index.html">SequentiaWallet</a></li>
+      </ul>
+    </div>
+    <div class="uk-navbar-right">
+      <ul class="uk-navbar-nav">
+        <li><a href="#">Contact</a></li>
+        <li>
+          <form class="uk-search uk-search-default">
+            <span class="uk-search-icon-flip" uk-search-icon></span>
+            <input class="uk-search-input" type="search" placeholder="Search...">
+          </form>
+        </li>
+      </ul>
+    </div>
+  </nav>
+  <!-- Closing Main menu -->
+
+  <!-- Aside pub and private keys -->
+  <aside style="display:none;">
+    <textarea id="pub_key"></textarea>
+    <textarea id="priv_key"></textarea>
+  </aside>
+
+  <!-- Aside pub and private keys -->
+
 <div class="uk-child-width-expand" uk-grid>
   <div class="uk-grid-item-match">
     <div class="uk-card uk-card-default uk-card-body">
@@ -37,35 +46,16 @@
   	  <a id="backbtn" class="uk-button uk-button-default" id="whitebutton" href="genometrics.html">Back</a>
       <h3>Ancestry</h3>
       <table class="uk-table uk-table-divider">
-    	<thead>
-        <tr>
+      	<thead>
+          <tr>
             <th>Region</th>
             <th>Percentage</th>
-        </tr>
-    	</thead>
-    	<tbody>
-        <tr>
-            <td>Germany</td>
-            <td>3</td>
-        </tr>
-        <tr>
-            <td>United States</td>
-            <td>29</td>
-        </tr>
-        <tr>
-            <td>Brazil</td>
-            <td>5</td>
-        </tr>
-        <tr>
-            <td>Canada</td>
-            <td>3</td>
-        </tr>
-        <tr>
-            <td>France</td>
-            <td>60</td>
-        </tr>
-    </tbody>
-</table>
+          </tr>
+      	</thead>
+      	<tbody id="tx_table_content">
+          <!-- Render here tx data -->
+        </tbody>
+    </table>
     </div>
   </div>
 
@@ -78,6 +68,67 @@
   </div>
 </div>
 
-<script type="text/javascript" src="js/genodetails.js"></script>
+  <script type="text/javascript" src="js/genodetails.js"></script>
+  <script src="js/localforage.min.js"></script>
+  <script src="https://code.jquery.com/jquery-1.8.3.min.js"></script>
+  <script src="js/jsencrypt.js"></script>
+  <script src="js/underscore-min.js"></script>
+  <script>
+    var tx_data_template = '<tr> \
+        <td><%= data.country_name %></td> \
+        <td><%= data.percentage %></td> \
+        </tr>'
+
+    function add_tx_markup(data){
+      // a tx data provided compile and render item
+      $('#non-item').remove();
+      var _template = _.template(tx_data_template);
+      var _compiled = _template({"data":data});
+      $('#tx_table_content').append(_compiled);
+    }
+
+    $(document).ready(function() {
+      // aqui va el codigo que se ejecuta despues de que cargue la pagina
+      (function ($, localforage){
+        // set the keys on textarea onload page
+        var encrypt = new JSEncrypt();
+        function setKeys(){
+          localforage.getItem('privatekey', function(err, value){
+            $('#priv_key').val(value);
+          });
+          localforage.getItem('publickey', function(err, value){
+            $('#pub_key').val(value);
+          });
+
+        };
+
+        function getTxData(){
+          // Render Tx Data on form
+          var searchParams = new URLSearchParams(window.location.search);
+          var url = "https://genobank-dev-pr-4.herokuapp.com/api/v1/rx-endpoint/"
+          if(searchParams.has("tx_id")){
+            url += searchParams.get('tx_id');
+            $.get(url, function(data) {
+            // get data from server
+            if (data.length == 0){
+              // render no tx label
+              $("#tx_table_content").html("<span id='non-item'>Without data :( Something missing!</span>");
+            }else{
+              data.data.forEach(function(item) {
+                // add tx to template
+                add_tx_markup(item);
+              });
+            }
+            console.log("Finish get!");
+          });
+          }
+        };
+        setKeys();
+        getTxData();
+
+
+      })($, localforage);
+    });
+  </script>
 </body>
 </html>
