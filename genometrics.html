@@ -114,20 +114,21 @@
       // aqui va el codigo que se ejecuta despues de que cargue la pagina
       (function ($, localforage){
         // set the keys on textarea onload page
-        var encrypt = new JSEncrypt();
         function setKeys(){
           localforage.getItem('privatekey', function(err, value){
             $('#priv_key').val(value);
           });
           localforage.getItem('publickey', function(err, value){
             $('#pub_key').val(value);
+            var encrypt = new JSEncrypt();
             encrypt.setPublicKey(value);
             value_b64 = encrypt.getPublicKeyB64();
             // Get Txs when load page!
             var list_rx = [];
             var pubkey_uri= encodeURIComponent(value_b64).replace(/'/g,"%27").replace(/"/g,"%22");
-            var pubkey_uri_test = "MIGeMA0GCSqGSIb3DQEBAQUAA4GMADCBiAKBgH7YXT4ZgPDvGei%2Bi%2FIcIbGteVCR%2BVemkPJWiTShUgDC7P3K69VXowXZOYnQiRHeGzmM5llsHBkf4xVCDJKvclGoBZgaCZONebEGVBWOaY3vtzaQ400tYZpGjaObqBKn6TgM18vRbGI6xbt0VjKc0K%2FoGDKyzFXwPcxcN9IA6AuvAgMBAAE%3D"
-            var url = "https://genobank-dev-pr-4.herokuapp.com/api/v1/rx-endpoint/?public_key=" + pubkey_uri_test;
+            // Remove later
+            // var pubkey_uri_test = "MIGeMA0GCSqGSIb3DQEBAQUAA4GMADCBiAKBgH7YXT4ZgPDvGei%2Bi%2FIcIbGteVCR%2BVemkPJWiTShUgDC7P3K69VXowXZOYnQiRHeGzmM5llsHBkf4xVCDJKvclGoBZgaCZONebEGVBWOaY3vtzaQ400tYZpGjaObqBKn6TgM18vRbGI6xbt0VjKc0K%2FoGDKyzFXwPcxcN9IA6AuvAgMBAAE%3D"
+            var url = "https://genobank-dev-pr-4.herokuapp.com/api/v1/rx-endpoint/?public_key=" + pubkey_uri;
             //console.log(value);
             //console.log("URL: "+ url);
             $.get(url, function(data) {
@@ -137,18 +138,105 @@
                 $("#genocontent").html("<span id='non-item'>Without Txs :( Start creating new one!</span>");
               }else{
                 data.results.forEach(function(item) {
-                  console.log(item); // remove later
                   // add tx to template
                   add_tx_markup(item);
                 });
               }
-              console.log("Finish get!");
+              // Finish get
             });
           });
 
         };
         setKeys();
       })($, localforage);
+    });
+    //Functions
+    function add_field(){
+    $('#table_fields tr:last').after('\
+      <tr>\
+        <td>\
+          <input class="uk-input" type="text" placeholder=" Country" required>\
+        </td>\
+        <td>\
+          <input class="uk-input" type="number" placeholder="   Percentage (Only numbers)" required>\
+        </td>\
+      </tr>');
+    }
+
+    function remove_field(){
+      $('#table_fields tr:last').remove();
+    }
+
+    function read_input(){
+      $.each($('#table_fields td').children(), function(){
+        value_input = $(this).val();
+        LIST.push(value_input);
+      });
+      return list_input=LIST;
+    }
+
+    function create_payload(){
+      //Make data
+      var index = 1;
+      var data_payload = [];
+      var payload = new Object();
+      for (index; index<list_input.length; index++){
+        if (index%2){
+          data_payload.push({"country_name":list_input[index-1],"percentage":list_input[index]});
+        }
+      }
+      // This is the complete payload: data_payload
+
+      //Encrypt data
+      var encrypt = new JSEncrypt();
+      encrypt.setPublicKey($("#pub_key").val());
+      var index_encrypt = 0;
+      for (index_encrypt; index_encrypt<data_payload.length; index_encrypt++){
+        data_payload[index_encrypt].country_name = encrypt.encrypt(data_payload[index_encrypt].country_name);
+        data_payload[index_encrypt].percentage = encrypt.encrypt(data_payload[index_encrypt].percentage);
+      }
+
+      var times = TODAY.toISOString();
+      payload.timestamp = times;
+
+      payload.public_key = encrypt.getPublicKeyB64();
+
+      payload.data = JSON.stringify(data_payload);
+
+      payload.location = "Mexico";
+
+      payload.signature = "FiQBQIimp0YgnxYuI4kFrME9CTxu9T7eTGOmlG+Bs5alN+7MXtQRr4KgD0rANNf/hIbLZWt5A/FPLOWtv/UriA==";
+
+      var posting = $.post("https://genobank-dev-pr-4.herokuapp.com/api/v1/rx-endpoint/",
+                      payload);
+
+      posting.done(function(data, text_status){
+        //console.log(data);
+        //console.log(text_status);
+      });
+      posting.fail(function(xhr, textStatus, errorThrown){
+        //console.log(xhr.responseText);
+      });
+      posting.always(function(){
+        // Finish POST!
+      });
+    }
+
+    //Events
+    $('#add_field').on('click', function(){
+      add_field();
+    });
+
+    $('#remove_field').on('click',function(){
+      var length_table = $('#table_fields tr').length;
+      if(length_table >= 3){
+        remove_field();
+      }
+    });
+
+    $('#send_data').on('click', function(){
+      read_input();
+      create_payload();
     });
   </script>
 </body>
