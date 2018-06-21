@@ -3,80 +3,23 @@ var PRIVATE_KEY;
 var TODAY = new Date();
 var LIST = [];
 
-var next_button = '\
-  <a class="uk-button uk-button-default" href="genometrics.html"> Next </a>'
-
-var alert = '<div  class="uk-alert-danger" uk-alert>\
-  <a class="uk-alert-close" uk-close></a>\
-  <p id="alert">Error. You have entered invalid keys; Please try again.</p>\
-  </div>'
-
 $('#create_entropy').on('click', function() {
   UIkit.modal($("#modal-example")).show();
   setInterval(function(){
-    if(document.entropy >= 1500){
+    if(document.entropy >= 1200){
       $("#create_keys").removeAttr("disabled");
     }
   }, 1000);
 });
 
-function save_key(){
+function save_key(private_key, public_key){
   //Save keys in localforage
-  localforage.setItem('privatekey', PRIVATE_KEY);
-  localforage.setItem('publickey', PUBLIC_KEY);
+  localforage.setItem('privatekey', private_key);
+  localforage.setItem('publickey', public_key);
   console.log("Set keys on Localstorage");
 }
 
-function validate_pubkey(){
-  //Verify if the field pubkey is empty
-  if ($("#pubkey").val().length===0){
-    return false
-  }else{
-    return true
-  }
-}
 
-function validate_privkey(){
-  //Verify if the field privkey is empty
-  if($("#privkey").val().lengthh===0){
-      return false
-  }else{
-      return true
-  }
-}
-
-function validate_keys(){
-  //Is a small test for validate the keys
-  if (validate_privkey() && validate_pubkey()){
-    // Encrypt with the public key
-    var encrypt = new JSEncrypt();
-    var test = 'This a test';
-    encrypt.setPublicKey($("#pubkey").val());
-    var encrypted = encrypt.encrypt(test);
-    // Decrypt with the private key
-    var decrypt = new JSEncrypt();
-    decrypt.setPrivateKey($("#privkey").val());
-    var uncrypted = decrypt.decrypt(encrypted);
-    if(uncrypted === test){
-      console.log("Valid Keys");
-      save_key();
-      console.log("Saved Keys");
-      $('#next_button').html(next_button);
-    }else{
-      $('#alert').html(alert);
-      console.log("Error");
-    }
-  }else{
-    $('#alert').html(alert);
-    console.log("Error");
-  }
-}
-
-$('#verify_keys').on('click', function(e) {
-  e.preventDefault();
-  console.log("Click saved keys");
-  validate_keys();
-});
 
 function create_keys(){
   console.log("Start genereting keys");
@@ -95,100 +38,9 @@ $('#create_keys').on('click', function(e) {
   create_keys();
 });
 
-$('#create_new').on('click', function(e){
-  e.preventDefault();
-  e.target.blur();
-  UIkit.modal.prompt('Name:','Your name').then(function(name){
-     console.log('Prompted:', name)
-  });
-});
 
-function add_field(){
-  $('#table_fields tr:last').after('\
-    <tr>\
-      <td>\
-        <input class="uk-input" type="text" placeholder=" Country" required>\
-      </td>\
-      <td>\
-        <input class="uk-input" type="number" placeholder="   Percentage (Only numbers)" required>\
-      </td>\
-    </tr>');
-}
 
-$('#add_field').on('click', function(){
-  add_field();
-});
 
-function remove_field(){
-  $('#table_fields tr:last').remove();
-}
-
-$('#remove_field').on('click',function(){
-  var length_table = $('#table_fields tr').length;
-  if(length_table >= 3){
-    remove_field();
-  }else{
-    console.log('No puede borrar');
-  }
-});
-
-function read_input(){
-  $.each($('#table_fields td').children(), function(){
-    value_input = $(this).val();
-    LIST.push(value_input);
-  });
-  console.log("Read input");
-  return list_input=LIST;
-}
-
-function create_payload(){
-  var index = 1;
-  var data_payload = [];
-  var payload = new Object();
-  var encrypt = new JSEncrypt();
-
-  for (index; index<list_input.length; index++){
-    if (index%2){
-      data_payload.push({"country_name":list_input[index-1],"percentage":list_input[index]});
-    }
-  }
-
-  var times = TODAY.toISOString();
-  payload.timestamp = times;
-
-  localforage.getItem('publickey', function(err, value){
-    encrypt.setPublicKey(value);
-    payload.public_key = encrypt.getPublicKeyB64();
-
-    payload.data = JSON.stringify(data_payload);
-
-    payload.location = "Mexico";
-
-    payload.signature = "FiQBQIimp0YgnxYuI4kFrME9CTxu9T7eTGOmlG+Bs5alN+7MXtQRr4KgD0rANNf/hIbLZWt5A/FPLOWtv/UriA==";
-
-    console.log("Create payload: ");
-    console.log(payload);
-
-    var posting = $.post("https://genobank-dev-pr-4.herokuapp.com/api/v1/rx-endpoint/",
-                    payload);
-
-    posting.done(function(data, text_status){
-      console.log(data);
-      console.log(text_status);
-    });
-    posting.fail(function(xhr, textStatus, errorThrown){
-      console.log(xhr.responseText);
-    });
-    posting.always(function(){
-      console.log("Finish POST!");
-    });
-  });
-}
-
-$('#send_data').on('click', function(){
-  read_input();
-  create_payload();
-});
 //     UIkit.util.on('#js-modal-prompt', 'click', function (e) {
 //            e.preventDefault();
 //            e.target.blur();
