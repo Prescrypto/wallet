@@ -2734,7 +2734,7 @@ function prng_newstate() {
 }
 // Pool size must be a multiple of 4 and greater than 32.
 // An array of bytes the size of the pool will be passed to init()
-var rng_psize = 1000;
+var rng_psize = 1000 ;
 
 // Random number generator - requires a PRNG backend, e.g. prng4.js
 var rng_state;
@@ -2795,9 +2795,9 @@ function rng_get_byte() {
     if (rng_state == null) {
         rng_state = prng_newstate();
         // At this point, we may not have collected enough entropy.  If not, fall back to Math.random
-        console.log("Create Keys");
+        //console.log(rng_pptr);
         while (rng_pptr < rng_psize) {
-            console.log("Entropia no suficiente");
+            console.log("Entropy not enough");
             var random = Math.floor(65536 * Math.random());
             rng_pool[rng_pptr++] = random & 255;
         }
