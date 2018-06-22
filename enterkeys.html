@@ -74,9 +74,9 @@
 <script src="js/jsencrypt.js"></script>
 <script src="js/wallet.js"></script>
 <script>
-
+  // Functions
   function validate_pubkey(){
-    //Verify if the field pubkey is empty
+    // Verify if the field pubkey is empty
     if ($("#pubkey").val().length===0){
       return false
     }else{
@@ -85,7 +85,7 @@
   }
 
   function validate_privkey(){
-    //Verify if the field privkey is empty
+    // Verify if the field privkey is empty
     if($("#privkey").val().lengthh===0){
         return false
     }else{
@@ -94,8 +94,7 @@
   }
 
   function validate_keys(){
-    //Is a small test for validate the keys
-
+    // Is a small test for validate the keys
     var next_button = '\
       <a class="uk-button uk-button-default" href="genometrics.html"> Next </a>'
 
@@ -110,10 +109,12 @@
       var test = 'This a test';
       encrypt.setPublicKey($("#pubkey").val());
       var encrypted = encrypt.encrypt(test);
+
       // Decrypt with the private key
       var decrypt = new JSEncrypt();
       decrypt.setPrivateKey($("#privkey").val());
       var uncrypted = decrypt.decrypt(encrypted);
+
       if(uncrypted === test){
         console.log("Valid Keys");
         save_key($("#privkey").val(), $("#pubkey").val());
@@ -121,19 +122,18 @@
         $('#next_button').html(next_button);
       }else{
         $('#alert').html(alert);
-        console.log("Error One");
       }
     }else{
       $('#alert').html(alert);
-      console.log("Error Two");
     }
   }
 
-$('#verify_keys').on('click', function(e) {
-  e.preventDefault();
-  console.log("Click saved keys");
-  validate_keys();
-});
+  // Events
+  $('#verify_keys').on('click', function(e) {
+    e.preventDefault();
+    console.log("Click saved keys");
+    validate_keys();
+  });
 </script>
 </body>
 </html>
