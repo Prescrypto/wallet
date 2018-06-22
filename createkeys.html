@@ -55,8 +55,8 @@
 <script>
     $(document).ready(function() {
       (function ($, localforage){
-        //Get the keys from localforage
         function setKeys(){
+          // Get the keys from localforage
           localforage.getItem('privatekey', function(err, value){
             $('#privkey').val(value);
           });
