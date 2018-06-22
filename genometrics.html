@@ -9,120 +9,250 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.5/js/uikit-icons.min.js"></script>
 </head>
 <body>
-<!-- Main menu -->
-<nav class="uk-navbar-container" uk-navbar>
-  <div class="uk-navbar-left">
-  	<ul class="uk-navbar-nav">
-  	  <li><a class="uk-navbar-item uk-logo" href="index.html">SequentiaWallet</a></li>
-    </ul>
-  </div>
-  <div class="uk-navbar-right">
-    <ul class="uk-navbar-nav">
-      <li><a href="#">Contact</a></li>
-      <li>
-        <form class="uk-search uk-search-default">
-          <span class="uk-search-icon-flip" uk-search-icon></span>
-          <input class="uk-search-input" type="search" placeholder="Search...">
-        </form>
-      </li>
-    </ul>
-  </div>
-</nav>
-<!-- Closing Main menu -->
+  <!-- Main menu -->
+  <nav class="uk-navbar-container" uk-navbar>
+    <div class="uk-navbar-left">
+      <ul class="uk-navbar-nav">
+        <li><a class="uk-navbar-item uk-logo" href="index.html">SequentiaWallet</a></li>
+      </ul>
+    </div>
+    <div class="uk-navbar-right">
+      <ul class="uk-navbar-nav">
+        <li><a href="#">Contact</a></li>
+        <li>
+          <form class="uk-search uk-search-default">
+            <span class="uk-search-icon-flip" uk-search-icon></span>
+            <input class="uk-search-input" type="search" placeholder="Search...">
+          </form>
+        </li>
+      </ul>
+    </div>
+  </nav>
+  <!-- Closing Main menu -->
 
-<!-- Hidden keys -->
-<aside style="display:none;">
-  <textarea id="pub_key"></textarea>
-  <textarea id="priv_key"></textarea>
-</aside>
-<!--End Hidden keys  -->
+  <!-- BEGIN Aside pub and private keys -->
+  <aside style="display:none;">
+    <textarea id="pub_key"></textarea>
+    <textarea id="priv_key"></textarea>
+  </aside>
+  <!-- END Aside pub and private keys -->
 
-<div class="uk-grid-medium" align="center">
-  <h2>Your Genometrics</h2>
-  <section class="uk-child-width-1-1@s" uk-grid>
-    <div>
-      <div id="genocontent" uk-sortable="group: sortable-group">
-
-        <a id="genome" href="genodetails.html">
-        <div class="uk-margin">
-          <div class="uk-card uk-card-default uk-card-body uk-card-small">
-          	<div class="uk-column-1-2">
-          	  <img align="center" src="media/dna-icon.png">
-          	  <p><span id="genotitle">Genome</span><br>Family and Gene</p>
-          	</div>
-          </div>
+  <div class="uk-grid-medium" align="center">
+    <h2>Your Genometrics</h2>
+    <div class="uk-child-width-1-1@s" uk-grid>
+      <div>
+        <div id="genocontent" uk-sortable="group: sortable-group">
+          <!-- Initial Items -->
         </div>
-        </a>
-
-        <a id="phenome" href="genodetails.html">
-        <div class="uk-margin">
-          <div class="uk-card uk-card-default uk-card-body uk-card-small">
-          	<div class="uk-column-1-2">
-          	  <img align="center" src="media/phenome-icon.png">
-          	  <p><span id="genotitle">Phenome</span><br>Biometrics</p>
-          	</div>
-          </div>
-        </div>
-        </a>
-
-        <a id="proteome" href="genodetails.html">
-        <div class="uk-margin">
-          <div class="uk-card uk-card-default uk-card-body uk-card-small">
-          	<div class="uk-column-1-2">
-          	  <img align="center" src="media/proteome-icon.png">
-          	  <p><span id="genotitle">Proteome</span><br>Lab Tests</p>
-          	</div>
-          </div>
-        </div>
-        </a>
-
-        <a id="clinome" href="genodetails.html">
-        <div class="uk-margin">
-          <div class="uk-card uk-card-default uk-card-body uk-card-small">
-          	<div class="uk-column-1-2">
-          	  <img align="center" src="media/clinome-icon.png">
-          	  <p><span id="genotitle">Clinome</span><br>Diagnostics</p>
-          	</div>
-          </div>
-        </div>
-        </a>
       </div>
     </div>
-  </section>
-  <button type="button" onclick="addFunc()" id="add" uk-icon="icon:plus">Add genometrics </button>
-</div>
-<br>
 
-  <!-- Script block -->
-  <script type="text/javascript" src="js/genometrics.js"></script>
+  <!-- Closing Menu Add Genometrics-->
+  <!-- Menu Create form -->
+  <button class="uk-button uk-button-default" type="button">Create</button>
+  <div id='fields' uk-dropdown>
+    <div id="formcontent">
+      <div id="inputGroup1" class="uk-nav uk-dropdown-nav">
+        <form id="inputGroup" class="uk-grid-small" uk-grid action="" method="post">
+          <table id="table_fields" class="uk-table uk-table-responsive">
+            <thead>
+              <tr>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <input class="uk-input" type="text" placeholder=" Country" required>
+                </td>
+                <td>
+                  <input class="uk-input" type="number" placeholder="Percentage (Only numbers)" required>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </form>
+      </div>
+    </div>
+    <div id="formButtons">
+      <button name="add_field" id="add_field" class="uk-button uk-button-default" type="button" uk-icon="icon:plus"> Add New  </button>
+      <button name="remove_field" id="remove_field" class="uk-button uk-button-default" type="button" uk-close> Remove  </button>
+      <button id="send_data" class="uk-button uk-button-default" type="submit"> Submit </button>
+    </div>
+  </div>
+  <!-- Closing create form-->
+  </div>
+
+  <br>
   <script src="js/localforage.min.js"></script>
   <script src="https://code.jquery.com/jquery-1.8.3.min.js"></script>
+  <script src="js/jsencrypt.js"></script>
+  <script src="js/jsrsasign-all-min.js"></script>
+  <script src="js/underscore-min.js"></script>
+  <script src="js/wallet.js"></script>
   <script>
+    // Tx template
+    var tx_template = '<a id="genome" href="genodetails.html?tx_id=<%= tx.id %>"> \
+        <div class="uk-margin"> \
+          <div class="uk-card uk-card-default uk-card-body uk-card-small"> \
+            <div class="uk-column-1-2"> \
+              <img align="center" src="media/dna-icon.png"> \
+              <p><span id="genotitle"><%= tx.timestamp %></span><br><%= tx.rxid %></p> \
+            </div> \
+          </div> \
+        </div> \
+        </a>'
+
+    function add_tx_markup(data){
+      // A tx data provided compile and render item
+      $('#non-item').remove();
+      var _template = _.template(tx_template);
+      var _compiled = _template({"tx":data});
+      $('#genocontent').append(_compiled);
+    }
+
     $(document).ready(function() {
-      // aqui va el codigo que se ejecuta despues de que cargue la pagina
       (function ($, localforage){
-        // set the keys on textarea onload page
         function setKeys(){
+          // Set the keys on textarea onload page
           localforage.getItem('privatekey', function(err, value){
             $('#priv_key').val(value);
           });
           localforage.getItem('publickey', function(err, value){
             $('#pub_key').val(value);
+            var encrypt = new JSEncrypt();
+            encrypt.setPublicKey(value);
+            value_b64 = encrypt.getPublicKeyB64();
             // Get Txs when load page!
             var list_rx = [];
-            var pubkey_uri= encodeURI(value);
-            var url = "https://genobank.herokuapp.com/api/v1/rx-endpoint/?public_key=" + pubkey_uri;
-            console.log(value);
-            console.log("URL: "+ url);
+            var pubkey_uri= encodeURIComponent(value_b64).replace(/'/g,"%27").replace(/"/g,"%22");
+            var url = "https://genobank-dev-pr-4.herokuapp.com/api/v1/rx-endpoint/?public_key=" + pubkey_uri;
             $.get(url, function(data) {
-              console.log(data);
-              console.log("Finish get!");
+              // Get data from server
+              if (data.results.length == 0){
+                // Render no tx label
+                $("#genocontent").html("<span id='non-item'>Without Txs :( Start creating new one!</span>");
+              }else{
+                data.results.forEach(function(item) {
+                  // Add tx to template
+                  add_tx_markup(item);
+                });
+              }
+              // Finish get
             });
           });
 
         };
         setKeys();
       })($, localforage);
+    });
+    // Functions
+    function add_field(){
+      // Add a field in table
+      $('#table_fields tr:last').after('\
+        <tr>\
+          <td>\
+            <input class="uk-input" type="text" placeholder=" Country" required>\
+          </td>\
+          <td>\
+            <input class="uk-input" type="number" placeholder="   Percentage (Only numbers)" required>\
+          </td>\
+        </tr>');
+    }
+
+    function sign(msg, priv_key, hash_alg){
+      //Create a signature of payload
+      var rsa = new RSAKey();
+      rsa.readPrivateKeyFromPEMString(priv_key);
+      var sign_msg = rsa.sign(msg, hash_alg);
+      var sign_b64 = linebrk(sign_msg, 64);
+      return sign_msg;
+    }
+
+
+    function remove_field(){
+      // Remove a field in table
+      $('#table_fields tr:last').remove();
+    }
+
+    function read_input(){
+      // Read all the inputs in form and make a list
+      var list_input = [];
+      $.each($('#table_fields td').children(), function(){
+        value_input = $(this).val();
+        list_input.push(value_input);
+      });
+      return list_input;
+    }
+
+    function create_payload(){
+      // Make data and make a POST
+
+      // Make data
+      var index = 1;
+      var data_payload = [];
+      var list_input = read_input();
+      var payload = new Object();
+
+      for (index; index<list_input.length; index++){
+        if (index%2){
+          data_payload.push({"country_name":list_input[index-1],"percentage":list_input[index]});
+        }
+      }
+
+      // Encrypt data
+      var encrypt = new JSEncrypt();
+      var index_encrypt = 0;
+
+      encrypt.setPublicKey($("#pub_key").val());
+      for (index_encrypt; index_encrypt<data_payload.length; index_encrypt++){
+        data_payload[index_encrypt].country_name = encrypt.encrypt(data_payload[index_encrypt].country_name);
+        data_payload[index_encrypt].percentage = encrypt.encrypt(data_payload[index_encrypt].percentage);
+      }
+
+      // Make payload
+      var today = new Date();
+      var times = today.toISOString();
+
+      payload.timestamp = times;
+      payload.public_key = encrypt.getPublicKeyB64();
+      payload.data = JSON.stringify(data_payload);
+      payload.location = "Mexico";
+
+      var msg = JSON.stringify(payload);
+      var hash_alg = 'sha1';
+      var prk = $('#priv_key').val();
+      payload.signature = sign(msg, prk, hash_alg);
+
+
+      // Make POST
+      var posting = $.post("https://genobank-dev-pr-4.herokuapp.com/api/v1/rx-endpoint/",
+                      payload);
+
+      posting.done(function(data, text_status){
+        console.log(text_status);
+      });
+      posting.fail(function(xhr, textStatus, errorThrown){
+        console.log(xhr.responseText);
+      });
+      posting.always(function(){
+        // Finish POST!
+      });
+    }
+
+    // Events
+    $('#add_field').on('click', function(){
+      add_field();
+    });
+
+    $('#remove_field').on('click',function(){
+      var length_table = $('#table_fields tr').length;
+      if(length_table >= 3){
+        remove_field();
+      }
+    });
+
+    $('#send_data').on('click', function(){
+      create_payload();
     });
   </script>
 </body>

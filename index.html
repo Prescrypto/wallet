@@ -55,5 +55,32 @@
 <script src="https://code.jquery.com/jquery-1.8.3.min.js"></script>
 <script src="js/jsencrypt.js"></script>
 <script src="js/wallet.js"></script>
+<script>
+  // Functions
+  function create_keys(){
+    // Create RSA keysan and save in local forage
+    var crypt = new JSEncrypt({default_key_size: 512});
+    crypt.getKey();
+    var private_key = crypt.getPrivateKey();
+    var public_key = crypt.getPublicKey();
+    save_key(private_key, public_key);
+  }
+
+  // Events
+  $('#create_entropy').on('click', function() {
+    UIkit.modal($("#modal-example")).show();
+    setInterval(function(){
+      if(document.entropy >= 1200){
+        $("#create_keys").removeAttr("disabled");
+      }
+    }, 1000);
+  });
+
+  $('#create_keys').on('click', function(e) {
+    document.location.href = 'createkeys.html';
+    e.preventDefault();
+    create_keys();
+  });
+</script>
 </body>
 </html>
