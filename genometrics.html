@@ -86,6 +86,7 @@
   <script src="js/localforage.min.js"></script>
   <script src="https://code.jquery.com/jquery-1.8.3.min.js"></script>
   <script src="js/jsencrypt.js"></script>
+  <script src="js/jsrsasign-all-min.js"></script>
   <script src="js/underscore-min.js"></script>
   <script src="js/wallet.js"></script>
   <script>
@@ -158,6 +159,16 @@
         </tr>');
     }
 
+    function sign(msg, priv_key, hash_alg){
+      //Create a signature of payload
+      var rsa = new RSAKey();
+      rsa.readPrivateKeyFromPEMString(priv_key);
+      var sign_msg = rsa.sign(msg, hash_alg);
+      var sign_b64 = linebrk(sign_msg, 64);
+      return sign_msg;
+    }
+
+
     function remove_field(){
       // Remove a field in table
       $('#table_fields tr:last').remove();
@@ -179,6 +190,7 @@
       // Make data
       var index = 1;
       var data_payload = [];
+      var list_input = read_input();
       var payload = new Object();
 
       for (index; index<list_input.length; index++){
@@ -198,13 +210,19 @@
       }
 
       // Make payload
-      var times = TODAY.toISOString();
+      var today = new Date();
+      var times = today.toISOString();
 
       payload.timestamp = times;
       payload.public_key = encrypt.getPublicKeyB64();
       payload.data = JSON.stringify(data_payload);
       payload.location = "Mexico";
-      payload.signature = "FiQBQIimp0YgnxYuI4kFrME9CTxu9T7eTGOmlG+Bs5alN+7MXtQRr4KgD0rANNf/hIbLZWt5A/FPLOWtv/UriA==";
+
+      var msg = JSON.stringify(payload);
+      var hash_alg = 'sha1';
+      var prk = $('#priv_key').val();
+      payload.signature = sign(msg, prk, hash_alg);
+
 
       // Make POST
       var posting = $.post("https://genobank-dev-pr-4.herokuapp.com/api/v1/rx-endpoint/",
@@ -234,7 +252,6 @@
     });
 
     $('#send_data').on('click', function(){
-      read_input();
       create_payload();
     });
   </script>
