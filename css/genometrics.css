@@ -33,17 +33,18 @@ div.uk-grid-medium{
 }
 h2{
   color:#3F3F3F !important;
-  font-family: 'Arial black' !important;
+  font-family: 'Source Sans Pro' !important;
+  font-weight: 900!important;
 }
 #genotitle{
    color:#583490 !important;
-   font-family: 'Arial black' !important;
+   font-family: 'Source Sans Pro' !important;
    font-size: 1em;
    font-style: normal;
 }
 p{
   color:#595959;
-  font-family: 'Arial';
+  font-family: 'Source Sans Pro';
   font-style: italic;
   margin:0 !important;
 }
@@ -59,12 +60,12 @@ div.uk-child-width-expand.uk-grid{
 }
 #backbtn{
   background-color: #666666;
-  font-family: 'Arial black' !important;
+  font-family: 'Source Sans Pro' !important;
   color: white;
 }
 #decryptbtn{
   background-color: #583490;
-  font-family: 'Arial black' !important;
+  font-family: 'Source Sans Pro' !important;
   color: white;
 }
 .uk-button-default{
