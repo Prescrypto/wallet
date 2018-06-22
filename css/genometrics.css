@@ -1,9 +1,28 @@
 body{
-  background-color: #EAEAEA;
+  background-color: #F0F0F7;
   min-height: 100vh;
 }
+nav.uk-navbar-container.uk-navbar{
+  background-color:#000;
+  font-size:20px;
+  padding:0 40px 0 40px;
+}
+
+a.uk-navbar-item.uk-logo{
+  font-family: 'Source Sans Pro';
+  font-weight:700;
+  color:#fff!important;
+}
+.uk-navbar-nav>li>a{
+  color:#fff!important;
+  font-size: 15px!important;
+  font-family: 'Source Sans Pro'!important;
+  font-weight:400!important;
+}
 form.uk-search.uk-search-default{
-  margin : 1em;
+  margin : 2em;
+  font-size: 10px;
+  color:#fff;
 }
 div.uk-grid-medium{
   text-align: left;
