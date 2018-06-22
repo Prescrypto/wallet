@@ -48,13 +48,13 @@ a.uk-button.uk-button-default.uk-width-1-1.uk-margin-small-bottom{
   font-weight: 700;
 }
 label.uk-form-label{
-  color: white;
+  color: #626262;
   font-family: 'Source Sans Pro';
-  font-size: 18px;
-  font-weight: 400;
+  font-size: 15px;
+  font-weight: 700;
 }
 div.js-upload.uk-placeholder.uk-text-center{
-  color: white;
+  color: #626262;
 }
 span.uk-link{
   color : #BBB;
@@ -66,6 +66,14 @@ input#form-horizontal-text.uk-input{
   border-radius: 6px;
 }
 #whitebutton{
+  background-color: white;
+  color : black;
+  font-family: 'Source Sans Pro';
+  font-weight: 700;
+  border:0;
+  margin-top: 1em;
+}
+#verify_keys{
   background-color: white;
   color : black;
   font-family: 'Source Sans Pro';
