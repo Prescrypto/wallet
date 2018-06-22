@@ -10,62 +10,52 @@
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 </head>
 <body>
-<!-- Main menu -->
-<nav class="uk-navbar-container" uk-navbar>
-  <div class="uk-navbar-left">
-  	<ul class="uk-navbar-nav">
-  	  <li><a class="uk-navbar-item uk-logo" href="index.html">SequentiaWallet</a></li>
-    </ul>
-  </div>
-  <div class="uk-navbar-right">
-    <ul class="uk-navbar-nav">
-      <li><a href="#">Contact</a></li>
-      <li>
-        <form class="uk-search uk-search-default">
-          <span class="uk-search-icon-flip" uk-search-icon></span>
-          <input class="uk-search-input" type="search" placeholder="Search...">
-        </form>
-      </li>
-    </ul>
-  </div>
-</nav>
-<!-- Closing Main menu -->
+  <!-- Main menu -->
+  <nav class="uk-navbar-container" uk-navbar>
+    <div class="uk-navbar-left">
+    	<ul class="uk-navbar-nav">
+    	  <li><a class="uk-navbar-item uk-logo" href="index.html">SequentiaWallet</a></li>
+      </ul>
+    </div>
+    <div class="uk-navbar-right">
+      <ul class="uk-navbar-nav">
+        <li><a href="#">Contact</a></li>
+        <li>
+          <form class="uk-search uk-search-default">
+            <span class="uk-search-icon-flip" uk-search-icon></span>
+            <input class="uk-search-input" type="search" placeholder="Search...">
+          </form>
+        </li>
+      </ul>
+    </div>
+  </nav>
+  <!-- Closing Main menu -->
+
+  <!-- Aside pub and private keys -->
+  <aside style="display:none;">
+    <textarea id="pub_key"></textarea>
+    <textarea id="priv_key"></textarea>
+  </aside>
+
+  <!-- Aside pub and private keys -->
+
 <div class="uk-child-width-expand" uk-grid>
   <div class="uk-grid-item-match">
     <div class="uk-card uk-card-default uk-card-body">
-      <button id="decryptbtn" class="uk-button uk-button-default">Decrypt</button>
+      <button id="decrypt" class="uk-button uk-button-default">Decrypt</button>
   	  <a id="backbtn" class="uk-button uk-button-default" id="whitebutton" href="genometrics.html">Back</a>
       <h3>Ancestry</h3>
-      <table class="uk-table uk-table-divider">
-    	<thead>
-        <tr>
+      <table id="tx_table" class="uk-table uk-table-divider">
+      	<thead>
+          <tr>
             <th>Region</th>
             <th>Percentage</th>
-        </tr>
-    	</thead>
-    	<tbody>
-        <tr>
-            <td>Germany</td>
-            <td>3</td>
-        </tr>
-        <tr>
-            <td>United States</td>
-            <td>29</td>
-        </tr>
-        <tr>
-            <td>Brazil</td>
-            <td>5</td>
-        </tr>
-        <tr>
-            <td>Canada</td>
-            <td>3</td>
-        </tr>
-        <tr>
-            <td>France</td>
-            <td>60</td>
-        </tr>
-    </tbody>
-</table>
+          </tr>
+      	</thead>
+      	<tbody id="tx_table_content">
+          <!-- Render here tx data -->
+        </tbody>
+    </table>
     </div>
   </div>
 
@@ -78,6 +68,133 @@
   </div>
 </div>
 
-<script type="text/javascript" src="js/genodetails.js"></script>
+  <script src="js/jsencrypt.js"></script>
+  <script src="js/localforage.min.js"></script>
+  <script src="https://code.jquery.com/jquery-1.8.3.min.js"></script>
+  <script src="js/underscore-min.js"></script>
+  <script src="js/wallet.js"></script>
+  <script>
+    // Variables
+    var tx_data_template = '<tr> \
+        <td><%= data.country_name %></td> \
+        <td><%= data.percentage %></td> \
+        </tr>'
+
+    // Functions
+    function add_tx_markup(data){
+      // A tx data provided compile and render item
+      $('#non-item').remove();
+      var _template = _.template(tx_data_template);
+      var _compiled = _template({"data":data});
+      $('#tx_table_content').append(_compiled);
+    }
+
+    $(document).ready(function() {
+      (function ($, localforage){
+        // Set the keys on textarea onload page
+        var encrypt = new JSEncrypt();
+        function setKeys(){
+          localforage.getItem('privatekey', function(err, value){
+            $('#priv_key').val(value);
+          });
+          localforage.getItem('publickey', function(err, value){
+            $('#pub_key').val(value);
+          });
+
+        };
+
+        function getTxData(){
+          // Render Tx Data on form
+          var searchParams = new URLSearchParams(window.location.search);
+          var url = "https://genobank-dev-pr-4.herokuapp.com/api/v1/rx-endpoint/"
+          if(searchParams.has("tx_id")){
+            url += searchParams.get('tx_id');
+            $.get(url, function(data) {
+            // Get data from server
+            if (data.length == 0){
+              // Render no tx label
+              $("#tx_table_content").html("<span id='non-item'>Without data :( Something missing!</span>");
+            }else{
+              data.data.forEach(function(item) {
+                // Add tx to template
+                add_tx_markup(item);
+              });
+            }
+            console.log("Finish get!");
+          });
+          }
+        };
+        setKeys();
+        getTxData();
+        google.charts.setOnLoadCallback(map_test);
+        google.charts.setOnLoadCallback(chart_test);
+
+      })($, localforage);
+      // Global variables
+      var data_country = null;
+      google.charts.load('current', {
+        'packages':['geochart'],
+        'mapsApiKey': 'AIzaSyD-9tSrke72PouQMnMX-a7eZSW0jkFMBWY'
+        });
+      google.charts.load('current', {'packages':['corechart']});
+
+      // Functions
+      function decrypt_data(){
+        // Decrypt data and create list
+        var data_decrypt = [];
+
+        $.each($('#tx_table_content tr').children(), function(){
+          var value_input = $(this).html();
+          // Decrypt data
+          var decrypt = new JSEncrypt();
+          decrypt.setPrivateKey($("#priv_key").val());
+          $(this).html(decrypt.decrypt(value_input));
+          // Create list with decrypt data
+          data_decrypt.push($(this).html());
+        });
+        // Here return list of decrypt data
+        $("#decrypt").attr("disabled", "true");
+
+        // Make list for graph
+        var index = 1;
+        var list_decrypt = [['Country', 'Popularity'],];
+
+        for (index; index<data_decrypt.length; index++){
+          if (index%2){
+            list_decrypt.push([data_decrypt[index-1],parseFloat(data_decrypt[index])]);
+          }
+        }
+        // Here return list of decrypt data for graph
+        data_country =list_decrypt;
+      }
+
+      function draw_map(){
+        // Create a map graph
+        var data = google.visualization.arrayToDataTable(data_country);
+        var options = {};
+        var chart = new google.visualization.GeoChart(document.getElementById('regions_div'));
+        chart.draw(data, options);
+      }
+
+
+      function draw_chart() {
+        // Create a pie graph
+        var data = google.visualization.arrayToDataTable(data_country);
+        var options = {
+          title: 'Ancestry Chart'
+        };
+        var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+
+        chart.draw(data, options);
+      }
+
+      // Events
+      $('#decrypt').on('click', function(){
+        decrypt_data();
+        google.charts.setOnLoadCallback(draw_map);
+        google.charts.setOnLoadCallback(draw_chart);
+      });
+    });
+  </script>
 </body>
 </html>

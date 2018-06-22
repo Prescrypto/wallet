@@ -32,6 +32,8 @@
 
 <div class="uk-grid-medium" align="center">
   <form class="uk-form-horizontal uk-margin-large">
+    <!-- Alert Invalid Keys-->
+    <div id="alert"></div>
     <div class="uk-margin">
       <label class="uk-form-label" for="form-horizontal-text">Private Keys</label>
         <div class="uk-form-controls">
@@ -47,10 +49,9 @@
     <div id="next_button">
       <button class="uk-button uk-button-default" id="verify_keys"> Verify </button>
     </div>
-
-
   </form>
 </div>
+
 <!--Upload section-->
 <!--<div class="js-upload uk-placeholder uk-text-center">
   <span uk-icon="icon: cloud-upload"></span>
@@ -72,5 +73,67 @@
 <script src="https://code.jquery.com/jquery-1.8.3.min.js"></script>
 <script src="js/jsencrypt.js"></script>
 <script src="js/wallet.js"></script>
+<script>
+  // Functions
+  function validate_pubkey(){
+    // Verify if the field pubkey is empty
+    if ($("#pubkey").val().length===0){
+      return false
+    }else{
+      return true
+    }
+  }
+
+  function validate_privkey(){
+    // Verify if the field privkey is empty
+    if($("#privkey").val().lengthh===0){
+        return false
+    }else{
+        return true
+    }
+  }
+
+  function validate_keys(){
+    // Is a small test for validate the keys
+    var next_button = '\
+      <a class="uk-button uk-button-default" href="genometrics.html"> Next </a>'
+
+    var alert = '<div  class="uk-alert-danger" uk-alert>\
+      <a class="uk-alert-close" uk-close></a>\
+      <p id="alert">Error. You have entered invalid keys; Please try again.</p>\
+      </div>'
+
+    if (validate_privkey() && validate_pubkey()){
+      // Encrypt with the public key
+      var encrypt = new JSEncrypt();
+      var test = 'This a test';
+      encrypt.setPublicKey($("#pubkey").val());
+      var encrypted = encrypt.encrypt(test);
+
+      // Decrypt with the private key
+      var decrypt = new JSEncrypt();
+      decrypt.setPrivateKey($("#privkey").val());
+      var uncrypted = decrypt.decrypt(encrypted);
+
+      if(uncrypted === test){
+        console.log("Valid Keys");
+        save_key($("#privkey").val(), $("#pubkey").val());
+        console.log("Saved Keys");
+        $('#next_button').html(next_button);
+      }else{
+        $('#alert').html(alert);
+      }
+    }else{
+      $('#alert').html(alert);
+    }
+  }
+
+  // Events
+  $('#verify_keys').on('click', function(e) {
+    e.preventDefault();
+    console.log("Click saved keys");
+    validate_keys();
+  });
+</script>
 </body>
 </html>

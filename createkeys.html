@@ -33,13 +33,13 @@
 <div class="uk-grid-medium" align="center">
   <form class="uk-form-horizontal uk-margin-large">
     <div class="uk-margin">
-      <label class="uk-form-label" for="form-horizontal-text">Private Keys</label>
+      <label class="uk-form-label" for="form-horizontal-text">Private Key</label>
         <div class="uk-form-controls">
           <textarea id="privkey" name="privkey" class="uk-input" type="text" placeholder="Generate keys"></textarea>
         </div>
     </div>
     <div class="uk-margin">
-      <label class="uk-form-label" for="form-horizontal-text">Public Keys</label>
+      <label class="uk-form-label" for="form-horizontal-text">Public Key</label>
         <div class="uk-form-controls">
           <textarea id="pubkey" name="pubkey" class="uk-input" type="text" placeholder="Generate keys"></textarea>
         </div>
@@ -52,6 +52,21 @@
 <script src="https://code.jquery.com/jquery-1.8.3.min.js"></script>
 <script src="js/jsencrypt.js"></script>
 <script src="js/wallet.js"></script>
-
+<script>
+    $(document).ready(function() {
+      (function ($, localforage){
+        function setKeys(){
+          // Get the keys from localforage
+          localforage.getItem('privatekey', function(err, value){
+            $('#privkey').val(value);
+          });
+          localforage.getItem('publickey', function(err, value){
+            $('#pubkey').val(value);
+          });
+        };
+        setKeys();
+      })($, localforage);
+    });
+</script>
 </body>
 </html>
