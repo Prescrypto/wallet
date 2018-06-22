@@ -179,6 +179,7 @@
       // Make data
       var index = 1;
       var data_payload = [];
+      var list_input = read_input();
       var payload = new Object();
 
       for (index; index<list_input.length; index++){
@@ -198,7 +199,8 @@
       }
 
       // Make payload
-      var times = TODAY.toISOString();
+      var today = new Date();
+      var times = today.toISOString();
 
       payload.timestamp = times;
       payload.public_key = encrypt.getPublicKeyB64();
@@ -234,7 +236,7 @@
     });
 
     $('#send_data').on('click', function(){
-      read_input();
+      //read_input();
       create_payload();
     });
   </script>
