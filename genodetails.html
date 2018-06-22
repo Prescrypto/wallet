@@ -80,6 +80,16 @@
         <td><%= data.percentage %></td> \
         </tr>'
 
+    //Graphics Test
+    google.charts.load('current', {
+      'packages':['geochart'],
+      // Note: you will need to get a mapsApiKey for your project.
+      // See: https://developers.google.com/chart/interactive/docs/basic_load_libs#load-settings
+      'mapsApiKey': 'AIzaSyD-9tSrke72PouQMnMX-a7eZSW0jkFMBWY'
+    });
+
+    google.charts.load('current', {'packages':['corechart']});
+
     // Functions
     function add_tx_markup(data){
       // A tx data provided compile and render item
@@ -88,6 +98,32 @@
       var _compiled = _template({"data":data});
       $('#tx_table_content').append(_compiled);
     }
+
+    function map_test(){
+        // Create a map graph
+        var data = google.visualization.arrayToDataTable([
+          ['Country', 'Popularity'],
+          ['Unknown', 0],
+        ]);
+        var options = {};
+        var chart = new google.visualization.GeoChart(document.getElementById('regions_div'));
+
+        chart.draw(data, options);
+      }
+
+      function chart_test(){
+        // Create a pie graph
+        var data = google.visualization.arrayToDataTable([
+          ['Region', 'Percentage'],
+          ['Unknown',     100],
+        ]);
+        var options = {
+          title: 'Ancestry Chart'
+        };
+        var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+
+        chart.draw(data, options);
+      }
 
     $(document).ready(function() {
       (function ($, localforage){
