@@ -1,7 +1,5 @@
 body{
-  background: #5c258d; /* fallback for old browsers */
-  background: -webkit-linear-gradient(to right, #5c258d, #4389a2); /* Chrome 10-25, Safari 5.1-6 */
-  background: linear-gradient(to right, #5c258d, #4389a2); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+  background: #F0F0F7;
   height : 100vh;
 }
 div.uk-grid-medium{
@@ -11,28 +9,30 @@ div.uk-grid-medium{
   margin: auto;
 }
 .welcome{
-  color:white;
-  font-family: 'Roboto Condensed', sans-serif;
+  color:#000;
+  font-family: 'Source Sans Pro', sans-serif;
+  font-weight:900;
   font-size: 60px;
 }
 form.uk-search.uk-search-default{
   margin : 1em;
 }
 p{
-  color:white;
-  font-family: 'Arial Narrow';
+  color:#626262;
+  font-family: 'Source Sans Pro';
   font-size: 18px;
 }
 a.uk-button.uk-button-default.uk-width-1-1.uk-margin-small-bottom{
 	color:white;
-	font-family: 'Arial Black';
-	border-radius: 6px;
+  background-color: #626262;
+	font-family: 'Source Sans Pro';
+  font-weight: 700;
 }
 label.uk-form-label{
   color: white;
-  font-family: 'Arial Narrow';
+  font-family: 'Source Sans Pro';
   font-size: 18px;
-  font-weight: 800;
+  font-weight: 400;
 }
 div.js-upload.uk-placeholder.uk-text-center{
   color: white;
@@ -49,8 +49,8 @@ input#form-horizontal-text.uk-input{
 #whitebutton{
   background-color: white;
   color : black;
-  font-family: 'Arial Narrow';
-  font-weight: 600;
+  font-family: 'Source Sans Pro';
+  font-weight: 700;
   border:0;
   margin-top: 1em;
 }
@@ -59,11 +59,12 @@ img{
 }
 h2.uk-modal-title{
   color : #583490;
-  font-family: 'Arial Black';
+  font-family: 'Source Sans Pro';
+  font-weight: 900;
 }
 #greytxt{
   color: #595959;
-  font-family: 'Arial Italic';
+  font-family: 'Source Sans Pro';
 }
 #alert{
   color:red !important;
