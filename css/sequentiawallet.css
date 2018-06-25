@@ -1,8 +1,23 @@
 body{
-  background: #5c258d; /* fallback for old browsers */
-  background: -webkit-linear-gradient(to right, #5c258d, #4389a2); /* Chrome 10-25, Safari 5.1-6 */
-  background: linear-gradient(to right, #5c258d, #4389a2); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+  background-color: #F0F0F7;
   height : 100vh;
+}
+nav.uk-navbar-container.uk-navbar{
+  background-color:#000;
+  font-size:20px;
+  padding:0 40px 0 40px;
+}
+
+a.uk-navbar-item.uk-logo{
+  font-family: 'Source Sans Pro';
+  font-weight:700;
+  color:#fff!important;
+}
+.uk-navbar-nav>li>a{
+  color:#fff!important;
+  font-size: 15px!important;
+  font-family: 'Source Sans Pro'!important;
+  font-weight:400!important;
 }
 div.uk-grid-medium{
   text-align: left;
@@ -11,31 +26,35 @@ div.uk-grid-medium{
   margin: auto;
 }
 .welcome{
-  color:white;
-  font-family: 'Roboto Condensed', sans-serif;
+  color:#000;
+  font-family: 'Source Sans Pro', sans-serif;
+  font-weight:900;
   font-size: 60px;
 }
 form.uk-search.uk-search-default{
-  margin : 1em;
+  margin : 2em;
+  font-size: 10px;
+  color:#fff;
 }
 p{
-  color:white;
-  font-family: 'Arial Narrow';
+  color:#626262;
+  font-family: 'Source Sans Pro';
   font-size: 18px;
 }
 a.uk-button.uk-button-default.uk-width-1-1.uk-margin-small-bottom{
 	color:white;
-	font-family: 'Arial Black';
-	border-radius: 6px;
+  background-color: #626262;
+	font-family: 'Source Sans Pro';
+  font-weight: 700;
 }
 label.uk-form-label{
-  color: white;
-  font-family: 'Arial Narrow';
-  font-size: 18px;
-  font-weight: 800;
+  color: #626262;
+  font-family: 'Source Sans Pro';
+  font-size: 15px;
+  font-weight: 700;
 }
 div.js-upload.uk-placeholder.uk-text-center{
-  color: white;
+  color: #626262;
 }
 span.uk-link{
   color : #BBB;
@@ -49,8 +68,16 @@ input#form-horizontal-text.uk-input{
 #whitebutton{
   background-color: white;
   color : black;
-  font-family: 'Arial Narrow';
-  font-weight: 600;
+  font-family: 'Source Sans Pro';
+  font-weight: 700;
+  border:0;
+  margin-top: 1em;
+}
+#verify_keys{
+  background-color: white;
+  color : black;
+  font-family: 'Source Sans Pro';
+  font-weight: 700;
   border:0;
   margin-top: 1em;
 }
@@ -58,12 +85,13 @@ img{
   margin-bottom: 1em;
 }
 h2.uk-modal-title{
-  color : #583490;
-  font-family: 'Arial Black';
+  color : #000;
+  font-family: 'Source Sans Pro';
+  font-weight: 900;
 }
 #greytxt{
   color: #595959;
-  font-family: 'Arial Italic';
+  font-family: 'Source Sans Pro';
 }
 #alert{
   color:red !important;

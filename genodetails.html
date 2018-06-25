@@ -4,7 +4,7 @@
   <title>Sequentia Wallet</title>
   <link rel="stylesheet" type="text/css" href="css/genometrics.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.5/css/uikit.min.css" />
-  <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed:700" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,900" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.5/js/uikit.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.5/js/uikit-icons.min.js"></script>
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
@@ -13,19 +13,20 @@
   <!-- Main menu -->
   <nav class="uk-navbar-container" uk-navbar>
     <div class="uk-navbar-left">
-    	<ul class="uk-navbar-nav">
-    	  <li><a class="uk-navbar-item uk-logo" href="index.html">SequentiaWallet</a></li>
+      <ul class="uk-navbar-nav">
+        <li><a class="uk-navbar-item uk-logo" href="index.html"> SequentiaWallet </a></li>
       </ul>
     </div>
     <div class="uk-navbar-right">
       <ul class="uk-navbar-nav">
-        <li><a href="#">Contact</a></li>
-        <li>
+        <li id="menu_item"><a href="#">Go to Navigator</a></li>
+        <li id="menu_item">
           <form class="uk-search uk-search-default">
             <span class="uk-search-icon-flip" uk-search-icon></span>
             <input class="uk-search-input" type="search" placeholder="Search...">
           </form>
         </li>
+        <li id="menu_item"><a href="#">Contact</a></li>
       </ul>
     </div>
   </nav>
@@ -42,7 +43,7 @@
 <div class="uk-child-width-expand" uk-grid>
   <div class="uk-grid-item-match">
     <div class="uk-card uk-card-default uk-card-body">
-      <button id="decrypt" class="uk-button uk-button-default">Decrypt</button>
+      <button id="decrypt" class="uk-button uk-button-default" style="font-weight: 700;background-color: white">Decrypt</button>
   	  <a id="backbtn" class="uk-button uk-button-default" id="whitebutton" href="genometrics.html">Back</a>
       <h3>Ancestry</h3>
       <table id="tx_table" class="uk-table uk-table-divider">
