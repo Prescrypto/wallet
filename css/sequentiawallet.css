@@ -47,6 +47,13 @@ a.uk-button.uk-button-default.uk-width-1-1.uk-margin-small-bottom{
 	font-family: 'Source Sans Pro';
   font-weight: 700;
 }
+.table > tbody > tr > td{
+  border-top: 0px;
+  padding: 1em 1.5em;
+  max-width:200px; /* Customise it accordingly */
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 label.uk-form-label{
   color: #626262;
   font-family: 'Source Sans Pro';

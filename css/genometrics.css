@@ -27,9 +27,14 @@ form.uk-search.uk-search-default{
 div.uk-grid-medium{
   text-align: left;
   padding-top: 150px;
-  width:400px;
+  width:800px;
   margin: auto;
   padding-right: 20px;
+}
+#genocontent{
+  max-width:200px; /* Customise it accordingly */
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 h2{
   color:#3F3F3F !important;
