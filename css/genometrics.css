@@ -57,6 +57,11 @@ h2{
    font-size: 1em;
    font-style: normal;
 }
+p#geno_p{
+  max-width:200px; /* Customise it accordingly */
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 p{
   color:#595959;
   font-family: 'Source Sans Pro';
