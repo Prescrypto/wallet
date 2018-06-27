@@ -31,7 +31,17 @@ div.uk-grid-medium{
   margin: auto;
   padding-right: 20px;
 }
+#genome{
+  max-width:200px;
+}
 #genocontent{
+  max-width:500px; /* Customise it accordingly */
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.table > tbody > tr > td{
+  border-top: 0px;
+  padding: 1em 1.5em;
   max-width:200px; /* Customise it accordingly */
   overflow: hidden;
   text-overflow: ellipsis;
