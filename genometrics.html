@@ -126,7 +126,7 @@
             // Get Txs when load page!
             var list_rx = [];
             var pubkey_uri= encodeURIComponent(value_b64).replace(/'/g,"%27").replace(/"/g,"%22");
-            var url = "https://genobank-dev-pr-4.herokuapp.com/api/v1/rx-endpoint/?public_key=" + pubkey_uri;
+            var url = "https://genobank.herokuapp.com/api/v1/rx-endpoint/?public_key=" + pubkey_uri;
             $.get(url, function(data) {
               // Get data from server
               if (data.results.length == 0){
@@ -226,7 +226,7 @@
 
 
       // Make POST
-      var posting = $.post("https://genobank-dev-pr-4.herokuapp.com/api/v1/rx-endpoint/",
+      var posting = $.post("https://genobank.herokuapp.com/api/v1/rx-endpoint/",
                       payload);
 
       posting.done(function(data, text_status){
