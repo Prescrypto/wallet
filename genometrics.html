@@ -167,7 +167,6 @@
       var rsa = new RSAKey();
       rsa.readPrivateKeyFromPEMString(priv_key);
       var sign_msg = rsa.sign(msg, hash_alg);
-      var sign_b64 = linebrk(sign_msg, 64);
       return sign_msg;
     }
 
@@ -221,7 +220,7 @@
       payload.data = JSON.stringify(data_payload);
       payload.location = "Mexico";
 
-      var msg = JSON.stringify(payload);
+      var msg = payload.data;
       var hash_alg = 'sha1';
       var prk = $('#priv_key').val();
       payload.signature = sign(msg, prk, hash_alg);
