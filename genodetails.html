@@ -145,7 +145,7 @@
         function getTxData(){
           // Render Tx Data on form
           var searchParams = new URLSearchParams(window.location.search);
-          var url = "https://genobank.herokuapp.com/api/v1/rx-endpoint/"
+          var url = window.baseurl + "api/v1/rx-endpoint/"
           if(searchParams.has("tx_id")){
             url += searchParams.get('tx_id');
             $.get(url, function(data) {
