@@ -114,3 +114,8 @@ h2.uk-modal-title{
     width:90%;
   }
 }
+@media (max-width: 1200px){
+  div.uk-grid-medium{
+    width:90%;
+  }
+}
