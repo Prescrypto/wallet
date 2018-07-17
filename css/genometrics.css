@@ -19,8 +19,10 @@ a.uk-navbar-item.uk-logo{
   font-family: 'Source Sans Pro'!important;
   font-weight:400!important;
 }
+.uk-navbar-dropdown-nav>li>a{
+  color:#000!important;
+}
 form.uk-search.uk-search-default{
-  margin : 2em;
   font-size: 10px;
   color:#fff;
 }
