@@ -103,3 +103,13 @@ h2.uk-modal-title{
 #alert{
   color:red !important;
 }
+
+@media (max-width: 900px){
+  .welcome{
+    font-size: 50px!important;
+  }
+  #index_content{
+    margin:0 auto;
+    width:90%;
+  }
+}
