@@ -96,3 +96,9 @@ div.uk-child-width-expand.uk-grid{
 #formButtons{
   margin-top:10px;
 }
+
+@media (max-width: 1200px){
+  div.uk-grid-medium{
+    width:90%;
+  }
+}
