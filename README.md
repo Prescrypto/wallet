@@ -13,4 +13,4 @@ $ python -m SimpleHTTPServer 8080
 
 ```
 
-NOTE: sNeed to open /uikit to run server
+NOTE: Can use whatever simple server instead python server!
