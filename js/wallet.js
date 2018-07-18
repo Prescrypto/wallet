@@ -12,7 +12,7 @@ function save_key(private_key, public_key){
     // set privatekey
     localforage.setItem('publickey', public_key).then(function(value){
       console.log("Success Generated Keys!");
-      window.open("/createkeys.html","_self");
+      window.open("./createkeys.html","_self");
     });
   }).catch(function(e){
     console.log(e);
