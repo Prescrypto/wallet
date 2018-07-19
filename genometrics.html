@@ -12,7 +12,7 @@
 </head>
 <body>
   <!-- Main menu -->
-  <nav class="uk-navbar-container" uk-navbar>
+  <nav class="uk-navbar-container" uk-navbar="boundary-align: true; align: right;">
     <div class="uk-navbar-left">
       <ul class="uk-navbar-nav">
         <li><a class="uk-navbar-item uk-logo" href="index.html"> SequentiaWallet </a></li>
@@ -20,14 +20,21 @@
     </div>
     <div class="uk-navbar-right">
       <ul class="uk-navbar-nav">
-        <li id="menu_item"><a href="#">Go to Navigator</a></li>
-        <li id="menu_item">
-          <form class="uk-search uk-search-default">
-            <span class="uk-search-icon-flip" uk-search-icon></span>
-            <input class="uk-search-input" type="search" placeholder="Search...">
-          </form>
+        <li>
+          <a class="uk-navbar-toggle" uk-navbar-toggle-icon href=""></a>
+          <div class="uk-navbar-dropdown">
+            <ul class="uk-nav uk-navbar-dropdown-nav">
+              <li id="menu_item"><a href="https://genobank.herokuapp.com/">Go to Navigator</a></li>
+              <li id="menu_item">
+                <form class="uk-search uk-search-default">
+                  <span class="uk-search-icon-flip" uk-search-icon></span>
+                  <input class="uk-search-input" type="search" placeholder="Search...">
+                </form>
+              </li>
+              <li id="menu_item"><a href="#">Contact</a></li>
+            </ul>
+          </div>
         </li>
-        <li id="menu_item"><a href="#">Contact</a></li>
       </ul>
     </div>
   </nav>
@@ -41,7 +48,7 @@
   <!-- END Aside pub and private keys -->
 
   <div class="uk-grid-medium" align="center">
-    <h2>Your Genometrics</h2>
+    <h2>Your Genomics</h2>
     <div class="uk-child-width-1-1@s" uk-grid>
       <div>
         <div id="genocontent" uk-sortable="group: sortable-group">

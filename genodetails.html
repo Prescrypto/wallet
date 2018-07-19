@@ -13,7 +13,7 @@
 </head>
 <body>
   <!-- Main menu -->
-  <nav class="uk-navbar-container" uk-navbar>
+  <nav class="uk-navbar-container" uk-navbar="boundary-align: true; align: right;">
     <div class="uk-navbar-left">
       <ul class="uk-navbar-nav">
         <li><a class="uk-navbar-item uk-logo" href="index.html"> SequentiaWallet </a></li>
@@ -21,14 +21,21 @@
     </div>
     <div class="uk-navbar-right">
       <ul class="uk-navbar-nav">
-        <li id="menu_item"><a href="#">Go to Navigator</a></li>
-        <li id="menu_item">
-          <form class="uk-search uk-search-default">
-            <span class="uk-search-icon-flip" uk-search-icon></span>
-            <input class="uk-search-input" type="search" placeholder="Search...">
-          </form>
+        <li>
+          <a class="uk-navbar-toggle" uk-navbar-toggle-icon href=""></a>
+          <div class="uk-navbar-dropdown">
+            <ul class="uk-nav uk-navbar-dropdown-nav">
+              <li id="menu_item"><a href="https://genobank.herokuapp.com/">Go to Navigator</a></li>
+              <li id="menu_item">
+                <form class="uk-search uk-search-default">
+                  <span class="uk-search-icon-flip" uk-search-icon></span>
+                  <input class="uk-search-input" type="search" placeholder="Search...">
+                </form>
+              </li>
+              <li id="menu_item"><a href="#">Contact</a></li>
+            </ul>
+          </div>
         </li>
-        <li id="menu_item"><a href="#">Contact</a></li>
       </ul>
     </div>
   </nav>
@@ -42,9 +49,9 @@
 
   <!-- Aside pub and private keys -->
 
-<div class="uk-child-width-expand" uk-grid>
+<div class="uk-child-width-expand@s" uk-grid>
   <div class="uk-grid-item-match">
-    <div class="uk-card uk-card-default uk-card-body">
+    <div class="uk-child-width-1-2 uk-card uk-card-default uk-card-body">
       <button id="decrypt" class="uk-button uk-button-default" style="font-weight: 700;background-color: white">Decrypt</button>
   	  <a id="backbtn" class="uk-button uk-button-default" id="whitebutton" href="genometrics.html">Back</a>
       <h3>Ancestry</h3>
@@ -62,12 +69,11 @@
     </div>
   </div>
 
-  <div class="uk-card uk-card-default uk-card-body">
+  <div class="uk-child-width-1 uk-card uk-card-default uk-card-body">
     <div id="regions_div" style="width: 100%;"></div>
     <div class="uk-card uk-card-default uk-card-body">
-    <div id="piechart" style="width: 100%;"></div>
-    </p>
-  </div>
+      <div id="piechart" style="width: 100%;"></div>
+    </div>
   </div>
 </div>
 
@@ -232,6 +238,11 @@
         decrypt_data();
         google.charts.setOnLoadCallback(draw_map);
         google.charts.setOnLoadCallback(draw_chart);
+      });
+
+      $(window).resize(function(){
+        map_test();
+        chart_test();
       });
     });
   </script>
