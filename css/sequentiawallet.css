@@ -104,6 +104,12 @@ h2.uk-modal-title{
 #alert{
   color:red !important;
 }
+#upload_link{
+  color: #48a9e1;
+}
+.uk-placeholder{
+  border:1px dashed #626262!important;
+}
 
 @media (max-width: 900px){
   .welcome{
