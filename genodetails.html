@@ -239,10 +239,12 @@
         google.charts.setOnLoadCallback(draw_map);
         google.charts.setOnLoadCallback(draw_chart);
       });
-
+      // Make Map, pie chart and data responsive.
       $(window).resize(function(){
         map_test();
         chart_test();
+        draw_map();
+        draw_chart();
       });
     });
   </script>
