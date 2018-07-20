@@ -63,20 +63,24 @@
 </div>
 
 <!--Upload section-->
-<!--<div class="js-upload uk-placeholder uk-text-center">
+<div class="js-upload uk-placeholder uk-text-center">
   <span uk-icon="icon: cloud-upload"></span>
-  <span class="uk-text-middle">Attach Keys by dropping them here or</span>
+  <span class="uk-text-middle">Attach your PRIVATE Key by dropping them here or</span>
   <div uk-form-custom>
-    <input type="file" multiple>
-    <span class="uk-link">select from computer</span>
+    <input id="privkey_file" type="file">
+    <span class="uk-link">Select your PRIVATE Key from computer</span>
   </div>
 </div>
 
-<progress id="js-progressbar" class="uk-progress" value="0" max="100" hidden></progress>-->
-
+<div class="js-upload uk-placeholder uk-text-center">
+  <span uk-icon="icon: cloud-upload"></span>
+  <span class="uk-text-middle">Attach your PUBLIC Key by dropping them here or</span>
+  <div uk-form-custom>
+    <input id="pubkey_file" type="file">
+    <span class="uk-link">Select your PUBLIC Key from computer</span>
+  </div>
+</div>
 <!-- Closing upload section-->
-
-
 
 <script type="text/javascript" src="js/enterkeys.js"></script>
 <script src="js/localforage.min.js"></script>
@@ -108,7 +112,7 @@
     var next_button = '\
       <a class="uk-button uk-button-default" href="genometrics.html"> Next </a>'
 
-    var alert = '<div  class="uk-alert-danger" uk-alert>\
+    var alert_keys = '<div  class="uk-alert-danger" uk-alert>\
       <a class="uk-alert-close" uk-close></a>\
       <p id="alert">Error. You have entered invalid keys; Please try again.</p>\
       </div>'
@@ -131,11 +135,48 @@
         console.log("Saved Keys");
         $('#next_button').html(next_button);
       }else{
-        $('#alert').html(alert);
+        $('#alert').html(alert_keys);
       }
     }else{
-      $('#alert').html(alert);
+      $('#alert').html(alert_keys);
     }
+  }
+
+  function read_pubkey_file(e) {
+    // Variable
+    var file = e.target.files[0];
+
+    //Small Validation
+    if (!file) {
+      return;
+    }
+
+    //Read file
+    var read = new FileReader();
+    read.onload = function(e) {
+      var content = e.target.result;
+      $("#pubkey").html(content);
+    };
+    read.readAsText(file);
+
+  }
+
+  function read_privkey_file(e) {
+    // Variable
+    var file = e.target.files[0];
+
+    //Small Validation
+    if (!file) {
+      return;
+    }
+
+    //Read file
+    var read = new FileReader();
+    read.onload = function(e) {
+      var content = e.target.result;
+      $("#privkey").html(content);
+    };
+    read.readAsText(file);
   }
 
   // Events
@@ -144,6 +185,12 @@
     console.log("Click saved keys");
     validate_keys();
   });
+
+  document.getElementById('pubkey_file')
+  .addEventListener('change', read_pubkey_file, false);
+
+  document.getElementById('privkey_file')
+  .addEventListener('change', read_privkey_file, false);
 </script>
 </body>
 </html>
