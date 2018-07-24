@@ -60,12 +60,27 @@
         <!-- This is Transfer Data Modal-->
         <div id="modal-transact" uk-modal>
             <div class="uk-modal-dialog uk-modal-body">
-                <h2 class="uk-modal-title">Headline</h2>
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-                <p class="uk-text-right">
-                    <button class="uk-button uk-button-default uk-modal-close" type="button">Cancel</button>
-                    <button class="uk-button uk-button-primary" type="button">Save</button>
-                </p>
+                <h2 class="uk-modal-title">Transfer your genomic Data</h2>
+                <form class="uk-form-stacked">
+                  <div class="uk-margin">
+                    <label class="uk-form-label" for="form-stacked-text">To: </label>
+                    <div class="uk-form-controls">
+                      <input class="uk-input" id="form-stacked-text" type="text" placeholder="Public key" required>
+                    </div>
+                  </div>
+                  <div class="uk-margin">
+                    <label class="uk-form-label" for="form-text-area">Memo: </label>
+                    <textarea id="form-text-area" class="uk-textarea" rows="5" placeholder=""></textarea>
+                  </div>
+                  <div class="uk-margin">
+                    <label class="uk-form-label" for="form-pin">Pin: </label>
+                    <div id="form-pin" class="uk-inline">
+                      <span class="uk-form-icon uk-form-icon-flip" uk-icon="icon: lock"></span>
+                      <input class="uk-input" type="number" required>
+                    </div>
+                  </div>
+                  <input type="submit" value="Transfer" class="uk-button uk-button-default" style="font-weight: 700;background-color: #3C3C3C; color:#fff;">
+                </form>
             </div>
         </div>
       </div>
