@@ -47,14 +47,16 @@
         <div class="uk-form-controls">
           <textarea id="privkey" name="privkey" class="uk-input" type="text" placeholder="Generate keys"></textarea>
         </div>
+        <a id="download_privkey" download="HOLA:TXT"> Export </a>
     </div>
     <div class="uk-margin">
       <label class="uk-form-label" for="form-horizontal-text">Public Key</label>
         <div class="uk-form-controls">
           <textarea id="pubkey" name="pubkey" class="uk-input" type="text" placeholder="Generate keys"></textarea>
         </div>
+        <a id="download_pubkey"> Export </a>
     </div>
-   <a id="whitebutton" class="uk-button uk-button-default" href="genometrics.html">Next</a>
+   <a id="whitebutton" class="uk-button uk-button-default" href="genometrics.html"> Next </a>
   </form>
 </div>
 
@@ -65,7 +67,7 @@
 <script>
     $(document).ready(function() {
       (function ($, localforage){
-        function setKeys(){
+          function setKeys(){
           // Get the keys from localforage
           localforage.getItem('privatekey', function(err, value){
             $('#privkey').val(value);
@@ -76,6 +78,19 @@
         };
         setKeys();
       })($, localforage);
+    });
+
+    //Events
+    //Download private key files
+    $('#download_privkey').click(function() {
+      var content = $('#privkey').val();
+      window.location.href = 'data:application/octet-stream,'+ encodeURIComponent(content);
+    });
+
+    //Download private key files
+    $('#download_pubkey').click(function() {
+      var content = $('#pubkey').val();
+      window.location.href = 'data:application/octet-stream,'+ encodeURIComponent(content);
     });
 </script>
 </body>
