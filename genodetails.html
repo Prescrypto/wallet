@@ -181,12 +181,12 @@
      var alert_not_found = '<div  class="uk-alert-danger" uk-alert>\
         <a class="uk-alert-close" uk-close></a>\
         <p id="alert">Error. No Public or Private key found.</p>\
-        </div>'
+        </div>';
 
       var alert_fail = '<div  class="uk-alert-danger" uk-alert>\
         <a class="uk-alert-close" uk-close></a>\
         <p id="alert">Error. Transference failed.</p>\
-        </div>'
+        </div>';
       var index = 1;
       var data_payload = [];
       var payload = new Object();
@@ -264,12 +264,8 @@
          console.log("No Public Key found");
           $('#alert').html(alert_not_found);
           document.getElementById("transferdata").disabled = true;
-
       }
-
-
   }
-
 
   function read_pubkey_file(e) {
     // Variable
@@ -290,7 +286,6 @@
     read.readAsText(file);
 
   }
-
     function add_tx_markup(data){
       // A tx data provided compile and render item
       $('#non-item').remove();
@@ -324,7 +319,6 @@
 
         chart.draw(data, options);
       }
-
 
     $(document).ready(function() {
       (function ($, localforage){
@@ -411,8 +405,6 @@
           document.getElementById("transferaction").disabled = false;
 
         }
-
-
       }
 
       function draw_map(){
