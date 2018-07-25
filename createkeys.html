@@ -47,14 +47,14 @@
         <div class="uk-form-controls">
           <textarea id="privkey" name="privkey" class="uk-input" type="text" placeholder="Generate keys"></textarea>
         </div>
-        <a id="download_privkey" download="HOLA:TXT"> Export </a>
+        <a id="download_privkey" download="">Save Private Key </a>
     </div>
     <div class="uk-margin">
       <label class="uk-form-label" for="form-horizontal-text">Public Key</label>
         <div class="uk-form-controls">
           <textarea id="pubkey" name="pubkey" class="uk-input" type="text" placeholder="Generate keys"></textarea>
         </div>
-        <a id="download_pubkey"> Export </a>
+        <a id="download_pubkey">Save Public Key</a>
     </div>
    <a id="whitebutton" class="uk-button uk-button-default" href="genometrics.html"> Next </a>
   </form>
@@ -79,15 +79,14 @@
         setKeys();
       })($, localforage);
     });
-
     //Events
-    //Download private key files
+    //Download private key file
     $('#download_privkey').click(function() {
       var content = $('#privkey').val();
       window.location.href = 'data:application/octet-stream,'+ encodeURIComponent(content);
     });
 
-    //Download private key files
+    //Download public key file
     $('#download_pubkey').click(function() {
       var content = $('#pubkey').val();
       window.location.href = 'data:application/octet-stream,'+ encodeURIComponent(content);
