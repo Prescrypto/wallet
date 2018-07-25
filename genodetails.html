@@ -55,31 +55,42 @@
       <div class="uk-inline" style="width: 100%">
         <button id="decrypt" class="uk-button uk-button-default" style="font-weight: 700;background-color: white">Decrypt</button>
         <!-- Transfer Data button calling modal-->
-        <button id="decrypt" class="uk-button uk-button-default" uk-toggle="target: #modal-transact" style="font-weight: 700;background-color: #4AD991; color:#fff;">Transfer Data</button>
+        <button id="transferaction" name="transferaction" class="uk-button uk-button-default" uk-toggle="target: #modal-transact" style="font-weight: 700;background-color: #4AD991; color:#fff;" disabled>Transfer Data</button>
         <a id="backbtn" class="uk-button uk-button-default" id="whitebutton" href="genometrics.html">Back</a>
         <!-- This is Transfer Data Modal-->
         <div id="modal-transact" uk-modal>
             <div class="uk-modal-dialog uk-modal-body">
                 <h2 class="uk-modal-title">Transfer your genomic Data</h2>
                 <form class="uk-form-stacked">
+                  <div id="alert"></div>
                   <div class="uk-margin">
                     <label class="uk-form-label" for="form-stacked-text">To: </label>
                     <div class="uk-form-controls">
-                      <input class="uk-input" id="form-stacked-text" type="text" placeholder="Public key" required>
+                      <textarea id="newpubkey" name="newpubkey" class="uk-input" type="text" placeholder="Paste Public key" onchange="validate_transfer()" required></textarea>
+                        <div class="js-upload uk-placeholder uk-text-center">
+                          <span uk-icon="icon: cloud-upload"></span>
+                          <span class="uk-text-middle">Attach your PUBLIC Key by dropping it here or</span>
+                          <div uk-form-custom>
+                            <input id="pubkey_file" type="file">
+                            <span id="upload_link" class="uk-link">Select your PUBLIC Key from computer</span>
+                          </div>
+                        </div>
                     </div>
                   </div>
                   <div class="uk-margin">
                     <label class="uk-form-label" for="form-text-area">Memo: </label>
-                    <textarea id="form-text-area" class="uk-textarea" rows="5" placeholder=""></textarea>
+                    <textarea id="memo" name="memo" class="uk-textarea" rows="5" placeholder=""></textarea>
                   </div>
                   <div class="uk-margin">
                     <label class="uk-form-label" for="form-pin">Pin: </label>
                     <div id="form-pin" class="uk-inline">
                       <span class="uk-form-icon uk-form-icon-flip" uk-icon="icon: lock"></span>
-                      <input class="uk-input" type="number" required>
+                      <input class="uk-input" type="number" name="pin" id="pin" required>
                     </div>
                   </div>
-                  <input type="submit" value="Transfer" class="uk-button uk-button-default" style="font-weight: 700;background-color: #3C3C3C; color:#fff;">
+                  <div id="transfer_button">
+                    <button  id="transferdata"  class="uk-button uk-button-default" style="font-weight: 700;background-color: #fff; color:#3C3C3C;" disabled> Transfer </button>
+                  </div>
                 </form>
             </div>
         </div>
@@ -107,29 +118,196 @@
   </div>
 </div>
 
-  <script src="js/jsencrypt.js"></script>
   <script src="js/localforage.min.js"></script>
   <script src="https://code.jquery.com/jquery-1.8.3.min.js"></script>
+  <script src="js/jsencrypt.js"></script>
+  <script src="js/jsrsasign-all-min.js"></script>
   <script src="js/underscore-min.js"></script>
   <script src="js/wallet.js"></script>
   <script>
-    // Variables
+    // Global variables
+    var data_country = null;
+    var list_decrypt = [];
+    google.charts.load('current', {
+      'packages':['geochart'],
+      'mapsApiKey': 'AIzaSyD-9tSrke72PouQMnMX-a7eZSW0jkFMBWY'
+      });
+    google.charts.load('current', {'packages':['corechart']});
+
     var tx_data_template = '<tr> \
         <td><%= data.country_name %></td> \
         <td><%= data.percentage %></td> \
         </tr>'
 
-    //Graphics Test
-    google.charts.load('current', {
-      'packages':['geochart'],
-      // Note: you will need to get a mapsApiKey for your project.
-      // See: https://developers.google.com/chart/interactive/docs/basic_load_libs#load-settings
-      'mapsApiKey': 'AIzaSyD-9tSrke72PouQMnMX-a7eZSW0jkFMBWY'
-    });
-
-    google.charts.load('current', {'packages':['corechart']});
-
     // Functions
+    function validate_key(key_id){
+      // Verify if the field pubkey is empty
+      if ($(key_id).val().length===0){
+        return false
+      }else{
+        return true
+      }
+    }
+
+    function sign(msg, priv_key, hash_alg){
+      //Create a signature of payload
+      var rsa = new RSAKey();
+      rsa.readPrivateKeyFromPEMString(priv_key);
+      var sign_msg = rsa.sign(msg, hash_alg);
+      return sign_msg;
+  }
+
+
+  function validate_transfer(){
+    var transfer_button = '<button onclick="transfer_data()" id="transferdata"  class="uk-button uk-button-default" style="font-weight: 700;background-color: #3C3C3C; color:#fff;"> Transfer </button>'
+    var transfer_button_disabled = '<button onclick="transfer_data()" id="transferdata"  class="uk-button uk-button-default" style="font-weight: 700;background-color: #fff; color:#3C3C3C;" disabled> Transfer </button>'
+
+    var alert_key = '<div  class="uk-alert-danger" uk-alert>\
+      <a class="uk-alert-close" uk-close></a>\
+      <p id="alert">Error. You have entered invalid key; Please try again.</p>\
+      </div>'
+
+      if (validate_key("#newpubkey")){
+        console.log("Valid Key");
+        //document.getElementById("transferdata").disabled = false;
+        $('#transfer_button').html(transfer_button);
+        
+      }else{
+        $('#transfer_button').html(transfer_button_disabled);
+        $('#alert').html(alert_key);
+      }
+  }
+
+  function transfer_data(){
+    //transfer data to the new owner
+     var alert_not_found = '<div  class="uk-alert-danger" uk-alert>\
+        <a class="uk-alert-close" uk-close></a>\
+        <p id="alert">Error. No Public or Private key found.</p>\
+        </div>'
+      var index = 1;
+      var data_payload = [];
+      var payload = new Object();
+      var form_pin = $('#pin').val();
+      var form_memo = $('#memo').val();
+
+
+      if (validate_key("#newpubkey") && validate_key("#priv_key")){
+         
+        for (index; index<list_decrypt.length; index++){
+          var index2 = 0
+            var templist = list_decrypt[index]
+            data_payload.push({"country_name":templist[0],"percentage":templist[1]});
+          
+        }
+        
+        
+
+        // Encrypt data
+        var encrypt = new JSEncrypt();
+        var index_encrypt = 0;
+        var new_pub_key = $("#newpubkey").val();
+        var prk = $('#priv_key').val();
+
+        encrypt.setPublicKey(new_pub_key);
+        for (index_encrypt; index_encrypt<data_payload.length; index_encrypt++){
+          data_payload[index_encrypt].country_name = encrypt.encrypt(data_payload[index_encrypt].country_name);
+          data_payload[index_encrypt].percentage = encrypt.encrypt(data_payload[index_encrypt].percentage);
+        }
+
+        if(form_pin.length > 0){
+          data_payload.push({"pin": encrypt.encrypt(form_pin)});
+        }
+        if(form_memo.length > 0){
+          data_payload.push({"memo": encrypt.encrypt(form_memo)});
+        }
+
+        // Make payload
+        var today = new Date();
+        var times = today.toISOString();
+
+        payload.timestamp = times;
+        payload.public_key = encrypt.getPublicKeyB64();
+        payload.data = JSON.stringify(data_payload);
+        payload.location = "Mexico";
+
+        var msg = payload.data;
+        var hash_alg = 'sha1';
+        
+        payload.signature = sign(msg, prk, hash_alg);
+
+        // Make POST
+       /* var posting = $.post(window.baseurl + "api/v1/rx-endpoint/", payload);
+ 
+
+        posting.done(function(data, text_status){
+          console.log("transfered1");
+          console.log(text_status);
+          console.log("transfered2");
+          $(location).attr('href', 'genometrics.html');
+          // reload page to see new items
+          //location.reload();
+        });
+        posting.fail(function(xhr, textStatus, errorThrown){
+          console.log(xhr.responseText);
+          console.log("transferense failed");
+          console.log(errorThrown);
+
+          $(location).attr('href', 'genometrics.html');
+        });
+        //posting.always(function(){
+          // Finish POST!
+        //}); */
+
+        $.ajax({
+            type: "POST",
+            url: window.baseurl + "api/v1/rx-endpoint/",
+            data: payload
+        }).done(function (data) {
+            console.log(data);
+            console.log("transfered correctly");
+            $(location).attr('href', 'genometrics.html');
+
+        }).fail(function(xhr, textStatus, errorThrown){
+          console.log(xhr.responseText);
+          console.log("transferense failed");
+          console.log(textStatus);
+          console.log(errorThrown);
+
+          
+        });
+
+      }
+      else{
+         console.log("No Public Key found");
+          $('#alert').html(alert_not_found);
+          document.getElementById("transferdata").disabled = true;
+
+      }
+
+
+  }
+
+
+  function read_pubkey_file(e) {
+    // Variable
+    var file = e.target.files[0];
+
+    //Small Validation
+    if (!file) {
+      return;
+    }
+
+    //Read file
+    var read = new FileReader();
+    read.onload = function(e) {
+      var content = e.target.result;
+      $("#newpubkey").html(content);
+      validate_transfer();
+    };
+    read.readAsText(file);
+
+  }
+
     function add_tx_markup(data){
       // A tx data provided compile and render item
       $('#non-item').remove();
@@ -163,6 +341,7 @@
 
         chart.draw(data, options);
       }
+
 
     $(document).ready(function() {
       (function ($, localforage){
@@ -205,42 +384,52 @@
         google.charts.setOnLoadCallback(chart_test);
 
       })($, localforage);
-      // Global variables
-      var data_country = null;
-      google.charts.load('current', {
-        'packages':['geochart'],
-        'mapsApiKey': 'AIzaSyD-9tSrke72PouQMnMX-a7eZSW0jkFMBWY'
-        });
-      google.charts.load('current', {'packages':['corechart']});
 
       // Functions
       function decrypt_data(){
-        // Decrypt data and create list
+         // Decrypt data and create list
         var data_decrypt = [];
+        var alert_not_found = '<div  class="uk-alert-danger" uk-alert>\
+        <a class="uk-alert-close" uk-close></a>\
+        <p id="alert">Error. No Private key found.</p>\
+        </div>'
 
-        $.each($('#tx_table_content tr').children(), function(){
-          var value_input = $(this).html();
-          // Decrypt data
-          var decrypt = new JSEncrypt();
-          decrypt.setPrivateKey($("#priv_key").val());
-          $(this).html(decrypt.decrypt(value_input));
-          // Create list with decrypt data
-          data_decrypt.push($(this).html());
-        });
-        // Here return list of decrypt data
-        $("#decrypt").attr("disabled", "true");
+        if(!validate_key("#priv_key")){
+          console.log("No Priv Key found");
+          $('#alert').html(alert_not_found);
+          document.getElementById("transferaction").disabled = true;
 
-        // Make list for graph
-        var index = 1;
-        var list_decrypt = [['Country', 'Popularity'],];
-
-        for (index; index<data_decrypt.length; index++){
-          if (index%2){
-            list_decrypt.push([data_decrypt[index-1],parseFloat(data_decrypt[index])]);
-          }
         }
-        // Here return list of decrypt data for graph
-        data_country =list_decrypt;
+        else{
+          $.each($('#tx_table_content tr').children(), function(){
+            var value_input = $(this).html();
+            // Decrypt data
+            var decrypt = new JSEncrypt();
+            decrypt.setPrivateKey($("#priv_key").val());
+
+            $(this).html(decrypt.decrypt(value_input));
+            // Create list with decrypt data
+            data_decrypt.push($(this).html());
+          });
+          // Here return list of decrypt data
+          $("#decrypt").attr("disabled", "true");
+
+          // Make list for graph
+          var index = 1;
+          list_decrypt = [['Country', 'Popularity'],];
+
+          for (index; index<data_decrypt.length; index++){
+            if (index%2){
+              list_decrypt.push([data_decrypt[index-1],parseFloat(data_decrypt[index])]);
+            }
+          }
+          // Here return list of decrypt data for graph
+          data_country =list_decrypt;
+          document.getElementById("transferaction").disabled = false;
+
+        }
+
+
       }
 
       function draw_map(){
@@ -269,6 +458,15 @@
         google.charts.setOnLoadCallback(draw_map);
         google.charts.setOnLoadCallback(draw_chart);
       });
+
+      document.getElementById('pubkey_file')
+      .addEventListener('change', read_pubkey_file, false);
+
+      document.getElementById("transferdata").addEventListener("click", function(event){
+          event.preventDefault();
+          transfer_data();
+      });
+
       // Make Map, pie chart and data responsive.
       $(window).resize(function(){
         map_test();
