@@ -80,16 +80,26 @@
       })($, localforage);
     });
     //Events
-    //Download private key file
-    $('#download_privkey').click(function() {
-      var content = $('#privkey').val();
-      window.location.href = 'data:application/octet-stream,'+ encodeURIComponent(content);
-    });
-
     //Download public key file
     $('#download_pubkey').click(function() {
+      //Read the public key
       var content = $('#pubkey').val();
-      window.location.href = 'data:application/octet-stream,'+ encodeURIComponent(content);
+      //Create a label type a
+      var link = document.createElement("a");
+        link.download ="Public_Key.pem";
+        link.href = 'data:application/octet-stream,'+ encodeURIComponent(content);
+        link.click();
+    });
+
+    //Download private key file
+    $('#download_privkey').click(function() {
+      //Read the private key
+      var content = $('#privkey').val();
+      //Create a label type a
+      var link = document.createElement("a");
+        link.download ="Pivate_Key.pem";
+        link.href = 'data:application/octet-stream,'+ encodeURIComponent(content);
+        link.click();
     });
 </script>
 </body>
