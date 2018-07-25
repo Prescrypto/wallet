@@ -89,7 +89,7 @@
                     </div>
                   </div>
                   <div id="transfer_button">
-                    <button  id="transferdata"  class="uk-button uk-button-default" style="font-weight: 700;background-color: #fff; color:#3C3C3C;" disabled> Transfer </button>
+                    <a id="transferdata"  class="uk-button uk-button-default" style="font-weight: 700;background-color: #fff; color:#3C3C3C;" disabled> Transfer </a>
                   </div>
                 </form>
             </div>
@@ -155,29 +155,21 @@
       rsa.readPrivateKeyFromPEMString(priv_key);
       var sign_msg = rsa.sign(msg, hash_alg);
       return sign_msg;
-  }
-
-  function encrypt_payload(payload){
-
-
-
-  }
-
+    }
 
   function validate_transfer(){
-    var transfer_button = '<button onclick="transfer_data()" id="transferdata"  class="uk-button uk-button-default" style="font-weight: 700;background-color: #3C3C3C; color:#fff;"> Transfer </button>'
-    var transfer_button_disabled = '<button onclick="transfer_data()" id="transferdata"  class="uk-button uk-button-default" style="font-weight: 700;background-color: #fff; color:#3C3C3C;" disabled> Transfer </button>'
+    var transfer_button = '<a onclick="transfer_data()" id="transferdata"  class="uk-button uk-button-default" style="font-weight: 700;background-color: #3C3C3C; color:#fff;"> Transfer </a>';
+    var transfer_button_disabled = '<a onclick="transfer_data()" id="transferdata"  class="uk-button uk-button-default" style="font-weight: 700;background-color: #fff; color:#3C3C3C;" disabled> Transfer </a>';
 
     var alert_key = '<div  class="uk-alert-danger" uk-alert>\
       <a class="uk-alert-close" uk-close></a>\
       <p id="alert">Error. You have entered invalid key; Please try again.</p>\
-      </div>'
+      </div>';
 
       if (validate_key("#newpubkey")){
         console.log("Valid Key");
-        //document.getElementById("transferdata").disabled = false;
         $('#transfer_button').html(transfer_button);
-        
+
       }else{
         $('#transfer_button').html(transfer_button_disabled);
         $('#alert').html(alert_key);
@@ -201,18 +193,12 @@
       var form_pin = $('#pin').val();
       var form_memo = $('#memo').val();
 
-
       if (validate_key("#newpubkey") && validate_key("#priv_key")){
-         
         for (index; index<list_decrypt.length; index++){
           var index2 = 0
             var templist = list_decrypt[index]
             data_payload.push({"country_name":templist[0],"percentage":templist[1]});
-          
         }
-        
-        
-
         // Encrypt data
         var encrypt = new JSEncrypt();
         var index_encrypt = 0;
@@ -252,33 +238,26 @@
 
         var msg = payload.data;
         var hash_alg = 'sha1';
-        
+
         payload.signature = sign(msg, prk, hash_alg);
 
         // Make POST
         var posting = $.post(window.baseurl + "api/v1/rx-endpoint/", payload);
- 
 
         posting.done(function(data, text_status){
-          console.log("transference done");
-
-          $(location).attr('href', 'genometrics.html');
-          
+          console.log("Transfer success!");
+          console.log(data);
+          window.open("./genometrics.html", "_self");
         });
-        posting.fail(function(xhr, textStatus, errorThrown){
-          console.log(xhr.responseText);
-          console.log("transferense failed");
-          console.log(errorThrown);
-          $('#alert').html(alert_fail);
-          // reload page to see new items
-          //location.reload();
 
+        posting.fail(function(xhr, textStatus, errorThrown){
+          console.log("Transfer has been failed");
+          $('#alert').html(alert_fail);
         });
         posting.always(function(){
           // Finish POST!
-        }); 
-
-        
+          console.log("Finish Transfer!");
+        });
 
       }
       else{
@@ -467,7 +446,6 @@
       .addEventListener('change', read_pubkey_file, false);
 
       document.getElementById("transferdata").addEventListener("click", function(event){
-          event.preventDefault();
           transfer_data();
       });
 
