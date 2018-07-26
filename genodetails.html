@@ -213,12 +213,11 @@
         }
 
         var searchParams = new URLSearchParams(window.location.search);
-        var txid = "";
-        if(searchParams.has("tx_id")){
-          txid = searchParams.get('tx_id');
-        }
 
-        payload.txhash = txid;
+        if(searchParams.has("tx_id")){
+          var txid = searchParams.get('tx_id');
+          payload.tx_hash = txid;
+        }
 
         if(form_pin.length > 0){
           payload.pin = encrypt.encrypt(form_pin);
