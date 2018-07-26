@@ -46,15 +46,19 @@
       <label class="uk-form-label" for="form-horizontal-text">Private Key</label>
         <div class="uk-form-controls">
           <textarea id="privkey" name="privkey" class="uk-input" type="text" placeholder="Generate keys"></textarea>
+          <button style="font-size:12px;" class="uk-margin-small uk-button uk-button-primary uk-button-small" id="download_privkey"> Save Private Key </button>
         </div>
+        
     </div>
     <div class="uk-margin">
       <label class="uk-form-label" for="form-horizontal-text">Public Key</label>
         <div class="uk-form-controls">
           <textarea id="pubkey" name="pubkey" class="uk-input" type="text" placeholder="Generate keys"></textarea>
+          <button style="font-size:12px;" class="uk-margin-small uk-button uk-button-primary uk-button-small" id="download_pubkey">Save Public Key</button>
         </div>
+        
     </div>
-   <a id="whitebutton" class="uk-button uk-button-default" href="genometrics.html">Next</a>
+   <a id="whitebutton" class="uk-button uk-button-default" href="genometrics.html"> Next </a>
   </form>
 </div>
 
@@ -65,7 +69,7 @@
 <script>
     $(document).ready(function() {
       (function ($, localforage){
-        function setKeys(){
+          function setKeys(){
           // Get the keys from localforage
           localforage.getItem('privatekey', function(err, value){
             $('#privkey').val(value);
@@ -76,6 +80,28 @@
         };
         setKeys();
       })($, localforage);
+    });
+    //Events
+    //Download public key file
+    $('#download_pubkey').click(function() {
+      //Read the public key
+      var content = $('#pubkey').val();
+      //Create a label type a
+      var link = document.createElement("a");
+        link.download ="Public_Key.pem";
+        link.href = 'data:application/octet-stream,'+ encodeURIComponent(content);
+        link.click();
+    });
+
+    //Download private key file
+    $('#download_privkey').click(function() {
+      //Read the private key
+      var content = $('#privkey').val();
+      //Create a label type a
+      var link = document.createElement("a");
+        link.download ="Pivate_Key.pem";
+        link.href = 'data:application/octet-stream,'+ encodeURIComponent(content);
+        link.click();
     });
 </script>
 </body>
