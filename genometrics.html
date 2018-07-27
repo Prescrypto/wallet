@@ -51,9 +51,9 @@
     <h2>Your Genomics</h2>
     <div class="uk-child-width-1-1@s" uk-grid>
       <div>
-        <ul id="genocontent" uk-accordion="collapsible: false">
+        <div id="genocontent" uk-sortable="group: sortable-group">
           <!-- Initial Items -->
-        </ul>
+        </div>
         <br>
       </div>
     </div>
@@ -107,48 +107,23 @@
   <script src="js/wallet.js"></script>
   <script>
     // Tx template
-    var tx_template = '<a id="genome" href="genodetails.html?tx_id=<%= tx.hash_id %>"> \
+    var tx_template = '<a id="genome" href="genodetails.html?hash_id=<%= tx.hash_id %>"> \
         <div class="uk-margin"> \
-          <div class="uk-card uk-card-default uk-card-body uk-card-small"> \
+          <div class="uk-card uk-card-default uk-card-body uk-card-small" > \
             <div class="uk-column-1-2"> \
-              <img align="center" src="media/dna-icon.png"> \
+              <img align="center" src="media/dna-icon.png" style="background-color: <%= txcolor %>;color:#fff"> \
               <p id="geno_p"><span id="genotitle"><%= tx.timestamp %> Readable: <%= tx.readable %></span><br><%= tx.hash_id %></p> \
             </div> \
           </div> \
         </div> \
         </a>'
 
-            var tx_acc_template_unselected = '<li>\
-                <a class="uk-accordion-title uk-card uk-card-default uk-card-small" id="genome" href="#" style="font-weight:50;background-color: #d7d8d9;color:#000" >\
-                 <%= tx.hash_id %> </a>\
-                <div class="uk-accordion-content" aria-hidden="false" hidden="">\
-                  <div class="uk-card uk-card-default uk-card-body uk-card-small"> \
-                    <div class="uk-column-1-2"> \
-                      <img align="center" src="media/dna-icon.png" href="genodetails.html?tx_id=<%= tx.id %>" > \
-                      <a id="geno_p" href="genodetails.html?tx_id=<%= tx.hash_id %>"><span id="genotitle"><%= tx.timestamp %></span><br><%= tx.hash_id %></a> \
-                    </div> \
-                  </div> \
-                </div>\
-            </li>'
-
-    var tx_acc_template = '<li>\
-                <a class="uk-accordion-title uk-container uk-container-xsmall" id="genome" href="#" style="text-align:center; font-size:100%; font-weight:200;background-color: #d7d8d9;color:#000" >\
-                 <%= tx.hash_id %> </a>\
-                <div class="uk-accordion-content" aria-hidden="false" hidden="">\
-                  <div class="uk-card uk-card-default uk-card-body uk-card-small"> \
-                    <div class="uk-column-1-2"> \
-                      <img align="center" src="media/dna-icon.png" href="genodetails.html?tx_id=<%= tx.id %>" > \
-                      <a id="geno_p" href="genodetails.html?tx_id=<%= tx.hash_id %>" style="text-align:center;"><span id="genotitle"><%= tx.timestamp %></span><br><%= tx.hash_id %></a> \
-                    </div> \
-                  </div>\
-                </div>\
-            </li>'
-
-    function add_tx_markup(data){
+          
+    function add_tx_markup(data, color){
       // A tx data provided compile and render item
       $('#non-item').remove();
       var _template = _.template(tx_template);
-      var _compiled = _template({"tx":data});
+      var _compiled = _template({"tx":data, "txcolor":color});
       $('#genocontent').append(_compiled);
     }
 
@@ -176,7 +151,15 @@
               }else{
                 data.results.forEach(function(item) {
                   // Add tx to template
-                  add_tx_markup(item);
+                  console.log(item);
+                  var color= "#fff";
+                  if(item.readable == true){
+                    color= "#d9f7ec";
+                  }
+                  else{
+                    color= "#f5c5d2";
+                  }
+                  add_tx_markup(item, color);
                 });
               }
               // Finish get

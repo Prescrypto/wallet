@@ -214,8 +214,8 @@
 
         var searchParams = new URLSearchParams(window.location.search);
 
-        if(searchParams.has("tx_id")){
-          var txid = searchParams.get('tx_id');
+        if(searchParams.has("hash_id")){
+          var txid = searchParams.get('hash_id');
           payload.previous_hash = txid;
         }
 
@@ -314,8 +314,8 @@
           // Render Tx Data on form
           var searchParams = new URLSearchParams(window.location.search);
           var url = window.baseurl + "api/v1/rx-endpoint/"
-          if(searchParams.has("tx_id")){
-            url += searchParams.get('tx_id');
+          if(searchParams.has("hash_id")){
+            url += searchParams.get('hash_id');
             $.get(url, function(data) {
             // Get data from server
             if (data.length == 0){
