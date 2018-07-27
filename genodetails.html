@@ -216,7 +216,7 @@
 
         if(searchParams.has("tx_id")){
           var txid = searchParams.get('tx_id');
-          payload.tx_hash = txid;
+          payload.previous_hash = txid;
         }
 
         if(form_pin.length > 0){
@@ -241,6 +241,8 @@
         payload.signature = sign(msg, prk, hash_alg);
 
         // Make POST
+        console.log("Payload Data: ");
+        console.log(payload);
         var posting = $.post(window.baseurl + "api/v1/rx-endpoint/", payload);
 
         posting.done(function(data, text_status){
