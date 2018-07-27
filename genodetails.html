@@ -107,6 +107,9 @@
           <!-- Render here tx data -->
         </tbody>
     </table>
+      <div id="readable_status" >
+        <!-- Status of the Transaction-->
+      </div>
     </div>
   </div>
 
@@ -326,6 +329,16 @@
                 // Add tx to template
                 add_tx_markup(item);
               });
+
+              var color= "#fff";
+              if(data.readable == true){
+                color= "#d9f7ec";
+              }
+              else{
+                color= "#f5c5d2";
+              }
+
+              $("#readable_status").html('<div id="readable_status"><p style="background-color:'+color+';color:#000">Readable: '+data.readable+'</p></div>')
             }
             console.log("Finish get!");
           });
