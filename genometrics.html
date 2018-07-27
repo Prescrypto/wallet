@@ -112,7 +112,7 @@
           <div class="uk-card uk-card-default uk-card-body uk-card-small"> \
             <div class="uk-column-1-2"> \
               <img align="center" src="media/dna-icon.png"> \
-              <p id="geno_p"><span id="genotitle"><%= tx.timestamp %></span><br><%= tx.hash_id %></p> \
+              <p id="geno_p"><span id="genotitle"><%= tx.timestamp %> Readable: <%= tx.readable %></span><br><%= tx.hash_id %></p> \
             </div> \
           </div> \
         </div> \
@@ -147,7 +147,7 @@
     function add_tx_markup(data){
       // A tx data provided compile and render item
       $('#non-item').remove();
-      var _template = _.template(tx_acc_template);
+      var _template = _.template(tx_template);
       var _compiled = _template({"tx":data});
       $('#genocontent').append(_compiled);
     }
