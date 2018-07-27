@@ -295,32 +295,7 @@
       $('#tx_table_content').append(_compiled);
     }
 
-    function map_test(){
-        // Create a map graph
-        var data = google.visualization.arrayToDataTable([
-          ['Country', 'Popularity'],
-          ['Unknown', 0],
-        ]);
-        var options = {};
-        var chart = new google.visualization.GeoChart(document.getElementById('regions_div'));
-
-        chart.draw(data, options);
-      }
-
-      function chart_test(){
-        // Create a pie graph
-        var data = google.visualization.arrayToDataTable([
-          ['Region', 'Percentage'],
-          ['Unknown',     100],
-        ]);
-        var options = {
-          title: 'Ancestry Chart'
-        };
-        var chart = new google.visualization.PieChart(document.getElementById('piechart'));
-
-        chart.draw(data, options);
-      }
-
+    
     $(document).ready(function() {
       (function ($, localforage){
         // Set the keys on textarea onload page
@@ -367,6 +342,7 @@
       function decrypt_data(){
          // Decrypt data and create list
         var data_decrypt = [];
+        var isValidData = false;
         var alert_not_found = '<div  class="uk-alert-danger" uk-alert>\
         <a class="uk-alert-close" uk-close></a>\
         <p id="alert">Error. No Private key found.</p>\
@@ -376,34 +352,58 @@
           console.log("No Priv Key found");
           $('#alert').html(alert_not_found);
           document.getElementById("transferaction").disabled = true;
+          return null;
 
         }
         else{
-          $.each($('#tx_table_content tr').children(), function(){
-            var value_input = $(this).html();
-            // Decrypt data
-            var decrypt = new JSEncrypt();
-            decrypt.setPrivateKey($("#priv_key").val());
-
-            $(this).html(decrypt.decrypt(value_input));
-            // Create list with decrypt data
-            data_decrypt.push($(this).html());
-          });
-          // Here return list of decrypt data
-          $("#decrypt").attr("disabled", "true");
+          
 
           // Make list for graph
           var index = 1;
           list_decrypt = [['Country', 'Popularity'],];
+          var tx_table = $('#tx_table_content tr').children();
+          var decrypt = new JSEncrypt();
+          decrypt.setPrivateKey($("#priv_key").val());
 
+          $.each(tx_table, function(){
+            var value_input = $(this).html();
+            // Decrypt data          
+              $(this).html(decrypt.decrypt(value_input));
+              // Create list with decrypt data
+              data_decrypt.push($(this).html());
+            
+            
+          });
+          
           for (index; index<data_decrypt.length; index++){
             if (index%2){
-              list_decrypt.push([data_decrypt[index-1],parseFloat(data_decrypt[index])]);
+              var percent_decrypt = 0;
+              try{
+                  if(data_decrypt[index] == ""){
+                    isValidData = false;
+                    break;
+                  }
+                  percent_decrypt = parseFloat(data_decrypt[index]);
+                  list_decrypt.push([data_decrypt[index-1],percent_decrypt]);
+                  isValidData = true;
+              }
+              catch(err){
+                isValidData = false;
+                break;
+              }
+              
             }
           }
-          // Here return list of decrypt data for graph
-          data_country =list_decrypt;
+
+          if (!isValidData){
+            return null;
+          }
+          
+          // Here we enable the transfer button and disable de decrypt button
+           $("#decrypt").attr("disabled", "true");
           document.getElementById("transferaction").disabled = false;
+          return list_decrypt;
+          
 
         }
       }
@@ -428,11 +428,45 @@
         chart.draw(data, options);
       }
 
+      function map_test(){
+        // Create a map graph
+        var data = google.visualization.arrayToDataTable([
+          ['Country', 'Popularity'],
+          ['Unknown', 0],
+        ]);
+        var options = {};
+        var chart = new google.visualization.GeoChart(document.getElementById('regions_div'));
+
+        chart.draw(data, options);
+      }
+
+      function chart_test(){
+        // Create a pie graph
+        var data = google.visualization.arrayToDataTable([
+          ['Region', 'Percentage'],
+          ['Unknown',     100],
+        ]);
+        var options = {
+          title: 'Ancestry Chart'
+        };
+        var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+
+        chart.draw(data, options);
+      }
+
+
+
       // Events
       $('#decrypt').on('click', function(){
-        decrypt_data();
-        google.charts.setOnLoadCallback(draw_map);
-        google.charts.setOnLoadCallback(draw_chart);
+        data_country = decrypt_data();
+        if(data_country!=null){
+          google.charts.setOnLoadCallback(draw_map);
+          google.charts.setOnLoadCallback(draw_chart);
+        }
+        else{
+          location.reload();
+        }
+        
       });
 
       document.getElementById('pubkey_file')

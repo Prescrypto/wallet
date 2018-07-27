@@ -51,9 +51,10 @@
     <h2>Your Genomics</h2>
     <div class="uk-child-width-1-1@s" uk-grid>
       <div>
-        <div id="genocontent" uk-sortable="group: sortable-group">
+        <ul id="genocontent" uk-accordion="collapsible: false">
           <!-- Initial Items -->
-        </div>
+        </ul>
+        <br>
       </div>
     </div>
 
@@ -93,6 +94,8 @@
       <!-- Closing create form-->
       <button class="uk-button uk-button-default" type="button" style="font-weight: 700;background-color: #A3A0FB;color:#fff">Receive</button>
     </div>
+
+    
   </div>
 
   <br>
@@ -115,15 +118,41 @@
         </div> \
         </a>'
 
+            var tx_acc_template_unselected = '<li>\
+                <a class="uk-accordion-title uk-card uk-card-default uk-card-small" id="genome" href="#" style="font-weight:50;background-color: #d7d8d9;color:#000" >\
+                 <%= tx.rxid %> </a>\
+                <div class="uk-accordion-content" aria-hidden="false" hidden="">\
+                  <div class="uk-card uk-card-default uk-card-body uk-card-small"> \
+                    <div class="uk-column-1-2"> \
+                      <img align="center" src="media/dna-icon.png" href="genodetails.html?tx_id=<%= tx.id %>" > \
+                      <a id="geno_p" href="genodetails.html?tx_id=<%= tx.id %>"><span id="genotitle"><%= tx.timestamp %></span><br><%= tx.rxid %></a> \
+                    </div> \
+                  </div> \
+                </div>\
+            </li>'
+
+    var tx_acc_template = '<li>\
+                <a class="uk-accordion-title uk-container uk-container-xsmall" id="genome" href="#" style="text-align:center; font-size:100%; font-weight:200;background-color: #d7d8d9;color:#000" >\
+                 <%= tx.rxid %> </a>\
+                <div class="uk-accordion-content" aria-hidden="false" hidden="">\
+                  <div class="uk-card uk-card-default uk-card-body uk-card-small"> \
+                    <div class="uk-column-1-2"> \
+                      <img align="center" src="media/dna-icon.png" href="genodetails.html?tx_id=<%= tx.id %>" > \
+                      <a id="geno_p" href="genodetails.html?tx_id=<%= tx.id %>" style="text-align:center;"><span id="genotitle"><%= tx.timestamp %></span><br><%= tx.rxid %></a> \
+                    </div> \
+                  </div>\
+                </div>\
+            </li>'
+
     function add_tx_markup(data){
       // A tx data provided compile and render item
       $('#non-item').remove();
-      var _template = _.template(tx_template);
+      var _template = _.template(tx_acc_template);
       var _compiled = _template({"tx":data});
       $('#genocontent').append(_compiled);
     }
 
-    $(document).ready(function() {
+    $(document).ready(function() {      
       (function ($, localforage){
         function setKeys(){
           // Set the keys on textarea onload page
