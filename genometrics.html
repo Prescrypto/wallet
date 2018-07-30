@@ -54,42 +54,48 @@
         <div id="genocontent" uk-sortable="group: sortable-group">
           <!-- Initial Items -->
         </div>
+        <br>
       </div>
     </div>
 
-  <!-- Closing Menu Add Genometrics-->
-  <!-- Menu Create form -->
-  <button class="uk-button uk-button-default" type="button" style="font-weight: 700;background-color: white">Create</button>
-  <div id='fields' uk-dropdown>
-    <div id="formcontent">
-      <div id="inputGroup1" class="uk-nav uk-dropdown-nav">
-        <form id="inputGroup" class="uk-grid-small" uk-grid action="" method="post">
-          <table id="table_fields" class="uk-table uk-table-responsive">
-            <thead>
-              <tr>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>
-                  <input class="uk-input" type="text" placeholder=" Country" required>
-                </td>
-                <td>
-                  <input class="uk-input" type="number" placeholder="Percentage (Only numbers)" required>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </form>
+    <!-- Closing Menu Add Genometrics-->
+    <!-- Menu Create form -->
+    <div>
+      <button class="uk-button uk-button-default" type="button" style="font-weight: 700;background-color: white">Create</button>
+      <div id='fields' uk-dropdown>
+        <div id="formcontent">
+          <div id="inputGroup1" class="uk-nav uk-dropdown-nav">
+            <form id="inputGroup" class="uk-grid-small" uk-grid action="" method="post">
+              <table id="table_fields" class="uk-table uk-table-responsive">
+                <thead>
+                  <tr>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <input class="uk-input" type="text" placeholder=" Country" required>
+                    </td>
+                    <td>
+                      <input class="uk-input" type="number" placeholder="Percentage (Only numbers)" required>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </form>
+          </div>
+        </div>
+        <div id="formButtons">
+          <button name="add_field" id="add_field" class="uk-button uk-button-default" type="button" uk-icon="icon:plus"> Add New  </button>
+          <button name="remove_field" id="remove_field" class="uk-button uk-button-default" type="button" uk-close> Remove  </button>
+          <button id="send_data" class="uk-button uk-button-default" type="submit"> Submit </button>
+        </div>
       </div>
+      <!-- Closing create form-->
+      <button class="uk-button uk-button-default" type="button" style="font-weight: 700;background-color: #A3A0FB;color:#fff">Receive</button>
     </div>
-    <div id="formButtons">
-      <button name="add_field" id="add_field" class="uk-button uk-button-default" type="button" uk-icon="icon:plus"> Add New  </button>
-      <button name="remove_field" id="remove_field" class="uk-button uk-button-default" type="button" uk-close> Remove  </button>
-      <button id="send_data" class="uk-button uk-button-default" type="submit"> Submit </button>
-    </div>
-  </div>
-  <!-- Closing create form-->
+
+
   </div>
 
   <br>
@@ -101,22 +107,23 @@
   <script src="js/wallet.js"></script>
   <script>
     // Tx template
-    var tx_template = '<a id="genome" href="genodetails.html?tx_id=<%= tx.id %>"> \
+    var tx_template = '<a id="genome" href="genodetails.html?hash_id=<%= tx.hash_id %>"> \
         <div class="uk-margin"> \
-          <div class="uk-card uk-card-default uk-card-body uk-card-small"> \
+          <div class="uk-card uk-card-default uk-card-body uk-card-small" > \
             <div class="uk-column-1-2"> \
-              <img align="center" src="media/dna-icon.png"> \
-              <p id="geno_p"><span id="genotitle"><%= tx.timestamp %></span><br><%= tx.rxid %></p> \
+              <img align="center" src="media/dna-icon.png" style="background-color: <%= txcolor %>;color:#fff"> \
+              <p id="geno_p"><span id="genotitle"><%= tx.timestamp %> Readable: <%= tx.readable %></span><br><%= tx.hash_id %></p> \
             </div> \
           </div> \
         </div> \
         </a>'
 
-    function add_tx_markup(data){
+          
+    function add_tx_markup(data, color){
       // A tx data provided compile and render item
       $('#non-item').remove();
       var _template = _.template(tx_template);
-      var _compiled = _template({"tx":data});
+      var _compiled = _template({"tx":data, "txcolor":color});
       $('#genocontent').append(_compiled);
     }
 
@@ -144,7 +151,14 @@
               }else{
                 data.results.forEach(function(item) {
                   // Add tx to template
-                  add_tx_markup(item);
+                  var color= "#fff";
+                  if(item.readable == true){
+                    color= "#d9f7ec";
+                  }
+                  else{
+                    color= "#f5c5d2";
+                  }
+                  add_tx_markup(item, color);
                 });
               }
               // Finish get
