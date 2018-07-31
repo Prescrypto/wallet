@@ -46,14 +46,19 @@
       <label class="uk-form-label" for="form-horizontal-text">Private Key</label>
         <div class="uk-form-controls">
           <textarea id="privkey" name="privkey" class="uk-input" type="text" placeholder="Generate keys"></textarea>
-        </div>
-        
+        </div>       
     </div>
     <div class="uk-margin">
       <label class="uk-form-label" for="form-horizontal-text">Public Key</label>
         <div class="uk-form-controls">
           <textarea id="pubkey" name="pubkey" class="uk-input" type="text" placeholder="Generate keys"></textarea>
-          <button style="font-size:12px;" class="uk-margin-small uk-button uk-button-primary uk-button-small" id="download_keys">Save Public Key</button>
+        </div>       
+    </div>
+    <div class="uk-margin">
+      <label class="uk-form-label" for="form-horizontal-text">Pin Code</label>
+        <div class="uk-form-controls">
+          <input id="pin_code" name="pin_code" class="uk-input" type="text" maxlength="4" placeholder="Enter four digits and remember not to forget this PIN" required />
+          <button style="font-size:12px;" class="uk-margin-small uk-button uk-button-primary uk-button-small" id="download_keys">Save Keys</button>
         </div>
         
     </div>
@@ -100,6 +105,14 @@
         link.click();
       }
     });
+    $(function(){
+    //Validation for Pin code
+    $('#pin_code').keypress(function(e) {
+      if(isNaN(this.value + String.fromCharCode(e.charCode))) 
+        return false;
+      })
+    });
+
 </script>
 </body>
 </html>
