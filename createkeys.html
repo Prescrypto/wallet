@@ -86,9 +86,43 @@
         setKeys();
       })($, localforage);
     });
-    //Events
-    //Download keys files
-    $('#download_keys').click(function(){
+
+    //Functions
+    function verify_lenght(field){
+      //This method verify if length of a fields is empty 
+      if (field.length == 0){
+        alert("Error. Please enter a pin; Please try again.");
+        return false
+      }else{
+        return true
+      }
+    }
+
+
+    function hash_string(){
+      //This method calculate hash for the  value from pin
+      var pin = CryptoJS.SHA256($('#pin_code').val());
+      var pin_hash = pin.toString(CryptoJS.enc.b64);  
+      return pin_hash
+    }
+    
+    function save_encrypt_privkey(){
+      //Encrypt private key and save in localforage
+      var privatekey = $('#privkey').val();
+      //Encrypt private key
+      var encrypt = CryptoJS.AES.encrypt(privatekey, hash_string());
+      var encrypt_b64 =  encrypt.toString(CryptoJS.enc.b64);
+      //Save encrypt private key in localforage
+      localforage.setItem('privatekey', encrypt_b64).then(function(value){
+        $('#privkey').val(value);
+        console.log("Success Generated Keys!");
+      }).catch(function(e){
+        console.log(e);
+      });
+    }
+
+    function download_file(){
+      //This method download keys files
       //Read keys
       var privatekey = $('#privkey').val();
       var publickey = $('#pubkey').val();
@@ -105,14 +139,25 @@
         link.href = 'data:application/octet-stream,'+ encodeURIComponent(files[i]);
         link.click();
       }
+    }
+
+    //Events
+    $('#download_keys').click(function(){
+      if (verify_lenght($('#pin_code').val())){
+        save_encrypt_privkey();
+        download_file();
+        window.open("./genometrics.html","_self");  
+      }
     });
-    $(function(){
+    
     //Validation for Pin code
-    $('#pin_code').keypress(function(e) {
-      if(isNaN(this.value + String.fromCharCode(e.charCode))) 
-        return false;
+    $(function(){
+      $('#pin_code').keypress(function(e) {
+        if(isNaN(this.value + String.fromCharCode(e.charCode))) 
+          return false;
       })
     });
+
 
 </script>
 </body>
