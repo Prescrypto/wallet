@@ -96,6 +96,7 @@
         </div>
       </div>
       <h3>Ancestry</h3>
+      <h5><a id="tx_link" href="#" target="_blank">Show on navigator</a></h5>
       <table id="tx_table" class="uk-table uk-table-divider">
       	<thead>
           <tr>
@@ -298,7 +299,7 @@
       $('#tx_table_content').append(_compiled);
     }
 
-    
+
     $(document).ready(function() {
       (function ($, localforage){
         // Set the keys on textarea onload page
@@ -319,17 +320,18 @@
           var url = window.baseurl + "api/v1/rx-endpoint/"
           if(searchParams.has("hash_id")){
             url += searchParams.get('hash_id');
-            $.get(url, function(data) {
-            // Get data from server
-            if (data.length == 0){
-              // Render no tx label
-              $("#tx_table_content").html("<span id='non-item'>Without data :( Something missing!</span>");
-            }else{
+            var response = $.get(url)
+
+            response.done(function(data, status){
+              // Done status
+              console.log(status);
               data.data.forEach(function(item) {
                 // Add tx to template
                 add_tx_markup(item);
               });
-
+              // Create tx link
+              $('#tx_link').attr("href", window.baseurl  + "hash/" + data.hash_id);
+              // Draw if is readable
               var color= "#fff";
               if(data.readable == true){
                 color= "#d9f7ec";
@@ -337,11 +339,15 @@
               else{
                 color= "#f5c5d2";
               }
-
               $("#readable_status").html('<div id="readable_status"><p style="background-color:'+color+';color:#000">Readable: '+data.readable+'</p></div>')
-            }
-            console.log("Finish get!");
-          });
+              console.log("Finish get!");
+            });
+
+            response.fail(function(){
+              // Render no tx label
+              $("#tx_table_content").html("<span id='non-item'>Without data :( Something missing!</span>");
+              $('#tx_link').html("Something missing!");
+            });
           }
         };
         setKeys();
@@ -366,11 +372,8 @@
           $('#alert').html(alert_not_found);
           document.getElementById("transferaction").disabled = true;
           return null;
-
         }
         else{
-          
-
           // Make list for graph
           var index = 1;
           list_decrypt = [['Country', 'Popularity'],];
@@ -380,14 +383,12 @@
 
           $.each(tx_table, function(){
             var value_input = $(this).html();
-            // Decrypt data          
+            // Decrypt data
               $(this).html(decrypt.decrypt(value_input));
               // Create list with decrypt data
               data_decrypt.push($(this).html());
-            
-            
           });
-          
+
           for (index; index<data_decrypt.length; index++){
             if (index%2){
               var percent_decrypt = 0;
@@ -404,19 +405,19 @@
                 isValidData = false;
                 break;
               }
-              
+
             }
           }
 
           if (!isValidData){
             return null;
           }
-          
+
           // Here we enable the transfer button and disable de decrypt button
            $("#decrypt").attr("disabled", "true");
           document.getElementById("transferaction").disabled = false;
           return list_decrypt;
-          
+
 
         }
       }
@@ -428,7 +429,6 @@
         var chart = new google.visualization.GeoChart(document.getElementById('regions_div'));
         chart.draw(data, options);
       }
-
 
       function draw_chart() {
         // Create a pie graph
@@ -467,8 +467,6 @@
         chart.draw(data, options);
       }
 
-
-
       // Events
       $('#decrypt').on('click', function(){
         data_country = decrypt_data();
@@ -479,7 +477,7 @@
         else{
           location.reload();
         }
-        
+
       });
 
       document.getElementById('pubkey_file')
