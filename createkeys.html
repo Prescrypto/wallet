@@ -116,6 +116,7 @@
       localforage.setItem('privatekey', encrypt_b64).then(function(value){
         $('#privkey').val(value);
         console.log("Success Generated Keys!");
+        window.open("./genometrics.html","_self");  
       }).catch(function(e){
         console.log(e);
       });
@@ -144,9 +145,8 @@
     //Events
     $('#download_keys').click(function(){
       if (verify_lenght($('#pin_code').val())){
-        save_encrypt_privkey();
         download_file();
-        window.open("./genometrics.html","_self");  
+        save_encrypt_privkey();    
       }
     });
     
