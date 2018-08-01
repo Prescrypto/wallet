@@ -90,11 +90,11 @@
     //Functions
     function verify_lenght(field){
       //This method verify if length of a fields is empty 
-      if (field.length == 0){
-        alert("Error. Please enter a pin; Please try again.");
-        return false
-      }else{
+      if (field.length == 4){
         return true
+      }else {
+        alert("ERROR. Please enter a pin from four digits; Please try again.");
+        return false
       }
     }
 
