@@ -148,10 +148,10 @@
 
   function validate_keys(){
     // Is a small test for validate the keys
-    var next_button = '\
-      <a class="uk-button uk-button-default" href="genometrics.html"> Next </a>'
+    var success_button = '\
+      <a id="next_button" class="uk-button uk-button-default" href="genometrics.html"> Next </a>'
 
-    var alert_keys = '<div  class="uk-alert-danger" uk-alert>\
+    var alert_danger_keys = '<div  class="uk-alert-danger" uk-alert>\
       <a class="uk-alert-close" uk-close></a>\
       <p id="alert">Error. You have entered invalid keys; Please try again.</p>\
       </div>'
@@ -170,14 +170,18 @@
 
       if(uncrypted === test){
         console.log("Valid Keys");
-        save_key($("#privkey").val(), $("#pubkey").val());
-        console.log("Saved Keys");
-        $('#next_button').html(next_button);
+        if (verify_lenght($('#pin_code').val())){
+          console.log("Valid Pin Code")
+          save_encrypt_privkey();          
+          save_key($("#privkey").val(), $("#pubkey").val());
+          console.log("Saved Keys");
+          $('#success_button').html(success_button);
+        }
       }else{
-        $('#alert').html(alert_keys);
+        $('#alert').html(alert_danger_keys);
       }
     }else{
-      $('#alert').html(alert_keys);
+      $('#alert').html(alert_danger_keys);
     }
   }
 
