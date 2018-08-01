@@ -127,6 +127,21 @@
       $('#genocontent').append(_compiled);
     }
 
+    function validate_pin(pin){
+      if (!/^([0-9])*$/.test(pin)){
+        return false
+      }else{
+        return true
+      }
+    }
+
+    function hash_string(value){
+    //This method calculate hash for the  value from pin
+    var pin = CryptoJS.SHA256(value);
+    var pin_hash = pin.toString(CryptoJS.enc.b64);  
+    return pin_hash
+    }
+
     $(document).ready(function() {
       (function ($, localforage){
         function setKeys(){
