@@ -81,13 +81,47 @@
   <!-- Closing upload section-->
 </div>
 
-<script type="text/javascript" src="js/enterkeys.js"></script>
 <script src="js/localforage.min.js"></script>
 <script src="https://code.jquery.com/jquery-1.8.3.min.js"></script>
+<script src="https://code.jquery.com/jquery-1.8.3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/components/core-min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/components/sha256.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
 <script src="js/jsencrypt.js"></script>
 <script src="js/wallet.js"></script>
 <script>
   // Functions
+    function verify_lenght(field){
+      //This method verify if length of a fields is empty 
+      if (field.length == 4){
+        return true
+      }else {
+        alert("ERROR. Please enter a pin from four digits; Please try again.");
+        return false
+      }
+    }
+
+    function hash_string(){
+      //This method calculate hash for the  value from pin
+      var pin = CryptoJS.SHA256($('#pin_code').val());
+      var pin_hash = pin.toString(CryptoJS.enc.b64);  
+      return pin_hash
+    }
+    
+    function save_encrypt_privkey(){
+      //Encrypt private key and save in localforage
+      var privatekey = $('#privkey').val();
+      //Encrypt private key
+      var encrypt = CryptoJS.AES.encrypt(privatekey, hash_string());
+      var encrypt_b64 =  encrypt.toString(CryptoJS.enc.b64);
+      //Save encrypt private key in localforage
+      localforage.setItem('privatekey', encrypt_b64).then(function(value){
+        $('#privkey').val(value);
+        console.log("Success Generated Keys!");
+      }).catch(function(e){
+        console.log(e);
+      });
+    }
   function validate_pubkey(){
     // Verify if the field pubkey is empty
     if ($("#pubkey").val().length===0){
