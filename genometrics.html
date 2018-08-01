@@ -205,8 +205,7 @@
       var sign_msg = rsa.sign(msg, hash_alg);
       return sign_msg;
     }
-
-
+    
     function remove_field(){
       // Remove a field in table
       $('#table_fields tr:last').remove();
@@ -241,7 +240,31 @@
       var encrypt = new JSEncrypt();
       var index_encrypt = 0;
 
-      encrypt.setPublicKey($("#pub_key").val());
+      var privkey_encrypt = $("#priv_key").val(); 
+
+      var pin_flag = true;
+      while (pin_flag){
+        var pin_code = prompt("Please, enter your PIN CODE");
+        if (pin_code.length==4){
+          if (validate_pin(pin_code)){
+            pin_flag = false
+          }
+        }else{
+        }
+      }
+
+      var privkey_decrypt = CryptoJS.AES.decrypt(privkey_encrypt, hash_string(pin_code));
+      
+      try{
+        var privkey = privkey_decrypt.toString(CryptoJS.enc.Utf8);
+      }
+      catch(err){
+        alert("PIN CODE invalid");
+        consle.log(err);
+      }
+
+      encrypt.setPrivateKey(privkey);
+
       for (index_encrypt; index_encrypt<data_payload.length; index_encrypt++){
         data_payload[index_encrypt].country_name = encrypt.encrypt(data_payload[index_encrypt].country_name);
         data_payload[index_encrypt].percentage = encrypt.encrypt(data_payload[index_encrypt].percentage);
@@ -258,8 +281,7 @@
 
       var msg = payload.data;
       var hash_alg = 'sha1';
-      var prk = $('#priv_key').val();
-      payload.signature = sign(msg, prk, hash_alg);
+      payload.signature = sign(msg, privkey, hash_alg);
 
 
       // Make POST
