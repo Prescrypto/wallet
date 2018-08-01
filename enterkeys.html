@@ -114,19 +114,14 @@
     return pin_hash
   }
   
-  function save_encrypt_privkey(){
+  function encrypt_privkey(){
     //Encrypt private key and save in localforage
     var privatekey = $('#privkey').val();
     //Encrypt private key
     var encrypt = CryptoJS.AES.encrypt(privatekey, hash_string());
     var encrypt_b64 =  encrypt.toString(CryptoJS.enc.b64);
-    //Save encrypt private key in localforage
-    localforage.setItem('privatekey', encrypt_b64).then(function(value){
-      $('#privkey').val(value);
-      console.log("Success Generated Keys!");
-    }).catch(function(e){
-      console.log(e);
-    });
+    //Input private key in the field privkey 
+    $('#privkey').val(encrypt_b64);  
   }
 
   function validate_pubkey(){
