@@ -224,6 +224,14 @@
 
   document.getElementById('privkey_file')
   .addEventListener('change', read_privkey_file, false);
+
+  //Validation for Pin code
+  $(function(){
+    $('#pin_code').keypress(function(e) {
+      if(isNaN(this.value + String.fromCharCode(e.charCode))) 
+        return false;
+    })
+  });
 </script>
 </body>
 </html>
