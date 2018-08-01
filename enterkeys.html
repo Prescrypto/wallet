@@ -56,7 +56,13 @@
           <textarea id="pubkey" name="pubkey" class="uk-input" id="form-horizontal-text" type="text" placeholder="Paste keys"></textarea>
         </div>
     </div>
-    <div id="next_button">
+    <div id="box_pin_code" class="uk-margin">
+      <label class="uk-form-label" for="form-horizontal-text">Pin Code</label>
+        <div class="uk-form-controls">
+          <input id="pin_code" name="pin_code" class="uk-input" type="text" maxlength="4" placeholder="Enter four digits and remember not to forget this PIN" required />
+        </div>
+    </div>
+    <div id="success_button" >
       <button class="uk-button uk-button-default" id="verify_keys"> Verify </button>
     </div>
   </form>
