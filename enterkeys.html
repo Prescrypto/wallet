@@ -144,9 +144,6 @@
 
   function validate_keys(){
     // Is a small test for validate the keys
-    var success_button = '\
-      <a id="next_button" class="uk-button uk-button-default" href="genometrics.html"> Next </a>'
-
     var alert_danger_keys = '<div  class="uk-alert-danger" uk-alert>\
       <a class="uk-alert-close" uk-close></a>\
       <p id="alert">Error. You have entered invalid keys; Please try again.</p>\
@@ -167,20 +164,11 @@
       //The keys are valid
       if(uncrypted === test){
         console.log("Valid Keys");
-        if (verify_lenght($('#pin_code').val())){
-          console.log("Valid Pin Code")
-          //Symmetric encrypt private key 
-          save_encrypt_privkey();
-          //Save keys          
-          save_key($("#privkey").val(), $("#pubkey").val());
-          console.log("Saved Keys");
-          $('#success_button').html(success_button);
-        }
-      }else{
-        $('#alert').html(alert_danger_keys);
+        return true    
       }
     }else{
       $('#alert').html(alert_danger_keys);
+      return false
     }
   }
 
@@ -218,10 +206,22 @@
 
   // Events
   $('#verify_keys').on('click', function(e) {
+    var success_button = '\
+        <a id="next_button" class="uk-button uk-button-default" href="genometrics.html"> Next </a>'
+
     e.preventDefault();
     console.log("Click saved keys");
-    validate_keys();
+    if (verify_lenght($('#pin_code').val())){
+        if (validate_keys()){
+          //Symmetric encrypt private key
+          encrypt_privkey();          
+          //Save keys
+          save_key($("#privkey").val(), $("#pubkey").val());
+          $('#success_button').html(success_button);  
+        }
+    }
   });
+
 
   document.getElementById('pubkey_file')
   .addEventListener('change', read_pubkey_file, false);
