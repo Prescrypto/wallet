@@ -325,213 +325,232 @@
     read.readAsText(file);
 
   }
-    function add_tx_markup(data){
-      // A tx data provided compile and render item
-      $('#non-item').remove();
-      var _template = _.template(tx_data_template);
-      var _compiled = _template({"data":data});
-      $('#tx_table_content').append(_compiled);
-    }
+  function add_tx_markup(data){
+    // A tx data provided compile and render item
+    $('#non-item').remove();
+    var _template = _.template(tx_data_template);
+    var _compiled = _template({"data":data});
+    $('#tx_table_content').append(_compiled);
+  }
 
-    
-    $(document).ready(function() {
-      (function ($, localforage){
-        // Set the keys on textarea onload page
-        var encrypt = new JSEncrypt();
-        function setKeys(){
-          localforage.getItem('privatekey', function(err, value){
-            $('#priv_key').val(value);
-          });
-          localforage.getItem('publickey', function(err, value){
-            $('#pub_key').val(value);
-          });
+  
+  $(document).ready(function() {
+    (function ($, localforage){
+      // Set the keys on textarea onload page
+      var encrypt = new JSEncrypt();
+      function setKeys(){
+        localforage.getItem('privatekey', function(err, value){
+          $('#priv_key').val(value);
+        });
+        localforage.getItem('publickey', function(err, value){
+          $('#pub_key').val(value);
+        });
 
-        };
+      };
 
-        function getTxData(){
-          // Render Tx Data on form
-          var searchParams = new URLSearchParams(window.location.search);
-          var url = window.baseurl + "api/v1/rx-endpoint/"
-          if(searchParams.has("hash_id")){
-            url += searchParams.get('hash_id');
-            $.get(url, function(data) {
-            // Get data from server
-            if (data.length == 0){
-              // Render no tx label
-              $("#tx_table_content").html("<span id='non-item'>Without data :( Something missing!</span>");
-            }else{
-              data.data.forEach(function(item) {
-                // Add tx to template
-                add_tx_markup(item);
-              });
+      function getTxData(){
+        // Render Tx Data on form
+        var searchParams = new URLSearchParams(window.location.search);
+        var url = window.baseurl + "api/v1/rx-endpoint/"
+        if(searchParams.has("hash_id")){
+          url += searchParams.get('hash_id');
+          $.get(url, function(data) {
+          // Get data from server
+          if (data.length == 0){
+            // Render no tx label
+            $("#tx_table_content").html("<span id='non-item'>Without data :( Something missing!</span>");
+          }else{
+            data.data.forEach(function(item) {
+              // Add tx to template
+              add_tx_markup(item);
+            });
 
-              var color= "#fff";
-              if(data.readable == true){
-                color= "#d9f7ec";
-              }
-              else{
-                color= "#f5c5d2";
-              }
-
-              $("#readable_status").html('<div id="readable_status"><p style="background-color:'+color+';color:#000">Readable: '+data.readable+'</p></div>')
+            var color= "#fff";
+            if(data.readable == true){
+              color= "#d9f7ec";
             }
-            console.log("Finish get!");
-          });
+            else{
+              color= "#f5c5d2";
+            }
+
+            $("#readable_status").html('<div id="readable_status"><p style="background-color:'+color+';color:#000">Readable: '+data.readable+'</p></div>')
           }
-        };
-        setKeys();
-        getTxData();
-        google.charts.setOnLoadCallback(map_test);
-        google.charts.setOnLoadCallback(chart_test);
-
-      })($, localforage);
-
-      // Functions
-      function decrypt_data(){
-         // Decrypt data and create list
-        var data_decrypt = [];
-        var isValidData = false;
-        var alert_not_found = '<div  class="uk-alert-danger" uk-alert>\
-        <a class="uk-alert-close" uk-close></a>\
-        <p id="alert">Error. No Private key found.</p>\
-        </div>'
-
-        if(!validate_key("#priv_key")){
-          console.log("No Priv Key found");
-          $('#alert').html(alert_not_found);
-          document.getElementById("transferaction").disabled = true;
-          return null;
-
+          console.log("Finish get!");
+        });
         }
-        else{
-          
+      };
+      setKeys();
+      getTxData();
+      google.charts.setOnLoadCallback(map_test);
+      google.charts.setOnLoadCallback(chart_test);
 
-          // Make list for graph
-          var index = 1;
-          list_decrypt = [['Country', 'Popularity'],];
-          var tx_table = $('#tx_table_content tr').children();
-          var decrypt = new JSEncrypt();
-          decrypt.setPrivateKey($("#priv_key").val());
+    })($, localforage);
 
-          $.each(tx_table, function(){
-            var value_input = $(this).html();
-            // Decrypt data          
-              $(this).html(decrypt.decrypt(value_input));
-              // Create list with decrypt data
-              data_decrypt.push($(this).html());
-            
-            
-          });
-          
-          for (index; index<data_decrypt.length; index++){
-            if (index%2){
-              var percent_decrypt = 0;
+    // Functions
+    function decrypt_data(){
+       // Decrypt data and create list
+      var data_decrypt = [];
+      var isValidData = false;
+      var alert_not_found = '<div  class="uk-alert-danger" uk-alert>\
+      <a class="uk-alert-close" uk-close></a>\
+      <p id="alert">Error. No Private key found.</p>\
+      </div>'
+
+      if(!validate_key("#priv_key")){
+        console.log("No Priv Key found");
+        $('#alert').html(alert_not_found);
+        document.getElementById("transferaction").disabled = true;
+        return null;
+
+      }
+      else{
+        
+
+        // Make list for graph
+        var index = 1;
+        list_decrypt = [['Country', 'Popularity'],];
+        var tx_table = $('#tx_table_content tr').children();
+        var decrypt = new JSEncrypt();
+        
+        var privkey_encrypt =  $("#priv_key").val(); 
+        var pin_flag = true;
+        while (pin_flag){
+          var pin_code = prompt("Please, enter your PIN CODE");
+          if (pin_code.length==4){
+            if (validate_pin(pin_code)){
+              var privkey_decrypt = CryptoJS.AES.decrypt(privkey_encrypt, hash_string(pin_code));
               try{
-                  if(data_decrypt[index] == ""){
-                    isValidData = false;
-                    break;
-                  }
-                  percent_decrypt = parseFloat(data_decrypt[index]);
-                  list_decrypt.push([data_decrypt[index-1],percent_decrypt]);
-                  isValidData = true;
-              }
-              catch(err){
-                isValidData = false;
-                break;
-              }
-              
+                var privkey = privkey_decrypt.toString(CryptoJS.enc.Utf8);
+                pin_flag = false
+              }catch(err){
+                alert("PIN CODE invalid");
+                console.log(err);
+                return null;  
+              }                            
             }
-          }
-
-          if (!isValidData){
+          }else{
+            alert("PIN CODE invalid");
             return null;
           }
-          
-          // Here we enable the transfer button and disable de decrypt button
-           $("#decrypt").attr("disabled", "true");
-          document.getElementById("transferaction").disabled = false;
-          return list_decrypt;
-          
-
         }
-      }
 
-      function draw_map(){
-        // Create a map graph
-        var data = google.visualization.arrayToDataTable(data_country);
-        var options = {};
-        var chart = new google.visualization.GeoChart(document.getElementById('regions_div'));
-        chart.draw(data, options);
-      }
+        decrypt.setPrivateKey(privkey);
 
-
-      function draw_chart() {
-        // Create a pie graph
-        var data = google.visualization.arrayToDataTable(data_country);
-        var options = {
-          title: 'Ancestry Chart'
-        };
-        var chart = new google.visualization.PieChart(document.getElementById('piechart'));
-
-        chart.draw(data, options);
-      }
-
-      function map_test(){
-        // Create a map graph
-        var data = google.visualization.arrayToDataTable([
-          ['Country', 'Popularity'],
-          ['Unknown', 0],
-        ]);
-        var options = {};
-        var chart = new google.visualization.GeoChart(document.getElementById('regions_div'));
-
-        chart.draw(data, options);
-      }
-
-      function chart_test(){
-        // Create a pie graph
-        var data = google.visualization.arrayToDataTable([
-          ['Region', 'Percentage'],
-          ['Unknown',     100],
-        ]);
-        var options = {
-          title: 'Ancestry Chart'
-        };
-        var chart = new google.visualization.PieChart(document.getElementById('piechart'));
-
-        chart.draw(data, options);
-      }
-
-
-
-      // Events
-      $('#decrypt').on('click', function(){
-        data_country = decrypt_data();
-        if(data_country!=null){
-          google.charts.setOnLoadCallback(draw_map);
-          google.charts.setOnLoadCallback(draw_chart);
+        $.each(tx_table, function(){
+          var value_input = $(this).html();
+          // Decrypt data          
+            $(this).html(decrypt.decrypt(value_input));
+            // Create list with decrypt data
+            data_decrypt.push($(this).html());
+          
+          
+        });
+        
+        for (index; index<data_decrypt.length; index++){
+          if (index%2){
+            var percent_decrypt = 0;
+            try{
+                if(data_decrypt[index] == ""){
+                  isValidData = false;
+                  break;
+                }
+                percent_decrypt = parseFloat(data_decrypt[index]);
+                list_decrypt.push([data_decrypt[index-1],percent_decrypt]);
+                isValidData = true;
+            }
+            catch(err){
+              isValidData = false;
+              break;
+            }
+            
+          }
         }
-        else{
-          location.reload();
+
+        if (!isValidData){
+          return null;
         }
         
-      });
+        // Here we enable the transfer button and disable de decrypt button
+         $("#decrypt").attr("disabled", "true");
+        document.getElementById("transferaction").disabled = false;
+        return list_decrypt; 
+      }
+    }
 
-      document.getElementById('pubkey_file')
-      .addEventListener('change', read_pubkey_file, false);
+    function draw_map(){
+      // Create a map graph
+      var data = google.visualization.arrayToDataTable(data_country);
+      var options = {};
+      var chart = new google.visualization.GeoChart(document.getElementById('regions_div'));
+      chart.draw(data, options);
+    }
 
-      document.getElementById("transferdata").addEventListener("click", function(event){
-          transfer_data();
-      });
 
-      // Make Map, pie chart and data responsive.
-      $(window).resize(function(){
-        map_test();
-        chart_test();
-        draw_map();
-        draw_chart();
-      });
+    function draw_chart() {
+      // Create a pie graph
+      var data = google.visualization.arrayToDataTable(data_country);
+      var options = {
+        title: 'Ancestry Chart'
+      };
+      var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+
+      chart.draw(data, options);
+    }
+
+    function map_test(){
+      // Create a map graph
+      var data = google.visualization.arrayToDataTable([
+        ['Country', 'Popularity'],
+        ['Unknown', 0],
+      ]);
+      var options = {};
+      var chart = new google.visualization.GeoChart(document.getElementById('regions_div'));
+
+      chart.draw(data, options);
+    }
+
+    function chart_test(){
+      // Create a pie graph
+      var data = google.visualization.arrayToDataTable([
+        ['Region', 'Percentage'],
+        ['Unknown',     100],
+      ]);
+      var options = {
+        title: 'Ancestry Chart'
+      };
+      var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+
+      chart.draw(data, options);
+    }
+
+    // Events
+    $('#decrypt').on('click', function(){
+      data_country = decrypt_data();
+      if(data_country!=null){
+        google.charts.setOnLoadCallback(draw_map);
+        google.charts.setOnLoadCallback(draw_chart);
+      }
+      else{
+        location.reload();
+      }
+      
     });
+
+    document.getElementById('pubkey_file')
+    .addEventListener('change', read_pubkey_file, false);
+
+    document.getElementById("transferdata").addEventListener("click", function(event){
+        transfer_data();
+    });
+
+    // Make Map, pie chart and data responsive.
+    $(window).resize(function(){
+      map_test();
+      chart_test();
+      draw_map();
+      draw_chart();
+    });
+  });
   </script>
 </body>
 </html>
