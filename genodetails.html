@@ -225,8 +225,6 @@
         var encrypt = new JSEncrypt();
         var index_encrypt = 0;
         var new_pub_key = $("#newpubkey").val();
-        var prk = $('#priv_key').val();
-
 
         encrypt.setPublicKey(new_pub_key);
         for (index_encrypt; index_encrypt<data_payload.length; index_encrypt++){
@@ -240,13 +238,31 @@
           var txid = searchParams.get('hash_id');
           payload.previous_hash = txid;
         }
-
-        if(form_pin.length > 0){
-          payload.pin = encrypt.encrypt(form_pin);
-        }
         if(form_memo.length > 0){
           payload.memo = encrypt.encrypt(form_memo);
         }
+
+        var prk = $('#priv_key').val();
+
+        var pin_flag = true;
+        while (pin_flag){
+          if(form_pin.length == 4){
+            var privkey_decrypt = CryptoJS.AES.decrypt(prk, hash_string(form_pin));
+            try{
+              var privkey = privkey_decrypt.toString(CryptoJS.enc.Utf8);
+              pin_flag = false;
+            }catch(err){
+              alert("PIN CODE invalid. Please enter a PIN with four digits, try again.");
+              console.log(err);
+              return; 
+            } 
+          }else{
+            alert("PIN CODE invalid. Please enter a PIN with four digits, try again.");
+            return;
+          }
+        }   
+
+        payload.pin = encrypt.encrypt(form_pin);//This value should not be saved
 
         // Make payload
         var today = new Date();
@@ -260,7 +276,7 @@
         var msg = payload.data;
         var hash_alg = 'sha1';
 
-        payload.signature = sign(msg, prk, hash_alg);
+        payload.signature = sign(msg, privkey, hash_alg);
 
         // Make POST
         console.log("Payload Data: ");
