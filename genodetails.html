@@ -126,7 +126,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/components/core-min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/components/sha256.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
-  
   <script src="js/jsencrypt.js"></script>
   <script src="js/jsrsasign-all-min.js"></script>
   <script src="js/underscore-min.js"></script>
@@ -209,6 +208,7 @@
         <a class="uk-alert-close" uk-close></a>\
         <p id="alert">Error. Transference failed.</p>\
         </div>';
+
       var index = 1;
       var data_payload = [];
       var payload = new Object();
@@ -252,7 +252,7 @@
               var privkey = privkey_decrypt.toString(CryptoJS.enc.Utf8);
               pin_flag = false;
             }catch(err){
-              alert("PIN CODE invalid. Please enter a PIN with four digits, try again.");
+              alert("PIN CODE invalid, try again.");
               console.log(err);
               return; 
             } 
@@ -261,8 +261,6 @@
             return;
           }
         }   
-
-        payload.pin = encrypt.encrypt(form_pin);//This value should not be saved
 
         // Make payload
         var today = new Date();
