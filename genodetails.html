@@ -212,7 +212,7 @@
       var index = 1;
       var data_payload = [];
       var payload = new Object();
-      var form_pin = $('#pin').val();
+      var form_pin = ($('#pin').val()).toString();
       var form_memo = $('#memo').val();
 
       if (validate_key("#newpubkey") && validate_key("#priv_key")){
