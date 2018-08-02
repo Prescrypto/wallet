@@ -239,31 +239,38 @@
       // Encrypt data
       var encrypt = new JSEncrypt();
       var index_encrypt = 0;
-
-      var privkey_encrypt = $("#priv_key").val(); 
-
+      var pubkey =  $("#pub_key").val(); 
+      
+      var privkey_encrypt =  $("#priv_key").val(); 
       var pin_flag = true;
+      var pin_attempts = 0;
       while (pin_flag){
         var pin_code = prompt("Please, enter your PIN CODE");
-        if (pin_code.length==4){
+        if (pin_attempts == 2){
+          alert("You have no more attempts");
+          return window.open("./genometrics.html","_self");    
+        }else if (pin_code.length==4){
           if (validate_pin(pin_code)){
-            pin_flag = false
+            var privkey_decrypt = CryptoJS.AES.decrypt(privkey_encrypt, hash_string(pin_code));
+            try{
+              var privkey = privkey_decrypt.toString(CryptoJS.enc.Utf8);
+              pin_flag = false;
+            }catch(err){
+              pin_attempts = pin_attempts + 1;
+              var attempts = 3 - pin_attempts ; 
+              alert("PIN CODE invalid,  remaining attempts: "+ attempts);
+              console.log(err);  
+            }        
           }
         }else{
+          pin_attempts = pin_attempts + 1;
+          var attempts = 3 - pin_attempts;  
+          alert("PIN CODE invalid,  remaining attempts: "+ attempts);
         }
       }
-
-      var privkey_decrypt = CryptoJS.AES.decrypt(privkey_encrypt, hash_string(pin_code));
       
-      try{
-        var privkey = privkey_decrypt.toString(CryptoJS.enc.Utf8);
-      }
-      catch(err){
-        alert("PIN CODE invalid");
-        consle.log(err);
-      }
 
-      encrypt.setPrivateKey(privkey);
+      encrypt.setPrivateKey(pubkey);
 
       for (index_encrypt; index_encrypt<data_payload.length; index_encrypt++){
         data_payload[index_encrypt].country_name = encrypt.encrypt(data_payload[index_encrypt].country_name);
