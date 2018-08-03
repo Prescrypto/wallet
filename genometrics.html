@@ -61,6 +61,7 @@
     <!-- Closing Menu Add Genometrics-->
     <!-- Menu Create form -->
     <div>
+       <button class="uk-button uk-button-default" uk-toggle="target: #modal-upload" type="button" id="uploadgeno" style="font-weight: 700;background-color: white">Upload</button>
       <button class="uk-button uk-button-default" type="button" style="font-weight: 700;background-color: white">Create</button>
       <div id='fields' uk-dropdown>
         <div id="formcontent">
@@ -93,6 +94,36 @@
       </div>
       <!-- Closing create form-->
       <button class="uk-button uk-button-default" type="button" style="font-weight: 700;background-color: #A3A0FB;color:#fff">Receive</button>
+
+      <!-- This is Transfer Data Modal-->
+        <div id="modal-upload" uk-modal>
+            <div class="uk-modal-dialog uk-modal-body">
+                <h2 class="uk-modal-title">Upload your Geno File</h2>
+                <form class="uk-form-stacked">
+                  <div id="alert"></div>
+                  <div class="uk-margin">
+                    <label class="uk-form-label" for="form-stacked-text"> Please upload your file</label>
+                    <div class="uk-form-controls">
+                         <!--Upload section-->
+                      <div class="js-upload uk-placeholder uk-text-center">
+                        <span uk-icon="icon: cloud-upload"></span>
+                        <span class="uk-text-middle">Attach your FILE Key by dropping it here or</span>
+                        <div uk-form-custom>
+                          <input id="fileobj" type="file">
+                          <span id="upload_link" class="uk-link">Select your FILE from computer</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                 
+                  <div id="done_action">
+                    <button id="done_button" type="button" class="uk-button uk-button-default uk-modal-close" style="font-weight: 700;background-color: #fff; color:#3C3C3C;"> Done</button>
+                  </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
   </div>
 
   <br>
@@ -100,12 +131,38 @@
   <script src="https://code.jquery.com/jquery-1.8.3.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/components/core-min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/components/sha256.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/components/enc-base64.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/components/hmac.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/components/pbkdf2.js"></script>
   <script src="js/jsencrypt.js"></script>
   <script src="js/jsrsasign-all-min.js"></script>
   <script src="js/underscore-min.js"></script>
   <script src="js/wallet.js"></script>
+  <script src="https://sdk.amazonaws.com/js/aws-sdk-2.7.18.min.js"></script>
   <script>
+    //variables
+    //Variables
+    var alert_success = '<div  class="uk-alert-success" uk-alert>\
+      <a class="uk-alert-close" uk-close></a>\
+      <p id="alert">';
+    var alert_error = '<div  class="uk-alert-danger" uk-alert>\
+      <a class="uk-alert-close" uk-close></a>\
+      <p id="alert">';
+    var alert_end ='</p></div>';
+        AWS.config.region = AWS_Region;
+    AWS.config.update({accessKeyId: AWS_AccessKeyId, secretAccessKey: AWS_SecretAccessKey}); //login to aws with credentials
+    var bucket = new AWS.S3({params: {Bucket: AWS_BucketName}, apiVersion: '2006-03-01'});
+    // Upload
+    var startTime = new Date();
+    var partSize = 1024 * 1024 * 5;// Minimum 5MB per chunk (except the last part) http://docs.aws.amazon.com/AmazonS3/latest/API/mpUploadComplete.html
+    var maxUploadTries = 3;
+    var multipartMap = {
+        Parts: []
+    };
+    var numPartsLeft = 0;
+    var multipartResponse = null;
+
     // Tx template
     var tx_template = '<a id="genome" href="genodetails.html?hash_id=<%= tx.hash_id %>"> \
         <div class="uk-margin"> \
@@ -308,7 +365,228 @@
       });
     }
 
+
+    //Upload file to s3 functions>>>>>>>>
+function completeMultipartUpload(doneParams) {
+  //complete the upload of a file when we get to the end
+  bucket.completeMultipartUpload(doneParams, function(err, data) {
+    if (err) {
+      console.log("An error occurred while completing the multipart upload");
+      console.log(err);
+      $('#alert').html(alert_error+'Filed on Upload '+alert_end);
+    } else {
+      var delta = (new Date() - startTime) / 1000;
+      console.log('Completed upload in', delta, 'seconds');
+      console.log('Final upload data:', data);
+      $('#alert').html( alert_success+'Uploaded To: <a href="'+data.Location +'">'+data.Location+'</a> '+ alert_end);
+    }
+  });
+}
+function uploadPart(multipart, partParams, fileKey, tryNum) {
+  //upload a part from a file sliced by 5mb
+    var tryNum = tryNum || 1;
+    bucket.uploadPart(partParams, function(multiErr, mData) {
+      if (multiErr){
+        console.log('multiErr, upload part error:', multiErr);
+        if (tryNum < maxUploadTries) {
+          console.log('Retrying upload of part: #', partParams.PartNumber);
+          uploadPart(multipart, partParams, tryNum + 1);
+        } else {
+          console.log('Failed uploading part: #', partParams.PartNumber);
+        }
+        return;
+      }
+      console.log(this.request.params.PartNumber);
+      multipartMap.Parts[this.request.params.PartNumber - 1] = {
+        ETag: mData.ETag,
+        PartNumber: Number(this.request.params.PartNumber)
+      };
+      console.log("Completed part", this.request.params.PartNumber);
+      console.log('mData', mData);
+      console.log(numPartsLeft);
+      if (--numPartsLeft > 0) return; // complete only when all parts uploaded
+      var doneParams = {
+        Bucket: AWS_BucketName,
+        Key: fileKey,
+        MultipartUpload: multipartMap,
+        UploadId: multipart.UploadId
+      };
+      console.log("Completing upload...");
+      completeMultipartUpload(doneParams);
+    });
+  }
+  
+  function uploadMultipart(fileName, fileData) {
+    //upload a file by parts because of the size
+    var fileKey = 'test/'+fileName;
+    var fileLength = fileData.length;
+    var partNum = 0;
+    multipartMap = {
+      Parts: []
+    };
+    numPartsLeft = Math.ceil(fileLength / partSize);
+    bucket.createMultipartUpload({ Bucket: AWS_BucketName, Key: fileKey,ContentType: fileData.type, ACL:AWS_ACL }, function(mpErr, multipart) {  
+      if(!mpErr){
+         console.log("multipart created", multipart.UploadId);
+          
+          try{
+            for (var rangeStart = 0; rangeStart < fileLength; rangeStart += partSize) {
+              
+                partNum++;
+                var end = Math.min(rangeStart + partSize, fileLength);
+                var partParams = { //create the part
+                  Body: fileData.slice(rangeStart, end),
+                  Bucket: AWS_BucketName,
+                  Key: fileKey,
+                  PartNumber: String(partNum),
+                  UploadId: multipart.UploadId
+                };
+                // Send a single part
+                console.log('Uploading part: #', partParams.PartNumber, ', Range start:', rangeStart);
+                uploadPart(multipart, partParams, fileKey);
+            }
+          }
+          catch(err){
+            console.log(err);
+            return;
+          }
+     
+      }else{
+        console.log(mpErr);
+        return;
+      }
+    });
+  }
+  function uploadNormal(myfile){
+     // See the Configuring section to configure credentials in the SDK
+    var today = new Date();
+    var timestamp = today.toISOString();
+    var parameters = {Key: 'test/file'+timestamp+'.txt', 
+        Body: myfile,
+        ContentType: myfile.type,
+        ACL: AWS_ACL};
+    bucket.upload(parameters, function (err, data) {
+      if (err){
+        console.log(err);
+        $('#alert').html(alert_error+'Error on Upload!'+alert_end);
+      }
+      if(data){
+        console.log("done uploading");
+        $('#alert').html( alert_success+'Uploaded To: <a href="'+data.Location +'">'+data.Location+'</a> '+ alert_end);
+      }
+     
+    });
+  }
+ function toWordArray(str){
+    //convert string to word array
+        return CryptoJS.enc.Utf8.parse(str);
+  }
+  function toString(words){
+    //convert word array to string
+        return CryptoJS.enc.Utf8.stringify(words);
+  }
+  function toBase64String(words){
+    //convert word array to string base 64
+        return CryptoJS.enc.Base64.stringify(words);
+  }
+  function decrypt_file_symm(cipherfile, mypriv_key, mypub_key){
+      // convert payload encoded in base64 to words
+      var secret_key = CryptoJS.SHA256(mypriv_key);
+      var iv = toWordArray(mypub_key);//CryptoJS.lib.WordArray.random(16);
+      var decrypted = CryptoJS.AES.decrypt(cipherfile, secret_key, {iv: iv});
+      return toString(decrypted);
+  }
+  function ecrypt_file_symm(myfile, mypriv_key, mypub_key){
+      //encrypt file with a symmetric key
+      var secret_key = CryptoJS.SHA256(mypriv_key);
+      var iv = toWordArray(mypub_key);//CryptoJS.lib.WordArray.random(16);
+      var encryptedfile = CryptoJS.AES.encrypt(myfile, secret_key, {iv: iv});
+      // encode in base64
+      return encryptedfile.toString();
+  }
+  function encrypt_file(myfile){
+    // Encrypt data
+    var encrypt = new JSEncrypt();
+    var index_encrypt = 0;
+    //var pub_key = $("#pubkey").val();
+    encrypt.setPublicKey(pub_key);
+    var encrypted_file = encrypt.encrypt(myfile);
+    return encrypted_file;
+  }
+   function upload_file(e) {
+    //uploads a file from local storage to memory
+    // Variables
+    var encrypted_file = null;
+    var rawdata = null;
+    var today = new Date();
+    var timestamp = today.toISOString();
+    var file = e.target.files[0];
+    var priv_key =$('#priv_key').val();
+    var pub_key = $('#pub_key').val();
+    if((priv_key.length < 1)||(pub_key.length < 1)){
+      console.log("no private or public keys");
+      return;
+    }
+    //Small Validation
+    if (!file) {
+      return;
+    }
+    //Read file
+    var read = new FileReader();
+    read.readAsText(file);
+    read.onload = function(e) {
+      var content = e.target.result;
+      encrypted_file = ecrypt_file_symm(content, priv_key, pub_key); 
+      $('#alert').html(alert_success+'File Loaded, waiting to Upload it...'+alert_end);
+      if(encrypted_file.length > partSize){
+        console.log("starting multipart upload");
+        uploadMultipart("myfile"+timestamp+".txt", encrypted_file);
+      }
+      else{
+        console.log("starting normal upload");
+        uploadNormal(encrypted_file);
+      }
+      
+      
+    };
+    
+  }
+  function decrypt_from_file(e) {
+    //decrypts the content of a file
+    // Variables
+    var encrypted_file = null;
+    var rawdata = null;
+    var today = new Date();
+    var timestamp = today.toISOString();
+    var priv_key =$('#priv_key').val();
+    var pub_key = $('#pub_key').val();
+    if((priv_key.length < 1)||(pub_key.length < 1)){
+      console.log("No private or public keys");
+      return;
+    }
+    var file = e.target.files[0];
+    //Small Validation
+    if (!file) {
+      return;
+    }
+    //Read file
+    var read = new FileReader();
+    read.readAsText(file);
+    read.onload = function(e) {
+      var content = e.target.result;
+      var finali = decrypt_file_symm(content, priv_key, pub_key);
+      console.log(finali);
+     };
+    
+  }
+
+
+
     // Events
+
+    document.getElementById('fileobj')
+    .addEventListener('change', upload_file, false);
+
     $('#add_field').on('click', function(){
       add_field();
     });
@@ -318,6 +596,10 @@
       if(length_table >= 3){
         remove_field();
       }
+    });
+
+     $('#done_button').one('click', function(){
+       $('#alert').html('<p id="alert"></p></div>');
     });
 
     $('#send_data').one('click', function(){
