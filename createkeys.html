@@ -46,23 +46,29 @@
       <label class="uk-form-label" for="form-horizontal-text">Private Key</label>
         <div class="uk-form-controls">
           <textarea id="privkey" name="privkey" class="uk-input" type="text" placeholder="Generate keys"></textarea>
-        </div>
-        
+        </div>       
     </div>
     <div class="uk-margin">
       <label class="uk-form-label" for="form-horizontal-text">Public Key</label>
         <div class="uk-form-controls">
           <textarea id="pubkey" name="pubkey" class="uk-input" type="text" placeholder="Generate keys"></textarea>
-          <button style="font-size:12px;" class="uk-margin-small uk-button uk-button-primary uk-button-small" id="download_keys">Save Public Key</button>
-        </div>
-        
+        </div>       
     </div>
-   <a id="whitebutton" class="uk-button uk-button-default" href="genometrics.html">Load Wallet </a>
+    <div class="uk-margin">
+      <label class="uk-form-label" for="form-horizontal-text">Pin Code</label>
+        <div class="uk-form-controls">
+          <input id="pin_code" name="pin_code" class="uk-input" type="text" maxlength="4" placeholder="Enter four digits and remember not to forget this PIN" required />
+          <a style="font-size:12px;" class="uk-margin-small uk-button uk-button-primary uk-button-small" id="download_keys"> Save Keys and Next </a>
+        </div>
+    </div>
   </form>
 </div>
 
 <script src="js/localforage.min.js"></script>
 <script src="https://code.jquery.com/jquery-1.8.3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/components/core-min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/components/sha256.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
 <script src="js/jsencrypt.js"></script>
 <script src="js/wallet.js"></script>
 <script>
@@ -80,9 +86,44 @@
         setKeys();
       })($, localforage);
     });
-    //Events
-    //Download keys files
-    $('#download_keys').click(function(){
+
+    //Functions
+    function verify_lenght(field){
+      //This method verify if length of a fields is empty 
+      if (field.length == 4){
+        return true
+      }else {
+        alert("ERROR. Please enter a pin from four digits; Please try again.");
+        return false
+      }
+    }
+
+
+    function hash_string(){
+      //This method calculate hash for the  value from pin
+      var pin = CryptoJS.SHA256($('#pin_code').val());
+      var pin_hash = pin.toString(CryptoJS.enc.b64);  
+      return pin_hash
+    }
+    
+    function save_encrypt_privkey(){
+      //Encrypt private key and save in localforage
+      var privatekey = $('#privkey').val();
+      //Encrypt private key
+      var encrypt = CryptoJS.AES.encrypt(privatekey, hash_string());
+      var encrypt_b64 =  encrypt.toString(CryptoJS.enc.b64);
+      //Save encrypt private key in localforage
+      localforage.setItem('privatekey', encrypt_b64).then(function(value){
+        $('#privkey').val(value);
+        console.log("Success Generated Keys!");
+        window.open("./genometrics.html","_self");  
+      }).catch(function(e){
+        console.log(e);
+      });
+    }
+
+    function download_file(){
+      //This method download keys files
       //Read keys
       var privatekey = $('#privkey').val();
       var publickey = $('#pubkey').val();
@@ -99,7 +140,25 @@
         link.href = 'data:application/octet-stream,'+ encodeURIComponent(files[i]);
         link.click();
       }
+    }
+
+    //Events
+    $('#download_keys').click(function(){
+      if (verify_lenght($('#pin_code').val())){
+        download_file();
+        save_encrypt_privkey();    
+      }
     });
+    
+    //Validation for Pin code
+    $(function(){
+      $('#pin_code').keypress(function(e) {
+        if(isNaN(this.value + String.fromCharCode(e.charCode))) 
+          return false;
+      })
+    });
+
+
 </script>
 </body>
 </html>

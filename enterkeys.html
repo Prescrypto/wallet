@@ -56,7 +56,13 @@
           <textarea id="pubkey" name="pubkey" class="uk-input" id="form-horizontal-text" type="text" placeholder="Paste keys"></textarea>
         </div>
     </div>
-    <div id="next_button">
+    <div id="box_pin_code" class="uk-margin">
+      <label class="uk-form-label" for="form-horizontal-text">Pin Code</label>
+        <div class="uk-form-controls">
+          <input id="pin_code" name="pin_code" class="uk-input" type="text" maxlength="4" placeholder="Enter four digits and remember not to forget this PIN" required />
+        </div>
+    </div>
+    <div id="success_button" >
       <button class="uk-button uk-button-default" id="verify_keys"> Verify </button>
     </div>
   </form>
@@ -81,13 +87,43 @@
   <!-- Closing upload section-->
 </div>
 
-<script type="text/javascript" src="js/enterkeys.js"></script>
 <script src="js/localforage.min.js"></script>
 <script src="https://code.jquery.com/jquery-1.8.3.min.js"></script>
+<script src="https://code.jquery.com/jquery-1.8.3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/components/core-min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/components/sha256.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
 <script src="js/jsencrypt.js"></script>
 <script src="js/wallet.js"></script>
 <script>
   // Functions
+  function verify_lenght(field){
+    //This method verify if length of a fields is empty 
+    if (field.length == 4){
+      return true
+    }else {
+      alert("ERROR. Please enter a pin from four digits; Please try again.");
+      return false
+    }
+  }
+
+  function hash_string(){
+    //This method calculate hash for the  value from pin
+    var pin = CryptoJS.SHA256($('#pin_code').val());
+    var pin_hash = pin.toString(CryptoJS.enc.b64);  
+    return pin_hash
+  }
+  
+  function encrypt_privkey(){
+    //Encrypt private key and save in localforage
+    var privatekey = $('#privkey').val();
+    //Encrypt private key
+    var encrypt = CryptoJS.AES.encrypt(privatekey, hash_string());
+    var encrypt_b64 =  encrypt.toString(CryptoJS.enc.b64);
+    //Input private key in the field privkey 
+    $('#privkey').val(encrypt_b64);  
+  }
+
   function validate_pubkey(){
     // Verify if the field pubkey is empty
     if ($("#pubkey").val().length===0){
@@ -108,10 +144,7 @@
 
   function validate_keys(){
     // Is a small test for validate the keys
-    var next_button = '\
-      <a class="uk-button uk-button-default" href="genometrics.html"> Next </a>'
-
-    var alert_keys = '<div  class="uk-alert-danger" uk-alert>\
+    var alert_danger_keys = '<div  class="uk-alert-danger" uk-alert>\
       <a class="uk-alert-close" uk-close></a>\
       <p id="alert">Error. You have entered invalid keys; Please try again.</p>\
       </div>'
@@ -128,28 +161,24 @@
       decrypt.setPrivateKey($("#privkey").val());
       var uncrypted = decrypt.decrypt(encrypted);
 
+      //The keys are valid
       if(uncrypted === test){
         console.log("Valid Keys");
-        save_key($("#privkey").val(), $("#pubkey").val());
-        console.log("Saved Keys");
-        $('#next_button').html(next_button);
-      }else{
-        $('#alert').html(alert_keys);
+        return true    
       }
     }else{
-      $('#alert').html(alert_keys);
+      $('#alert').html(alert_danger_keys);
+      return false
     }
   }
 
   function read_pubkey_file(e) {
     // Variable
     var file = e.target.files[0];
-
     //Small Validation
     if (!file) {
       return;
     }
-
     //Read file
     var read = new FileReader();
     read.onload = function(e) {
@@ -157,18 +186,15 @@
       $("#pubkey").html(content);
     };
     read.readAsText(file);
-
   }
 
   function read_privkey_file(e) {
     // Variable
     var file = e.target.files[0];
-
     //Small Validation
     if (!file) {
       return;
     }
-
     //Read file
     var read = new FileReader();
     read.onload = function(e) {
@@ -180,16 +206,36 @@
 
   // Events
   $('#verify_keys').on('click', function(e) {
+    var success_button = '\
+        <a id="next_button" class="uk-button uk-button-default" href="genometrics.html"> Next </a>'
+
     e.preventDefault();
     console.log("Click saved keys");
-    validate_keys();
+    if (verify_lenght($('#pin_code').val())){
+        if (validate_keys()){
+          //Symmetric encrypt private key
+          encrypt_privkey();          
+          //Save keys
+          save_key($("#privkey").val(), $("#pubkey").val());
+          $('#success_button').html(success_button);  
+        }
+    }
   });
+
 
   document.getElementById('pubkey_file')
   .addEventListener('change', read_pubkey_file, false);
 
   document.getElementById('privkey_file')
   .addEventListener('change', read_privkey_file, false);
+
+  //Validation for Pin code
+  $(function(){
+    $('#pin_code').keypress(function(e) {
+      if(isNaN(this.value + String.fromCharCode(e.charCode))) 
+        return false;
+    })
+  });
 </script>
 </body>
 </html>

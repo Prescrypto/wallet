@@ -67,13 +67,26 @@
 <script src="js/wallet.js"></script>
 <script>
   // Functions
+  function save_keys(private_key, public_key){
+    //Save keys in localforage
+    localforage.setItem('privatekey', private_key).then(function(value){
+      // set privatekey
+      localforage.setItem('publickey', public_key).then(function(value){
+        console.log("Success Generated Keys!");
+        window.open("./createkeys.html","_self");
+      });
+    }).catch(function(e){
+      console.log(e);
+    });
+  }
+
   function create_keys(){
     // Create RSA keysan and save in local forage
     var crypt = new JSEncrypt({default_key_size: 512});
     crypt.getKey();
     var private_key = crypt.getPrivateKey();
     var public_key = crypt.getPublicKey();
-    save_key(private_key, public_key);
+    save_keys(private_key, public_key);
   }
 
   // Events
