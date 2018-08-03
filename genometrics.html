@@ -140,6 +140,7 @@
   <script src="js/underscore-min.js"></script>
   <script src="js/wallet.js"></script>
   <script src="https://sdk.amazonaws.com/js/aws-sdk-2.7.18.min.js"></script>
+  <script src="js/config_aws.js"></script>
   <script>
     //variables
     //Variables
@@ -150,7 +151,7 @@
       <a class="uk-alert-close" uk-close></a>\
       <p id="alert">';
     var alert_end ='</p></div>';
-        AWS.config.region = AWS_Region;
+    AWS.config.region = AWS_Region;
     AWS.config.update({accessKeyId: AWS_AccessKeyId, secretAccessKey: AWS_SecretAccessKey}); //login to aws with credentials
     var bucket = new AWS.S3({params: {Bucket: AWS_BucketName}, apiVersion: '2006-03-01'});
     // Upload
