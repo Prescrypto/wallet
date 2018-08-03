@@ -298,33 +298,33 @@
       var encrypt = new JSEncrypt();
       var index_encrypt = 0;
       var pubkey =  $("#pub_key").val(); 
-      
+
+      var privkey = null;
+      var pin_attempts = 3;
       var privkey_encrypt =  $("#priv_key").val(); 
       var pin_flag = true;
-      var pin_attempts = 0;
       while (pin_flag){
+        pin_attempts = pin_attempts - 1 ; 
         var pin_code = prompt("Please, enter your PIN CODE");
-        if (pin_attempts == 2){
+        if (pin_attempts <0){
           alert("You have no more attempts");
           return window.open("./genometrics.html","_self");    
         }else if (pin_code.length==4){
           if (validate_pin(pin_code)){
             var privkey_decrypt = CryptoJS.AES.decrypt(privkey_encrypt, hash_string(pin_code));
             try{
-              var privkey = privkey_decrypt.toString(CryptoJS.enc.Utf8);
+              privkey = privkey_decrypt.toString(CryptoJS.enc.Utf8);
               pin_flag = false;
             }catch(err){
-              pin_attempts = pin_attempts + 1;
-              var attempts = 3 - pin_attempts ; 
-              alert("PIN CODE invalid,  remaining attempts: "+ attempts);
+              alert("PIN CODE invalid,  remaining attempts: "+ pin_attempts);
               console.log(err);  
             }        
           }
-        }else{
-          pin_attempts = pin_attempts + 1;
-          var attempts = 3 - pin_attempts;  
-          alert("PIN CODE invalid,  remaining attempts: "+ attempts);
+        }else{    
+          alert("PIN CODE invalid,  remaining attempts: "+ pin_attempts);
         }
+
+        
       }
       
 
@@ -449,11 +449,13 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
           }
           catch(err){
             console.log(err);
+            $('#alert').html(alert_error+'Error on Upload!'+alert_end);
             return;
           }
      
       }else{
         console.log(mpErr);
+        $('#alert').html(alert_error+'Error on Upload!'+alert_end);
         return;
       }
     });
@@ -522,8 +524,36 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
     var today = new Date();
     var timestamp = today.toISOString();
     var file = e.target.files[0];
-    var priv_key =$('#priv_key').val();
     var pub_key = $('#pub_key').val();
+
+    var priv_key = null;
+    var pin_attempts = 3;
+    var privkey_encrypt =  $("#priv_key").val(); 
+    var pin_flag = true;
+    while (pin_flag){
+      pin_attempts = pin_attempts - 1 ; 
+      var pin_code = prompt("Please, enter your PIN CODE");
+      if (pin_attempts < 0){
+        alert("You have no more attempts");
+        return window.open("./genometrics.html","_self");    
+      }else if (pin_code.length==4){
+        if (validate_pin(pin_code)){
+          var privkey_decrypt = CryptoJS.AES.decrypt(privkey_encrypt, hash_string(pin_code));
+          try{
+            priv_key = privkey_decrypt.toString(CryptoJS.enc.Utf8);
+            pin_flag = false;
+          }catch(err){
+            alert("PIN CODE invalid,  remaining attempts: "+ pin_attempts);
+            console.log(err);  
+          }        
+        }
+      }else{    
+        alert("PIN CODE invalid,  remaining attempts: "+ pin_attempts);
+      }
+
+      
+    }//finish while
+
     if((priv_key.length < 1)||(pub_key.length < 1)){
       console.log("no private or public keys");
       return;
