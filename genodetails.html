@@ -96,6 +96,7 @@
         </div>
       </div>
       <h3>Ancestry</h3>
+      <h5><a id="tx_link" href="#" target="_blank">Show on navigator</a></h5>
       <table id="tx_table" class="uk-table uk-table-divider">
       	<thead>
           <tr>
@@ -331,7 +332,6 @@
     $('#tx_table_content').append(_compiled);
   }
 
-  
   $(document).ready(function() {
     (function ($, localforage){
       // Set the keys on textarea onload page
@@ -482,7 +482,6 @@
       var chart = new google.visualization.GeoChart(document.getElementById('regions_div'));
       chart.draw(data, options);
     }
-
 
     function draw_chart() {
       // Create a pie graph
