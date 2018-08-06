@@ -127,7 +127,7 @@
       });
     }
 
-    function download_file(){
+    /*function download_file(){
       //This method download keys files
       //Read keys
       var privatekey = $('#privkey').val();
@@ -145,12 +145,11 @@
         link.href = 'data:application/octet-stream,'+ encodeURIComponent(files[i]);
         link.click();
       }
-    }
+    }*/
 
     //Events
-    $('#download_keys').click(function(){
+    $('#encrypt_privkey').click(function(){
       if (verify_lenght($('#pin_code').val())){
-        download_file();
         save_encrypt_privkey();    
       }
     });
