@@ -123,16 +123,13 @@ div.uk-child-width-expand.uk-grid{
 #light-h2{
   color:#fff!important;
 }
+#tx_link{
+  color:#303030;
+}
 
 @media (max-width: 1200px){
   div.uk-grid-medium{
     width:100%;
-  }
-}
-@media (max-width:700px){
-  .upload-modal-footer{
-    position:initial;
-    bottom:none;
   }
 }
 @media (max-width:400px){
