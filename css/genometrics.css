@@ -100,6 +100,16 @@ div.uk-child-width-expand.uk-grid{
 #formButtons{
   margin-top:10px;
 }
+.footer {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  background-color: #303030;
+  color: white;
+  text-align: center;
+  height:60px;
+}
 
 @media (max-width: 1200px){
   div.uk-grid-medium{
