@@ -110,6 +110,20 @@ div.uk-child-width-expand.uk-grid{
   text-align: center;
   height:60px;
 }
+.footer-btn{
+  border: 1px solid #48a9e1;
+  border-radius:40px;
+  padding:10px;
+  margin-top:10px;
+  margin-right:20px;
+  width:200px;
+  font-size:1.1em;
+  color:#fff;
+  background-color:transparent;
+}
+.footer-btn:active{
+  background-color:#48a9e1;
+}
 
 @media (max-width: 1200px){
   div.uk-grid-medium{
