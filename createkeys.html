@@ -39,8 +39,19 @@
     </div>
   </nav>
   <!-- Closing Main menu -->
-
-<div class="uk-grid-medium" align="center">
+    <div class="grey-background" align="center" style="padding:150px 0 20px 0;">
+      <div id="box_pin_code" class="uk-margin" align="center">
+        <h2 style="color:#fff"><img style="height:40px;margin-bottom:10px;" src="media/light-locker.svg" alt=""> PIN</h2>
+        <p style="color:#fff"><strong>Enter a 4 digits pin code</strong><br>Make sure you remember it, you’ll need it for all your transactions.</p>
+        <div class="uk-form-controls">
+          <input id="pin_code" name="pin_code" class="uk-input" type="text" maxlength="4" placeholder="Enter PIN code" required />
+        </div>
+      </div>
+    </div>
+    <div align="center" id="success_button" >
+      <button class="uk-button uk-button-default" id="download_keys"> NEXT </button>
+    </div>
+<!-- <div class="uk-grid-medium" align="center">
   <form class="uk-form-horizontal uk-margin-large">
     <div class="uk-margin">
       <label class="uk-form-label" for="form-horizontal-text">Private Key</label>
@@ -62,7 +73,7 @@
         </div>
     </div>
   </form>
-</div>
+</div> -->
 
 <script src="js/localforage.min.js"></script>
 <script src="https://code.jquery.com/jquery-1.8.3.min.js"></script>
