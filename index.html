@@ -54,11 +54,24 @@
   </div>
 <!-- Move mouse for 5 secs -->
 <div id="modal-example" uk-modal>
-  <div class="uk-modal-dialog uk-modal-body">
+  <div class="createkeys-modal uk-modal-dialog uk-modal-body">
     <h2 class="uk-modal-title">Create your keys!</h2>
     <p id="greytxt">Please move your mouse cursor, to activate the button "Create"</p>
     <p class="uk-text-right">
-    <img src="media/mouse.png">
+    <div>
+      <progress id="js-progressbar" class="uk-progress" value="10" max="100"></progress>
+      <script>
+        UIkit.util.ready(function () {
+          var bar = document.getElementById('js-progressbar');
+          var animate = setInterval(function () {
+            bar.value += 10;
+            if(document.entropy >= 1200) {
+                bar.value=100;
+            }
+          }, 5000);
+        });
+      </script>
+    </div>
     <button id="create_keys" class="uk-button uk-button-default" href="createkeys.html" disabled>Create</button>
     </p>
   </div>
