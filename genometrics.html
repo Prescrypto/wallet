@@ -129,11 +129,12 @@
 
   <br>
   <footer class="footer">
-    <button class="footer-btn">New Genomic</button>
+    <div class="uk-navbar-container uk-navbar-transparent">
+    <button class="footer-btn uk-button uk-button-default" type="button" uk-toggle="target: #modal-receive">New Genomic</button>
     <button class="footer-btn uk-button uk-button-default" type="button" uk-toggle="target: #modal-receive">Receive</button>
     <button class="footer-btn uk-button uk-button-default" type="button" uk-toggle="target: #modal-decrypt-file">Decrypt File</button>
-    <button class="footer-btn">Export keys</button>
-
+    <button class="footer-btn uk-button uk-button-default" type="button" uk-toggle="target: #modal-receive">Export keys</button>
+  </div>
 <!-- This is the Receive modal -->
 <div id="modal-receive" uk-modal>
   <div class="uk-modal-dialog uk-modal-body uk-margin-auto-vertical">
