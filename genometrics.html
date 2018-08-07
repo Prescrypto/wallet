@@ -130,11 +130,56 @@
   <br>
   <footer class="footer">
     <div class="uk-navbar-container uk-navbar-transparent">
-    <button class="footer-btn uk-button uk-button-default" type="button" uk-toggle="target: #modal-receive">New Genomic</button>
+    <a class="footer-btn uk-button uk-button-default" href="#modal-full" uk-toggle>New Genomic</a>
     <button class="footer-btn uk-button uk-button-default" type="button" uk-toggle="target: #modal-receive">Receive</button>
     <button class="footer-btn uk-button uk-button-default" type="button" uk-toggle="target: #modal-decrypt-file">Decrypt File</button>
     <button id="js-modal-dialog"  class="footer-btn uk-button uk-button-default" type="button">Export keys</button>
   </div>
+<!-- This is the fullscreen Create New Modal-->
+<div id="modal-full" class="uk-modal-full" uk-modal>
+  <div class="uk-modal-dialog">
+    <button class="uk-modal-close-full uk-close-large" type="button" uk-close></button>
+    <div class="uk-grid-collapse uk-child-width-1-2@s" uk-grid>
+      <div style="background-color:#303030;padding:100px 80px 40px 80px;" uk-height-viewport>
+          <h2 id="light-h2">Upload File</h2>
+          <h3 id="light-h2">Please upload your Geno file</h3>
+          <form class="uk-form-stacked">
+            <div id="alert"></div>
+            <div class="uk-margin-large">
+              <div class="uk-form-controls">
+                <!--Upload section-->
+                <div class="js-upload uk-placeholder uk-text-center">
+                  <span uk-icon="icon: cloud-upload"></span>
+                  <span class="uk-text-middle">Attach your FILE Key by dropping it here or</span>
+                  <div uk-form-custom>
+                    <input id="fileobj" type="file">
+                    <span id="upload_link" class="uk-link">Select your FILE from computer</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+          <div class="uk-inline">
+              <h2 id="light-h2"><img style="height:40px;margin-bottom:10px;" src="media/light-locker.svg" alt=""> PIN</h2>
+              <div class="uk-form-controls">
+                <input style="width:150px;" id="pin_code" name="pin_code" class="uk-input" type="text" maxlength="4" placeholder="Enter PIN code" required />
+              </div>
+          </div>
+          <div id="done_action" class="uk-modal-footer" style="background-color:transparent;position:fixed;bottom:0;">
+            <button id="done_button" type="button" class="uk-button uk-button-default uk-modal-close" style="font-weight: 700;background-color: #fff; color:#3C3C3C;"> Done</button>
+          </div>
+      <!--Right column Modal (White)-->
+      </div>
+        <div style="padding:100px 80px 40px 80px;">
+          <h2>Or create New Genomic</h2>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!--Closing fullscreen Modal-->
+
 <!-- This is the Receive modal -->
 <div id="modal-receive" uk-modal>
   <div class="uk-modal-dialog uk-modal-body uk-margin-auto-vertical">

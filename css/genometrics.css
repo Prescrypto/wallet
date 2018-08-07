@@ -120,6 +120,9 @@ div.uk-child-width-expand.uk-grid{
 .footer-btn.uk-button.uk-button-default:active{
   background-color:#48a9e1;
 }
+#light-h2{
+  color:#fff!important;
+}
 
 @media (max-width: 1200px){
   div.uk-grid-medium{
