@@ -231,7 +231,7 @@
     var pin_code = null;
     var pubkey = $('#pubkey').val();
 
-    //Verify if the keys are in raw
+    //Verify if the private key are is raw
     if (validate_keys(pubkey, $('#privkey').val())){
       pin_code = prompt("You Private Key is not encrypted, please enter a PIN CODE for encrypt it, remember not to forget this PIN");
       if (pin_code.length==4){
