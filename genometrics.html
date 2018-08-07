@@ -130,9 +130,20 @@
   <br>
   <footer class="footer">
     <button class="footer-btn">New Genomic</button>
-    <button class="footer-btn">Receive</button>
+    <button class="footer-btn uk-button uk-button-default" type="button" uk-toggle="target: #modal-receive">Receive</button>
     <button class="footer-btn">Decrypt File</button>
     <button class="footer-btn">Export keys</button>
+
+    <!-- This is the Receive modal -->
+<div id="modal-receive" uk-modal>
+    <div class="uk-modal-dialog uk-modal-body uk-margin-auto-vertical">
+        <h2 class="uk-modal-title">Public Keys</h2>
+        <p>If someone wishes to send you encrypted data, you must provide them with your public key.</p>
+        <div class="uk-margin">
+            <textarea id="pubkey" name="pubkey" class="uk-input" type="text" placeholder="---Public Key---"></textarea>
+        </div>
+    </div>
+</div>
   </footer>
   <script src="js/localforage.min.js"></script>
   <script src="https://code.jquery.com/jquery-1.8.3.min.js"></script>

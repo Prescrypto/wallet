@@ -56,7 +56,6 @@ p{
   font-size: 18px;
 }
 .createkeys-modal.uk-modal-dialog{
-  transform: translateY(80%)!important;
   border-radius:20px;
 }
 a.uk-button.uk-button-default.uk-width-1-1.uk-margin-small-bottom{
