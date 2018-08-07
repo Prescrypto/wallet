@@ -107,58 +107,58 @@
     }
   }
 
-  function hash_string(){
+  function hash_string(pin_code){
     //This method calculate hash for the  value from pin
-    var pin = CryptoJS.SHA256($('#pin_code').val());
+    var pin = CryptoJS.SHA256(pin_code);
     var pin_hash = pin.toString(CryptoJS.enc.b64);  
     return pin_hash
   }
   
-  function encrypt_privkey(){
+  function encrypt_privkey(pin){
     //Encrypt private key and save in localforage
     var privatekey = $('#privkey').val();
     //Encrypt private key
-    var encrypt = CryptoJS.AES.encrypt(privatekey, hash_string());
+    var encrypt = CryptoJS.AES.encrypt(privatekey, hash_string(pin));
     var encrypt_b64 =  encrypt.toString(CryptoJS.enc.b64);
     //Input private key in the field privkey 
     $('#privkey').val(encrypt_b64);  
   }
 
-  function validate_pubkey(){
+  function validate_pubkey(pubkey){
     // Verify if the field pubkey is empty
-    if ($("#pubkey").val().length===0){
+    if (pubkey.length===0){
       return false
     }else{
       return true
     }
   }
 
-  function validate_privkey(){
+  function validate_privkey(privkey){
     // Verify if the field privkey is empty
-    if($("#privkey").val().lengthh===0){
+    if(privkey.lengthh===0){
         return false
     }else{
         return true
     }
   }
 
-  function validate_keys(){
+  function validate_keys(pubkey, privkey){
     // Is a small test for validate the keys
     var alert_danger_keys = '<div  class="uk-alert-danger" uk-alert>\
       <a class="uk-alert-close" uk-close></a>\
       <p id="alert">Error. You have entered invalid keys; Please try again.</p>\
       </div>'
 
-    if (validate_privkey() && validate_pubkey()){
+    if (validate_privkey(privkey) && validate_pubkey(pubkey)){
       // Encrypt with the public key
       var encrypt = new JSEncrypt();
       var test = 'This a test';
-      encrypt.setPublicKey($("#pubkey").val());
+      encrypt.setPublicKey(pubkey);
       var encrypted = encrypt.encrypt(test);
 
       // Decrypt with the private key
       var decrypt = new JSEncrypt();
-      decrypt.setPrivateKey($("#privkey").val());
+      decrypt.setPrivateKey(privkey);
       var uncrypted = decrypt.decrypt(encrypted);
 
       //The keys are valid
@@ -239,3 +239,5 @@
 </script>
 </body>
 </html>
+ 
+
