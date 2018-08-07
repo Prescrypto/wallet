@@ -55,7 +55,7 @@
       <div class="uk-inline" style="width: 100%">
         <button id="decrypt" class="uk-button uk-button-default" style="font-weight: 700;background-color: white">Decrypt</button>
         <!-- Transfer Data button calling modal-->
-        <button id="transferaction" name="transferaction" class="uk-button uk-button-default" uk-toggle="target: #modal-transact" style="font-weight: 700;background-color: #4AD991; color:#fff;" disabled>Transfer Data</button>
+        <button id="transferaction" name="transferaction" class="uk-button uk-button-default" uk-toggle="target: #modal-transact" style="font-weight: 700;background-color: #4AD991; color:#fff;">Transfer Data</button>
         <a id="backbtn" class="uk-button uk-button-default" id="whitebutton" href="genometrics.html">Back</a>
         <!-- This is Transfer Data Modal-->
         <div id="modal-transact" uk-modal>
@@ -96,12 +96,12 @@
         </div>
       </div>
       <h3>Ancestry</h3>
-      <h5><a id="tx_link" href="#" target="_blank">Show on navigator</a></h5>
+      <h5><a id="tx_link" href="#" target="_blank"><img style="height:30px;" src="media/navigator.svg"> Show on Navigator</a></h5>
       <table id="tx_table" class="uk-table uk-table-divider">
       	<thead>
           <tr>
-            <th>Region</th>
-            <th>Percentage</th>
+            <th><span id="data1">Data 1</span></th>
+            <th><span id="data2">Data 2</span></th>
           </tr>
       	</thead>
       	<tbody id="tx_table_content">
