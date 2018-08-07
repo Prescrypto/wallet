@@ -131,19 +131,56 @@
   <footer class="footer">
     <button class="footer-btn">New Genomic</button>
     <button class="footer-btn uk-button uk-button-default" type="button" uk-toggle="target: #modal-receive">Receive</button>
-    <button class="footer-btn">Decrypt File</button>
+    <button class="footer-btn uk-button uk-button-default" type="button" uk-toggle="target: #modal-decrypt-file">Decrypt File</button>
     <button class="footer-btn">Export keys</button>
 
-    <!-- This is the Receive modal -->
+<!-- This is the Receive modal -->
 <div id="modal-receive" uk-modal>
-    <div class="uk-modal-dialog uk-modal-body uk-margin-auto-vertical">
-        <h2 class="uk-modal-title">Public Keys</h2>
-        <p>If someone wishes to send you encrypted data, you must provide them with your public key.</p>
-        <div class="uk-margin">
-            <textarea id="pubkey" name="pubkey" class="uk-input" type="text" placeholder="---Public Key---"></textarea>
-        </div>
+  <div class="uk-modal-dialog uk-modal-body uk-margin-auto-vertical">
+    <h2 class="uk-modal-title">Public Keys</h2>
+    <p>If someone wishes to send you encrypted data, you must provide them with your public key.</p>
+    <div class="uk-margin">
+      <textarea id="pubkey" name="pubkey" class="uk-input" type="text" placeholder="---Public Key---"></textarea>
     </div>
+  </div>
 </div>
+<!--Closing receive Modal-->
+
+<!-- This is the Decrypt file modal -->
+<div id="modal-decrypt-file" uk-modal>
+  <div class="uk-modal-dialog uk-margin-auto-vertical">
+    <button class="uk-modal-close-default" type="button" uk-close></button>
+    <div class="uk-modal-header">
+      <h2 class="uk-modal-title">Decrypt your files</h2>
+    </div>
+    <div class="uk-modal-body">
+      <table id="decrypt_filePath_table" class="uk-table uk-table-divider">
+        <thead>
+          <tr>
+            <th>Files</th>
+         </tr>
+        </thead>
+        <tbody id="filePath_content">
+        <!-- Render here File Path names for decryption -->
+        </tbody>
+      </table>
+      <hr>
+      <div class="js-upload uk-placeholder uk-text-center">
+        <span uk-icon="icon: cloud-upload"></span>
+        <span class="uk-text-middle">Attach your FILE by dropping it here or</span>
+        <div uk-form-custom>
+          <input type="file">
+          <span id="upload_link" class="uk-link">Select it from computer</span>
+        </div>
+      </div>
+    </div>
+    <div class="uk-modal-footer">
+      <button id="backbtn" class="uk-button uk-button-default">Decrypt</button>
+    </div>
+  </div>
+</div>
+  <!--Closing Decrypt file Modal-->
+
   </footer>
   <script src="js/localforage.min.js"></script>
   <script src="https://code.jquery.com/jquery-1.8.3.min.js"></script>
