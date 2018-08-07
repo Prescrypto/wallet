@@ -28,10 +28,13 @@ form.uk-search.uk-search-default{
 }
 div.uk-grid-medium{
   text-align: left;
-  padding-top: 150px;
+  padding-top: 30px;
   width:800px;
   margin: auto;
   padding-right: 20px;
+}
+.grey-background{
+  background-color:#303030;
 }
 #genome{
   max-width:200px;
@@ -40,6 +43,7 @@ div.uk-grid-medium{
   max-width:500px; /* Customise it accordingly */
   overflow: hidden;
   text-overflow: ellipsis;
+  margin:0 auto;
 }
 .uk-table td{
   border-top: 0px;
