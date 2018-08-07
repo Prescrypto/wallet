@@ -59,74 +59,6 @@
       </div>
     </div>
 
-    <!-- Closing Menu Add Genometrics-->
-    <!-- Menu Create form -->
-    <div>
-       <button class="uk-button uk-button-default" uk-toggle="target: #modal-upload" type="button" id="uploadgeno" style="font-weight: 700;background-color: white">Upload</button>
-      <button class="uk-button uk-button-default" type="button" style="font-weight: 700;background-color: white">Create</button>
-      <div id='fields' uk-dropdown>
-        <div id="formcontent">
-          <div id="inputGroup1" class="uk-nav uk-dropdown-nav">
-            <form id="inputGroup" class="uk-grid-small" uk-grid action="" method="post">
-              <table id="table_fields" class="uk-table uk-table-responsive">
-                <thead>
-                  <tr>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>
-                      <input class="uk-input" type="text" placeholder=" Country" required>
-                    </td>
-                    <td>
-                      <input class="uk-input" type="number" placeholder="Percentage (Only numbers)" required>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </form>
-          </div>
-        </div>
-        <div id="formButtons">
-          <button name="add_field" id="add_field" class="uk-button uk-button-default" type="button" uk-icon="icon:plus"> Add New  </button>
-          <button name="remove_field" id="remove_field" class="uk-button uk-button-default" type="button" uk-close> Remove  </button>
-          <button id="send_data" class="uk-button uk-button-default" type="submit"> Submit </button>
-        </div>
-      </div>
-      <!-- Closing create form-->
-      <button class="uk-button uk-button-default" type="button" style="font-weight: 700;background-color: #A3A0FB;color:#fff">Receive</button>
-
-      <!-- This is Transfer Data Modal-->
-        <div id="modal-upload" uk-modal>
-            <div class="uk-modal-dialog uk-modal-body">
-                <h2 class="uk-modal-title">Upload your Geno File</h2>
-                <form class="uk-form-stacked">
-                  <div id="alert"></div>
-                  <div class="uk-margin">
-                    <label class="uk-form-label" for="form-stacked-text"> Please upload your file</label>
-                    <div class="uk-form-controls">
-                         <!--Upload section-->
-                      <div class="js-upload uk-placeholder uk-text-center">
-                        <span uk-icon="icon: cloud-upload"></span>
-                        <span class="uk-text-middle">Attach your FILE Key by dropping it here or</span>
-                        <div uk-form-custom>
-                          <input id="fileobj" type="file">
-                          <span id="upload_link" class="uk-link">Select your FILE from computer</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                 
-                  <div id="done_action">
-                    <button id="done_button" type="button" class="uk-button uk-button-default uk-modal-close" style="font-weight: 700;background-color: #fff; color:#3C3C3C;"> Done</button>
-                  </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-  </div>
-
   <br>
   <footer class="footer">
     <div class="uk-navbar-container uk-navbar-transparent">
@@ -172,9 +104,37 @@
       </div>
         <div style="padding:100px 80px 40px 80px;">
           <h2>Or create New Genomic</h2>
-          
+          <div id='fields'>
+              <div id="formcontent">
+                <div id="inputGroup1">
+                  <form id="inputGroup" class="uk-grid-small" uk-grid action="" method="post">
+                    <table id="table_fields" class="uk-table uk-table-responsive">
+                      <thead>
+                        <tr>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>
+                            <input class="uk-input" type="text" placeholder=" Country" required>
+                          </td>
+                          <td>
+                            <input class="uk-input" type="number" placeholder="Percentage (Only numbers)" required>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </form>
+                </div>
+              </div>
+              <div id="formButtons">
+                <button name="add_field" id="add_field" class="uk-button uk-button-default" type="button" uk-icon="icon:plus"> Add New  </button>
+                <button name="remove_field" id="remove_field" class="uk-button uk-button-default" type="button" uk-close> Remove  </button>
+                <button id="send_data" class="uk-button uk-button-default" type="submit"> Submit </button>
+              </div>
         </div>
       </div>
+
     </div>
   </div>
 </div>
