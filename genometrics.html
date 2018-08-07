@@ -133,7 +133,7 @@
     <button class="footer-btn uk-button uk-button-default" type="button" uk-toggle="target: #modal-receive">New Genomic</button>
     <button class="footer-btn uk-button uk-button-default" type="button" uk-toggle="target: #modal-receive">Receive</button>
     <button class="footer-btn uk-button uk-button-default" type="button" uk-toggle="target: #modal-decrypt-file">Decrypt File</button>
-    <button class="footer-btn uk-button uk-button-default" type="button" uk-toggle="target: #modal-receive">Export keys</button>
+    <button id="js-modal-dialog"  class="footer-btn uk-button uk-button-default" type="button">Export keys</button>
   </div>
 <!-- This is the Receive modal -->
 <div id="modal-receive" uk-modal>
@@ -181,6 +181,16 @@
   </div>
 </div>
   <!--Closing Decrypt file Modal-->
+
+<!--Export Keys Alert Modal-->
+<script>
+  UIkit.util.on('#js-modal-dialog', 'click', function (e) {
+    e.preventDefault();
+    e.target.blur();
+    UIkit.modal.dialog('<p class="uk-modal-body">Your keys are now being exported!</p>');
+  });
+</script>
+<!-- closing Export keys modal alert-->
 
   </footer>
   <script src="js/localforage.min.js"></script>
