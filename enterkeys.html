@@ -204,24 +204,76 @@
     read.readAsText(file);
   }
 
-  // Events
-  $('#verify_keys').on('click', function(e) {
-    var success_button = '\
-        <a id="next_button" class="uk-button uk-button-default" href="genometrics.html"> Next </a>'
+  function validate_pin(pin){
+    if (!/^([0-9])*$/.test(pin)){
+      return false
+    }else{
+      return true
+    }
+  }
 
-    e.preventDefault();
-    console.log("Click saved keys");
-    if (verify_lenght($('#pin_code').val())){
-        if (validate_keys()){
+  function decrypt_privkey(pin){
+    //Encrypt private key and save in localforage
+    var privatekey = $('#privkey').val();
+    //Encrypt private key
+    var decrypt = CryptoJS.AES.decrypt(privatekey, hash_string(pin));
+    var decrypt_string = null;
+    try{
+      var decrypt_string = decrypt.toString(CryptoJS.enc.Utf8);
+    }catch(err){
+      alert("PIN CODE invalid");
+      console.log(err);  
+    }
+    return decrypt_string
+  }
+
+  function verify_files_keys(){
+    //Variables 
+    var success_button = '\
+    <a id="next_button" class="uk-button uk-button-default" href="genometrics.html"> Next </a>'
+    var pin_code = null;
+    var pubkey = $('#pubkey').val();
+
+    //Verify if the keys are in raw
+    if (validate_keys(pubkey, $('#privkey').val())){
+      pin_code = prompt("You Private Key is not encrypted, please enter a PIN CODE for encrypt it, remember not to forget this PIN");
+      if (pin_code.length==4){
+        if (validate_pin(pin_code)){
           //Symmetric encrypt private key
-          encrypt_privkey();          
+          encrypt_privkey(pin_code);          
           //Save keys
           save_key($("#privkey").val(), $("#pubkey").val());
           $('#success_button').html(success_button);  
+        }else{
+          alert("Please enter a PIN CODE of four digits. Try again");
+        } 
+      }else{
+        alert("Please enter a PIN CODE of four digits. Try again");
+      }
+    }else{
+      pin_code = prompt("You Private Key are encrypted, please enter a PIN CODE for decrypt it");
+      if (pin_code.length==4){
+        if (validate_pin(pin_code)){
+          //Symmetric decrypt private key
+          var privkey = decrypt_privkey(pin_code);
+          if (validate_keys(pubkey, privkey)){
+            //Save keys
+            save_key($("#privkey").val(), $("#pubkey").val());
+            alert("Valid Keys, please give click in button next");
+            $('#success_button').html(success_button);  
+          }         
         }
+      }else{
+        alert("Please enter a PIN CODE of four digits. Try again");
+      }
     }
-  });
+  }
 
+  // Events
+  $('#verify_keys').on('click', function(e){ 
+    e.preventDefault();
+    verify_files_keys();
+  });
 
   document.getElementById('pubkey_file')
   .addEventListener('change', read_pubkey_file, false);
