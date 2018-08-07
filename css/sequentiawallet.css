@@ -72,13 +72,13 @@ a.uk-button.uk-button-default.uk-width-1-1.uk-margin-small-bottom{
   text-overflow: ellipsis;
 }
 label.uk-form-label{
-  color: #626262;
+  color: #fff;
   font-family: 'Source Sans Pro';
   font-size: 15px;
   font-weight: 700;
 }
 div.js-upload.uk-placeholder.uk-text-center{
-  color: #626262;
+  color: #fff;
 }
 span.uk-link{
   color : #BBB;
