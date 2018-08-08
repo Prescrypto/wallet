@@ -58,7 +58,6 @@
         <br>
       </div>
     </div>
-
   <br>
   <footer class="footer">
     <div class="uk-navbar-container uk-navbar-transparent">
@@ -134,7 +133,6 @@
               </div>
         </div>
       </div>
-
     </div>
   </div>
 </div>
@@ -216,12 +214,11 @@
     //variables
     //Variables
     var alert_success = '<div  class="uk-alert-success" uk-alert>\
-      <a class="uk-alert-close" uk-close></a>\
-      <p id="alert">';
+      <a class="uk-alert-close" uk-close></a>';
     var alert_error = '<div  class="uk-alert-danger" uk-alert>\
-      <a class="uk-alert-close" uk-close></a>\
-      <p id="alert">';
+      <a class="uk-alert-close" uk-close></a>';
     var alert_end ='</p></div>';
+    var local_file_url = '#';
     AWS.config.region = AWS_Region;
     AWS.config.update({accessKeyId: AWS_AccessKeyId, secretAccessKey: AWS_SecretAccessKey}); //login to aws with credentials
     var bucket = new AWS.S3({params: {Bucket: AWS_BucketName}, apiVersion: '2006-03-01'});
@@ -369,33 +366,33 @@
       var encrypt = new JSEncrypt();
       var index_encrypt = 0;
       var pubkey =  $("#pub_key").val(); 
-      
+
+      var privkey = null;
+      var pin_attempts = 3;
       var privkey_encrypt =  $("#priv_key").val(); 
       var pin_flag = true;
-      var pin_attempts = 0;
       while (pin_flag){
+        pin_attempts = pin_attempts - 1 ; 
         var pin_code = prompt("Please, enter your PIN CODE");
-        if (pin_attempts == 2){
+        if (pin_attempts <0){
           alert("You have no more attempts");
           return window.open("./genometrics.html","_self");    
         }else if (pin_code.length==4){
           if (validate_pin(pin_code)){
             var privkey_decrypt = CryptoJS.AES.decrypt(privkey_encrypt, hash_string(pin_code));
             try{
-              var privkey = privkey_decrypt.toString(CryptoJS.enc.Utf8);
+              privkey = privkey_decrypt.toString(CryptoJS.enc.Utf8);
               pin_flag = false;
             }catch(err){
-              pin_attempts = pin_attempts + 1;
-              var attempts = 3 - pin_attempts ; 
-              alert("PIN CODE invalid,  remaining attempts: "+ attempts);
+              alert("PIN CODE invalid,  remaining attempts: "+ pin_attempts);
               console.log(err);  
             }        
           }
-        }else{
-          pin_attempts = pin_attempts + 1;
-          var attempts = 3 - pin_attempts;  
-          alert("PIN CODE invalid,  remaining attempts: "+ attempts);
+        }else{    
+          alert("PIN CODE invalid,  remaining attempts: "+ pin_attempts);
         }
+
+        
       }
       
 
@@ -445,12 +442,12 @@ function completeMultipartUpload(doneParams) {
     if (err) {
       console.log("An error occurred while completing the multipart upload");
       console.log(err);
-      $('#alert').html(alert_error+'Filed on Upload '+alert_end);
+      $('#alert_transfer').html(alert_error+'<p id="alert_transfer">Filed on Upload '+alert_end);
     } else {
       var delta = (new Date() - startTime) / 1000;
       console.log('Completed upload in', delta, 'seconds');
       console.log('Final upload data:', data);
-      $('#alert').html( alert_success+'Uploaded To: <a href="'+data.Location +'">'+data.Location+'</a> '+ alert_end);
+      $('#alert_transfer').html( alert_success+'<p id="alert_transfer">Uploaded To: <a href="'+data.Location +'">'+data.Location+'</a> '+ alert_end);
     }
   });
 }
@@ -520,11 +517,13 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
           }
           catch(err){
             console.log(err);
+            $('#alert').html(alert_error+'Error on Upload!'+alert_end);
             return;
           }
      
       }else{
         console.log(mpErr);
+        $('#alert').html(alert_error+'Error on Upload!'+alert_end);
         return;
       }
     });
@@ -540,11 +539,11 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
     bucket.upload(parameters, function (err, data) {
       if (err){
         console.log(err);
-        $('#alert').html(alert_error+'Error on Upload!'+alert_end);
+        $('#alert_transfer').html(alert_error+'<p id="alert_transfer">Error on Upload!'+alert_end);
       }
       if(data){
         console.log("done uploading");
-        $('#alert').html( alert_success+'Uploaded To: <a href="'+data.Location +'">'+data.Location+'</a> '+ alert_end);
+        $('#alert_transfer').html( alert_success+'<p id="alert_transfer">Uploaded To: <a href="'+data.Location +'">'+data.Location+'</a> '+ alert_end);
       }
      
     });
@@ -585,7 +584,15 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
     var encrypted_file = encrypt.encrypt(myfile);
     return encrypted_file;
   }
-   function upload_file(e) {
+  function download_file(text, name, type) {
+    var file = new Blob([text], {type: type});
+    var download_link = document.getElementById("link");
+    local_file_url = URL.createObjectURL(file);
+    download_link.href = local_file_url;
+    download_link.download = name;
+    document.getElementById('down_button').disabled = false;
+  }
+  function upload_file(e) {
     //uploads a file from local storage to memory
     // Variables
     var encrypted_file = null;
@@ -593,8 +600,36 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
     var today = new Date();
     var timestamp = today.toISOString();
     var file = e.target.files[0];
-    var priv_key =$('#priv_key').val();
     var pub_key = $('#pub_key').val();
+
+    var priv_key = null;
+    var pin_attempts = 3;
+    var privkey_encrypt =  $("#priv_key").val(); 
+    var pin_flag = true;
+    while (pin_flag){
+      pin_attempts = pin_attempts - 1 ; 
+      var pin_code = prompt("Please, enter your PIN CODE");
+      if (pin_attempts < 0){
+        alert("You have no more attempts");
+        return window.open("./genometrics.html","_self");    
+      }else if (pin_code.length==4){
+        if (validate_pin(pin_code)){
+          var privkey_decrypt = CryptoJS.AES.decrypt(privkey_encrypt, hash_string(pin_code));
+          try{
+            priv_key = privkey_decrypt.toString(CryptoJS.enc.Utf8);
+            pin_flag = false;
+          }catch(err){
+            alert("PIN CODE invalid,  remaining attempts: "+ pin_attempts);
+            console.log(err);  
+          }        
+        }
+      }else{    
+        alert("PIN CODE invalid,  remaining attempts: "+ pin_attempts);
+      }
+
+      
+    }//finish while
+
     if((priv_key.length < 1)||(pub_key.length < 1)){
       console.log("no private or public keys");
       return;
@@ -609,7 +644,7 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
     read.onload = function(e) {
       var content = e.target.result;
       encrypted_file = ecrypt_file_symm(content, priv_key, pub_key); 
-      $('#alert').html(alert_success+'File Loaded, waiting to Upload it...'+alert_end);
+      $('#alert_transfer').html(alert_success+'<p id="alert_transfer">File Loaded, waiting to Upload it...'+alert_end);
       if(encrypted_file.length > partSize){
         console.log("starting multipart upload");
         uploadMultipart("myfile"+timestamp+".txt", encrypted_file);
@@ -618,7 +653,6 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
         console.log("starting normal upload");
         uploadNormal(encrypted_file);
       }
-      
       
     };
     
@@ -630,34 +664,74 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
     var rawdata = null;
     var today = new Date();
     var timestamp = today.toISOString();
-    var priv_key =$('#priv_key').val();
     var pub_key = $('#pub_key').val();
-    if((priv_key.length < 1)||(pub_key.length < 1)){
-      console.log("No private or public keys");
-      return;
-    }
     var file = e.target.files[0];
+
+    var priv_key = null;
+    var pin_attempts = 3;
+    var privkey_encrypt = $("#priv_key").val(); 
+    var pin_flag = true;
+    while (pin_flag){
+      pin_attempts = pin_attempts - 1 ; 
+      var pin_code = prompt("Please, enter your PIN CODE");
+      if (pin_attempts < 0){
+        alert("You have no more attempts");
+        return window.open("./genometrics.html","_self");    
+      }else if (pin_code.length==4){
+        if (validate_pin(pin_code)){
+          var privkey_decrypt = CryptoJS.AES.decrypt(privkey_encrypt, hash_string(pin_code));
+          try{
+            priv_key = privkey_decrypt.toString(CryptoJS.enc.Utf8);
+            pin_flag = false;
+          }catch(err){
+            alert("PIN CODE invalid,  remaining attempts: "+ pin_attempts);
+            console.log(err);  
+          }        
+        }
+      }else{    
+        alert("PIN CODE invalid,  remaining attempts: "+ pin_attempts);
+      }
+      
+    }//finish while
+
+    if((priv_key.length < 1)||(pub_key.length < 1)){
+      console.log("no private or public keys");
+      $('#alert_decrypt').html(alert_error+"<p id='alert_decrypt'>Didn't find valid Keys"+alert_end);
+    }
+
+
     //Small Validation
     if (!file) {
-      return;
+      $('#alert_decrypt').html(alert_error+'<p id="alert_decrypt">No file found'+alert_end);
     }
     //Read file
     var read = new FileReader();
     read.readAsText(file);
     read.onload = function(e) {
       var content = e.target.result;
-      var finali = decrypt_file_symm(content, priv_key, pub_key);
-      console.log(finali);
+      try{
+        var decrypted_content = decrypt_file_symm(content, priv_key, pub_key);
+        download_file(decrypted_content, "mydecryptedfile.txt", "text/plain");
+        $('#alert_decrypt').html(alert_success+'<p id="alert_decrypt">File decrypted correctly'+alert_end);
+
+      }
+      catch(err){
+        console.log(err);
+        $('#alert_decrypt').html(alert_success+'<p id="alert_decrypt">Failed to decrypt the file'+alert_end);
+      }
+      
+      
      };
     
   }
-
-
 
     // Events
 
     document.getElementById('fileobj')
     .addEventListener('change', upload_file, false);
+
+    document.getElementById('encryptedfileobj')
+    .addEventListener('change', decrypt_from_file, false);
 
     $('#add_field').on('click', function(){
       add_field();
@@ -669,12 +743,18 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
         remove_field();
       }
     });
-
-     $('#done_button').one('click', function(){
-       $('#alert').html('<p id="alert"></p></div>');
+    $('#down_button').on('click', function(){
+       document.getElementById('link').click();
+    });
+    $('#decrypt_done_button').on('click', function(){
+      document.getElementById('down_button').disabled = true;
+       $('#alert_decrypt').html('<p id="alert_decrypt"></p></div>');
+    });
+     $('#done_button').on('click', function(){
+       $('#alert_transfer').html('<p id="alert_transfer"></p></div>');
     });
 
-    $('#send_data').one('click', function(){
+    $('#send_data').on('click', function(){
       create_payload();
       $(this).attr("disabled","disabled");
     });
