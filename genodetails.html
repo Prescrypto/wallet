@@ -244,13 +244,14 @@
         }
 
         var prk = $('#priv_key').val();
-
+        var privkey = null;
         var pin_flag = true;
+
         while (pin_flag){
           if(form_pin.length == 4){
             var privkey_decrypt = CryptoJS.AES.decrypt(prk, hash_string(form_pin));
             try{
-              var privkey = privkey_decrypt.toString(CryptoJS.enc.Utf8);
+              privkey = privkey_decrypt.toString(CryptoJS.enc.Utf8);
               pin_flag = false;
             }catch(err){
               alert("PIN CODE invalid, try again.");
