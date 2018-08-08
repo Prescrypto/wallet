@@ -46,9 +46,10 @@
     <textarea id="priv_key"></textarea>
   </aside>
   <!-- END Aside pub and private keys -->
-
+  <div class="grey-background" align="center">
+    <h2 style="color:#fff!important;padding-bottom:30px;">Your Genomics</h2>
+  </div>
   <div class="uk-grid-medium" align="center">
-    <h2>Your Genomics</h2>
     <div class="uk-child-width-1-1@s" uk-grid>
       <div>
         <div id="genocontent" uk-sortable="group: sortable-group">
@@ -57,104 +58,144 @@
         <br>
       </div>
     </div>
-
-    <!-- Closing Menu Add Genometrics-->
-    <!-- Menu Create form -->
-    <div>
-       <button class="uk-button uk-button-default" uk-toggle="target: #modal-upload" type="button" id="uploadgeno" style="font-weight: 700;background-color: white">Upload</button>
-       <button class="uk-button uk-button-default" uk-toggle="target: #modal-decrypt" type="button" id="decryptfile" style="font-weight: 700;background-color: white">Decrypt</button>
-      <button class="uk-button uk-button-default" type="button" style="font-weight: 700;background-color: white">Create</button>
-      <div id='fields' uk-dropdown>
-        <div id="formcontent">
-          <div id="inputGroup1" class="uk-nav uk-dropdown-nav">
-            <form id="inputGroup" class="uk-grid-small" uk-grid action="" method="post">
-              <table id="table_fields" class="uk-table uk-table-responsive">
-                <thead>
-                  <tr>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>
-                      <input class="uk-input" type="text" placeholder=" Country" required>
-                    </td>
-                    <td>
-                      <input class="uk-input" type="number" placeholder="Percentage (Only numbers)" required>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </form>
+  <br>
+  <footer class="footer">
+    <div class="uk-navbar-container uk-navbar-transparent">
+    <a class="footer-btn uk-button uk-button-default" href="#modal-full" uk-toggle>New Genomic</a>
+    <button class="footer-btn uk-button uk-button-default" type="button" uk-toggle="target: #modal-receive">Receive</button>
+    <button class="footer-btn uk-button uk-button-default" type="button" uk-toggle="target: #modal-decrypt-file">Decrypt File</button>
+    <button id="js-modal-dialog"  class="footer-btn uk-button uk-button-default" type="button">Export keys</button>
+  </div>
+<!-- This is the fullscreen Create New Modal-->
+<div id="modal-full" class="uk-modal-full" uk-modal>
+  <div class="uk-modal-dialog">
+    <button class="uk-modal-close-full uk-close-large" type="button" uk-close></button>
+    <div class="uk-grid-collapse uk-child-width-1-2@s" uk-grid>
+      <div style="background-color:#303030;padding:100px 80px 40px 80px;" uk-height-viewport>
+          <h2 id="light-h2">Upload File</h2>
+          <h3 id="light-h2">Please upload your Geno file</h3>
+          <form class="uk-form-stacked">
+            <div id="alert"></div>
+            <div class="uk-margin-large">
+              <div class="uk-form-controls">
+                <!--Upload section-->
+                <div class="js-upload uk-placeholder uk-text-center">
+                  <span uk-icon="icon: cloud-upload"></span>
+                  <span class="uk-text-middle">Attach your FILE Key by dropping it here or</span>
+                  <div uk-form-custom>
+                    <input id="fileobj" type="file">
+                    <span id="upload_link" class="uk-link">Select your FILE from computer</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+          <div class="uk-inline">
+              <h2 id="light-h2"><img style="height:40px;margin-bottom:10px;" src="media/light-locker.svg" alt=""> PIN</h2>
+              <div class="uk-form-controls">
+                <input style="width:150px;" id="pin_code" name="pin_code" class="uk-input" type="text" maxlength="4" placeholder="Enter PIN code" required />
+              </div>
           </div>
-        </div>
-        <div id="formButtons">
-          <button name="add_field" id="add_field" class="uk-button uk-button-default" type="button" uk-icon="icon:plus"> Add New  </button>
-          <button name="remove_field" id="remove_field" class="uk-button uk-button-default" type="button" uk-close> Remove  </button>
-          <button id="send_data" class="uk-button uk-button-default" type="submit"> Submit </button>
+          <div id="done_action" class="uk-modal-footer" style="background-color:transparent;margin-top:40px;">
+            <button id="done_button" type="button" class="uk-button uk-button-default uk-modal-close" style="font-weight: 700;background-color: #fff; color:#3C3C3C;"> Done</button>
+          </div>
+      <!--Right column Modal (White)-->
+      </div>
+        <div style="padding:100px 80px 40px 80px;">
+          <h2>Or create New Genomic</h2>
+          <div id='fields'>
+              <div id="formcontent">
+                <div id="inputGroup1">
+                  <form id="inputGroup" class="uk-grid-small" uk-grid action="" method="post">
+                    <table id="table_fields" class="uk-table uk-table-responsive">
+                      <thead>
+                        <tr>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>
+                            <input class="uk-input" type="text" placeholder=" Country" required>
+                          </td>
+                          <td>
+                            <input class="uk-input" type="number" placeholder="Percentage (Only numbers)" required>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </form>
+                </div>
+              </div>
+              <div id="formButtons">
+                <button name="add_field" id="add_field" class="uk-button uk-button-default" type="button" uk-icon="icon:plus"> Add New  </button>
+                <button name="remove_field" id="remove_field" class="uk-button uk-button-default" type="button" uk-close> Remove  </button>
+                <button id="send_data" class="uk-button uk-button-default" type="submit"> Submit </button>
+              </div>
         </div>
       </div>
-      <!-- Closing create form-->
-      <button class="uk-button uk-button-default" type="button" style="font-weight: 700;background-color: #A3A0FB;color:#fff">Receive</button>
-
-      <!-- This is Transfer Data Modal-->
-        <div id="modal-upload" uk-modal>
-            <div class="uk-modal-dialog uk-modal-body">
-                <h2 class="uk-modal-title">Upload your Geno File</h2>
-                <form class="uk-form-stacked">
-                  <div id="alert_transfer"></div>
-                  <div class="uk-margin">
-                    <label class="uk-form-label" for="form-stacked-text"> Please upload your file</label>
-                    <div class="uk-form-controls">
-                         <!--Upload section-->
-                      <div class="js-upload uk-placeholder uk-text-center">
-                        <span uk-icon="icon: cloud-upload"></span>
-                        <span class="uk-text-middle">Attach your FILE Key by dropping it here or</span>
-                        <div uk-form-custom>
-                          <input id="fileobj" type="file">
-                          <span id="upload_link" class="uk-link">Select your FILE from computer</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                 
-                  <div id="done_action">
-                    <button id="done_button" type="button" class="uk-button uk-button-default uk-modal-close" style="font-weight: 700;background-color: #fff; color:#3C3C3C;"> Done</button>
-                  </div>
-                </form>
-            </div>
-        </div>
-        <!-- This is Decrypt file Modal-->
-        <div id="modal-decrypt" uk-modal>
-            <div class="uk-modal-dialog uk-modal-body">
-                <h2 class="uk-modal-title">Decrypt File</h2>
-                <form class="uk-form-stacked">
-                  <div id="alert_decrypt"></div>
-                  <div class="uk-margin">
-                    <label class="uk-form-label" for="form-stacked-text"> Please upload your encrypted file</label>
-                    <div class="uk-form-controls">
-                         <!--Upload section-->
-                      <div class="js-upload uk-placeholder uk-text-center">
-                        <span uk-icon="icon: cloud-upload"></span>
-                        <span class="uk-text-middle">Attach your FILE Key by dropping it here or</span>
-                        <div uk-form-custom>
-                          <input id="encryptedfileobj" type="file">
-                          <span id="upload_link" class="uk-link">Select your FILE from computer</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <a id="link" href="#" download hidden></a>
-                    <button href="#" id="down_button" class="uk-button uk-button-default" style="font-weight: 700;background-color: #fff; color:#3C3C3C;" disabled> Download </button>
-                    <button id="decrypt_done_button" type="button" class="uk-button uk-button-default uk-modal-close" style="font-weight: 700;background-color: #fff; color:#3C3C3C;"> Done</button>
-              
-                </form>
-            </div>
-        </div>
     </div>
-
   </div>
+</div>
+<!--Closing fullscreen Modal-->
 
-  <br>
+<!-- This is the Receive modal -->
+<div id="modal-receive" uk-modal>
+  <div class="uk-modal-dialog uk-modal-body uk-margin-auto-vertical">
+    <h2 class="uk-modal-title">Public Keys</h2>
+    <p>If someone wishes to send you encrypted data, you must provide them with your public key.</p>
+    <div class="uk-margin">
+      <textarea id="pubkey" name="pubkey" class="uk-input" type="text" placeholder="---Public Key---"></textarea>
+    </div>
+  </div>
+</div>
+<!--Closing receive Modal-->
+
+<!-- This is the Decrypt file modal -->
+<div id="modal-decrypt-file" uk-modal>
+  <div class="uk-modal-dialog uk-margin-auto-vertical">
+    <button class="uk-modal-close-default" type="button" uk-close></button>
+    <div class="uk-modal-header">
+      <h2 class="uk-modal-title">Decrypt your files</h2>
+    </div>
+    <div class="uk-modal-body">
+      <table id="decrypt_filePath_table" class="uk-table uk-table-divider">
+        <thead>
+          <tr>
+            <th>Files</th>
+         </tr>
+        </thead>
+        <tbody id="filePath_content">
+        <!-- Render here File Path names for decryption -->
+        </tbody>
+      </table>
+      <hr>
+      <div class="js-upload uk-placeholder uk-text-center">
+        <span uk-icon="icon: cloud-upload"></span>
+        <span class="uk-text-middle">Attach your FILE by dropping it here or</span>
+        <div uk-form-custom>
+          <input type="file">
+          <span id="upload_link" class="uk-link">Select it from computer</span>
+        </div>
+      </div>
+    </div>
+    <div class="uk-modal-footer">
+      <button id="backbtn" class="uk-button uk-button-default">Decrypt</button>
+    </div>
+  </div>
+</div>
+  <!--Closing Decrypt file Modal-->
+
+<!--Export Keys Alert Modal-->
+<script>
+  UIkit.util.on('#js-modal-dialog', 'click', function (e) {
+    e.preventDefault();
+    e.target.blur();
+    UIkit.modal.dialog('<p class="uk-modal-body">Your keys are now being exported!</p>');
+  });
+</script>
+<!-- closing Export keys modal alert-->
+
+  </footer>
   <script src="js/localforage.min.js"></script>
   <script src="https://code.jquery.com/jquery-1.8.3.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/components/core-min.js"></script>
