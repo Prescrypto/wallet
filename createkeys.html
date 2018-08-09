@@ -46,20 +46,20 @@
     <textarea id="privkey"></textarea>
   </aside>
   <!-- END Aside pub and private keys -->
-
-  <div class="uk-grid-medium" align="center">
-    <form class="uk-form-horizontal uk-margin-large">
-      <div id="alert"></div>
-      <div class="uk-margin">
-        <label class="uk-form-label" for="form-horizontal-text">Pin Code</label>
-          <div class="uk-form-controls">
-            <input id="pin_code" name="pin_code" class="uk-input" type="text" maxlength="4" placeholder="Enter four digits and remember not to forget this PIN" required />
-            <a id="encrypt_privkey" style="font-size:12px;" class="uk-margin-small uk-button uk-button-primary uk-button-small"> Next </a>
-          </div>
+    <div class="grey-background" align="center" style="padding:150px 0 20px 0;">
+      <div id="box_pin_code" class="uk-margin" align="center">
+        <h2 style="color:#fff"><img style="height:40px;margin-bottom:10px;" src="media/light-locker.svg" alt=""> PIN</h2>
+        <p style="color:#fff"><strong>Enter a 4 digits pin code</strong><br>Make sure you remember it, you’ll need it for all your transactions.</p>
+        <div class="uk-form-controls">
+          <input id="pin_code" name="pin_code" class="uk-input" type="text" maxlength="4" placeholder="Enter PIN code" required />
+        </div>
       </div>
-    </form>
-  </div>
+    </div>
+    <div align="center" id="success_button" >
+      <button class="uk-button uk-button-default" id="encrypt_privkey"> NEXT </button>
+    </div>
 
+ 
 <script src="js/localforage.min.js"></script>
 <script src="https://code.jquery.com/jquery-1.8.3.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/components/core-min.js"></script>

@@ -118,7 +118,7 @@ input#form-horizontal-text.uk-input{
   margin-top: 1em;
   float:right;
 }
-#verify_keys, #download_keys{
+#verify_keys, #encrypt_privkey{
   background-color:#48a9e1;
   color : #fff;
   font-family: 'Source Sans Pro';
