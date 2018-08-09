@@ -796,7 +796,7 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
     
   }
 
-  function download_file(){
+  function download_keys(){
     //This method download keys files
     //Read keys
     var privatekey = $('#priv_key').val();
@@ -820,7 +820,7 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
 
     //Export Keys Alert Modal
     UIkit.util.on('#js-modal-dialog', 'click', function (e) {
-      download_file();
+      download_keys();
       e.preventDefault();
       e.target.blur();
       UIkit.modal.dialog('<p class="uk-modal-body">Your keys are now being exported!</p>');
