@@ -219,42 +219,36 @@
     //Variables 
     var success_button = '\
     <a id="next_button" class="uk-button uk-button-default" href="genometrics.html"> Next </a>'
-    var pin_code = null;
+    var alert_success = '<div  class="uk-alert-success" uk-alert>\
+      <a class="uk-alert-close" uk-close></a>\
+      <p id="alert">';
+    var alert_error = '<div  class="uk-alert-danger" uk-alert>\
+      <a class="uk-alert-close" uk-close></a>\
+      <p id="alert">';
+    var alert_end ='</p></div>';
+    var pin_code = $('#pin_code').val();
     var pubkey = $('#pubkey').val();
-
-    //Verify if the private key are is raw
-    if (validate_keys(pubkey, $('#privkey').val())){
-      pin_code = prompt("You Private Key is not encrypted, please enter a PIN CODE for encrypt it, remember not to forget this PIN");
-      if (pin_code.length==4){
-        if (validate_pin(pin_code)){
-          //Symmetric encrypt private key
-          encrypt_privkey(pin_code);          
+    
+    if(pin_code.length == 0){
+      $('#alert').html(alert_success+'Please enter your PIN CODE'+alert_end);
+    }else{
+      if (validate_keys(pubkey, $('#privkey').val())){ 
+        $('#alert').html(alert_success+'Your private key is not encrypted, we encrypt it with your PIN'+alert_end);
+        //Symmetric encrypt private key
+        encrypt_privkey(pin_code);          
+        //Save keys
+        save_key($("#privkey").val(), $("#pubkey").val());
+        $('#success_button').html(success_button);
+      }else{
+        var privkey = decrypt_privkey(pin_code);
+        if (validate_keys(pubkey, privkey)){
           //Save keys
           save_key($("#privkey").val(), $("#pubkey").val());
+          $('#alert').html(alert_success+'Valid Keys, please give click in button next'+alert_end);
           $('#success_button').html(success_button);  
-        }else{
-          alert("Please enter a PIN CODE of four digits. Try again");
-        } 
-      }else{
-        alert("Please enter a PIN CODE of four digits. Try again");
-      }
-    }else{
-      pin_code = prompt("You Private Key are encrypted, please enter a PIN CODE for decrypt it");
-      if (pin_code.length==4){
-        if (validate_pin(pin_code)){
-          //Symmetric decrypt private key
-          var privkey = decrypt_privkey(pin_code);
-          if (validate_keys(pubkey, privkey)){
-            //Save keys
-            save_key($("#privkey").val(), $("#pubkey").val());
-            alert("Valid Keys, please give click in button next");
-            $('#success_button').html(success_button);  
-          }         
         }
-      }else{
-        alert("Please enter a PIN CODE of four digits. Try again");
-      }
-    }
+      } 
+    }    
   }
 
   // Events
