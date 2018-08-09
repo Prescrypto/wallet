@@ -62,7 +62,7 @@
   <footer class="footer">
     <div class="uk-navbar-container uk-navbar-transparent">
     <a class="footer-btn uk-button uk-button-default" href="#modal-full" uk-toggle>New Genomic</a>
-    <button class="footer-btn uk-button uk-button-default" type="button" uk-toggle="target: #modal-receive">Receive</button>
+    <button id="recieve_button" class="footer-btn uk-button uk-button-default" type="button" uk-toggle="target: #modal-receive">Receive</button>
     <button class="footer-btn uk-button uk-button-default" type="button" uk-toggle="target: #modal-decrypt-file">Decrypt File</button>
     <button id="js-modal-dialog"  class="footer-btn uk-button uk-button-default" type="button">Export keys</button>
   </div>
@@ -146,7 +146,7 @@
     <h2 class="uk-modal-title">Public Keys</h2>
     <p>If someone wishes to send you encrypted data, you must provide them with your public key.</p>
     <div class="uk-margin">
-      <textarea id="pubkey" name="pubkey" class="uk-input" type="text" placeholder="---Public Key---"></textarea>
+      <textarea id="pubkey" name="pubkey" class="uk-input" type="text" placeholder="---Public Key---" ></textarea>
     </div>
   </div>
 </div>
@@ -886,6 +886,11 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
         document.getElementById('send_data').disabled = true;
         $('#alert_new').html('<p id="alert_transfer"></p></div>');
         $('#uploaded_list').html('<div id="uploaded_list"></div>');
+    });
+      $('#modal-receive').on('show.uk.modal', function(){
+      //clean the modal for new genomics
+
+        $('#pubkey').val($('#pub_key').val());
     });
 
      
