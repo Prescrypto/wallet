@@ -65,29 +65,12 @@
         <div class="uk-form-controls">
           <textarea id="pubkey" name="pubkey" class="uk-input" id="form-horizontal-text" type="text" placeholder="Paste keys"></textarea>
         </div>
-        <div class="js-upload uk-placeholder uk-text-center">
-          <span uk-icon="icon: cloud-upload"></span>
-          <span class="uk-text-middle">Attach your PUBLIC Key by dropping it here or</span>
-          <div uk-form-custom>
-            <input id="pubkey_file" type="file">
-            <span id="upload_link" class="uk-link">Select your PUBLIC Key from computer</span>
-          </div>
-        </div>
-      </div>
-    </form>
-  </div> <!--Closing Medium size div-->
-</div>
-<!--Pin code section-->
-<div class="uk-grid-medium" align="center" style="padding:30px 0 20px 0;">
-  <div id="box_pin_code" class="uk-margin" align="center">
-    <h2><img style="height:40px;margin-bottom:10px;" src="media/dark-locker.svg" alt=""> PIN</h2>
-    <p><strong>Enter a 4 digits pin code</strong><br>Make sure you remember it, you’ll need it for all your transactions.</p>
-    <div class="uk-form-controls">
-      <input id="pin_code" name="pin_code" class="uk-input" type="text" maxlength="4" placeholder="Enter PIN code" required />
     </div>
-    <br>
-    <div id="success_button" >
-      <button class="uk-button uk-button-default" id="verify_keys"> Verify </button>
+    <div id="box_pin_code" class="uk-margin">
+
+    </div>
+    <div id="success_button">
+      <button class="uk-button uk-button-default" id="verify_keys"> Verify Keys</button>
     </div>
   </div>
 </div>
@@ -114,58 +97,58 @@
     }
   }
 
-  function hash_string(){
+  function hash_string(pin_code){
     //This method calculate hash for the  value from pin
-    var pin = CryptoJS.SHA256($('#pin_code').val());
+    var pin = CryptoJS.SHA256(pin_code);
     var pin_hash = pin.toString(CryptoJS.enc.b64);  
     return pin_hash
   }
   
-  function encrypt_privkey(){
+  function encrypt_privkey(pin){
     //Encrypt private key and save in localforage
     var privatekey = $('#privkey').val();
     //Encrypt private key
-    var encrypt = CryptoJS.AES.encrypt(privatekey, hash_string());
+    var encrypt = CryptoJS.AES.encrypt(privatekey, hash_string(pin));
     var encrypt_b64 =  encrypt.toString(CryptoJS.enc.b64);
     //Input private key in the field privkey 
     $('#privkey').val(encrypt_b64);  
   }
 
-  function validate_pubkey(){
+  function validate_pubkey(pubkey){
     // Verify if the field pubkey is empty
-    if ($("#pubkey").val().length===0){
+    if (pubkey.length===0){
       return false
     }else{
       return true
     }
   }
 
-  function validate_privkey(){
+  function validate_privkey(privkey){
     // Verify if the field privkey is empty
-    if($("#privkey").val().lengthh===0){
+    if(privkey.lengthh===0){
         return false
     }else{
         return true
     }
   }
 
-  function validate_keys(){
+  function validate_keys(pubkey, privkey){
     // Is a small test for validate the keys
     var alert_danger_keys = '<div  class="uk-alert-danger" uk-alert>\
       <a class="uk-alert-close" uk-close></a>\
       <p id="alert">Error. You have entered invalid keys; Please try again.</p>\
       </div>'
 
-    if (validate_privkey() && validate_pubkey()){
+    if (validate_privkey(privkey) && validate_pubkey(pubkey)){
       // Encrypt with the public key
       var encrypt = new JSEncrypt();
       var test = 'This a test';
-      encrypt.setPublicKey($("#pubkey").val());
+      encrypt.setPublicKey(pubkey);
       var encrypted = encrypt.encrypt(test);
 
       // Decrypt with the private key
       var decrypt = new JSEncrypt();
-      decrypt.setPrivateKey($("#privkey").val());
+      decrypt.setPrivateKey(privkey);
       var uncrypted = decrypt.decrypt(encrypted);
 
       //The keys are valid
@@ -211,24 +194,76 @@
     read.readAsText(file);
   }
 
-  // Events
-  $('#verify_keys').on('click', function(e) {
-    var success_button = '\
-        <a id="next_button" class="uk-button uk-button-default" href="genometrics.html"> Next </a>'
+  function validate_pin(pin){
+    if (!/^([0-9])*$/.test(pin)){
+      return false
+    }else{
+      return true
+    }
+  }
 
-    e.preventDefault();
-    console.log("Click saved keys");
-    if (verify_lenght($('#pin_code').val())){
-        if (validate_keys()){
+  function decrypt_privkey(pin){
+    //Encrypt private key and save in localforage
+    var privatekey = $('#privkey').val();
+    //Encrypt private key
+    var decrypt = CryptoJS.AES.decrypt(privatekey, hash_string(pin));
+    var decrypt_string = null;
+    try{
+      var decrypt_string = decrypt.toString(CryptoJS.enc.Utf8);
+    }catch(err){
+      alert("PIN CODE invalid");
+      console.log(err);  
+    }
+    return decrypt_string
+  }
+
+  function verify_files_keys(){
+    //Variables 
+    var success_button = '\
+    <a id="next_button" class="uk-button uk-button-default" href="genometrics.html"> Next </a>'
+    var pin_code = null;
+    var pubkey = $('#pubkey').val();
+
+    //Verify if the private key are is raw
+    if (validate_keys(pubkey, $('#privkey').val())){
+      pin_code = prompt("You Private Key is not encrypted, please enter a PIN CODE for encrypt it, remember not to forget this PIN");
+      if (pin_code.length==4){
+        if (validate_pin(pin_code)){
           //Symmetric encrypt private key
-          encrypt_privkey();          
+          encrypt_privkey(pin_code);          
           //Save keys
           save_key($("#privkey").val(), $("#pubkey").val());
           $('#success_button').html(success_button);  
+        }else{
+          alert("Please enter a PIN CODE of four digits. Try again");
+        } 
+      }else{
+        alert("Please enter a PIN CODE of four digits. Try again");
+      }
+    }else{
+      pin_code = prompt("You Private Key are encrypted, please enter a PIN CODE for decrypt it");
+      if (pin_code.length==4){
+        if (validate_pin(pin_code)){
+          //Symmetric decrypt private key
+          var privkey = decrypt_privkey(pin_code);
+          if (validate_keys(pubkey, privkey)){
+            //Save keys
+            save_key($("#privkey").val(), $("#pubkey").val());
+            alert("Valid Keys, please give click in button next");
+            $('#success_button').html(success_button);  
+          }         
         }
+      }else{
+        alert("Please enter a PIN CODE of four digits. Try again");
+      }
     }
-  });
+  }
 
+  // Events
+  $('#verify_keys').on('click', function(e){ 
+    e.preventDefault();
+    verify_files_keys();
+  });
 
   document.getElementById('pubkey_file')
   .addEventListener('change', read_pubkey_file, false);
@@ -246,3 +281,5 @@
 </script>
 </body>
 </html>
+ 
+

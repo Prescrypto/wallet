@@ -39,41 +39,26 @@
     </div>
   </nav>
   <!-- Closing Main menu -->
-    <div class="grey-background" align="center" style="padding:150px 0 20px 0;">
-      <div id="box_pin_code" class="uk-margin" align="center">
-        <h2 style="color:#fff"><img style="height:40px;margin-bottom:10px;" src="media/light-locker.svg" alt=""> PIN</h2>
-        <p style="color:#fff"><strong>Enter a 4 digits pin code</strong><br>Make sure you remember it, you’ll need it for all your transactions.</p>
-        <div class="uk-form-controls">
-          <input id="pin_code" name="pin_code" class="uk-input" type="text" maxlength="4" placeholder="Enter PIN code" required />
-        </div>
+
+ <!-- BEGIN Aside pub and private keys -->
+  <aside style="display:none;">
+    <textarea id="pubkey"></textarea>
+    <textarea id="privkey"></textarea>
+  </aside>
+  <!-- END Aside pub and private keys -->
+
+  <div class="uk-grid-medium" align="center">
+    <form class="uk-form-horizontal uk-margin-large">
+      <div id="alert"></div>
+      <div class="uk-margin">
+        <label class="uk-form-label" for="form-horizontal-text">Pin Code</label>
+          <div class="uk-form-controls">
+            <input id="pin_code" name="pin_code" class="uk-input" type="text" maxlength="4" placeholder="Enter four digits and remember not to forget this PIN" required />
+            <a id="encrypt_privkey" style="font-size:12px;" class="uk-margin-small uk-button uk-button-primary uk-button-small"> Next </a>
+          </div>
       </div>
-    </div>
-    <div align="center" id="success_button" >
-      <button class="uk-button uk-button-default" id="download_keys"> NEXT </button>
-    </div>
-<!-- <div class="uk-grid-medium" align="center">
-  <form class="uk-form-horizontal uk-margin-large">
-    <div class="uk-margin">
-      <label class="uk-form-label" for="form-horizontal-text">Private Key</label>
-        <div class="uk-form-controls">
-          <textarea id="privkey" name="privkey" class="uk-input" type="text" placeholder="Generate keys"></textarea>
-        </div>       
-    </div>
-    <div class="uk-margin">
-      <label class="uk-form-label" for="form-horizontal-text">Public Key</label>
-        <div class="uk-form-controls">
-          <textarea id="pubkey" name="pubkey" class="uk-input" type="text" placeholder="Generate keys"></textarea>
-        </div>       
-    </div>
-    <div class="uk-margin">
-      <label class="uk-form-label" for="form-horizontal-text">Pin Code</label>
-        <div class="uk-form-controls">
-          <input id="pin_code" name="pin_code" class="uk-input" type="text" maxlength="4" placeholder="Enter four digits and remember not to forget this PIN" required />
-          <a style="font-size:12px;" class="uk-margin-small uk-button uk-button-primary uk-button-small" id="download_keys"> Save Keys and Next </a>
-        </div>
-    </div>
-  </form>
-</div> -->
+    </form>
+  </div>
 
 <script src="js/localforage.min.js"></script>
 <script src="https://code.jquery.com/jquery-1.8.3.min.js"></script>
@@ -98,13 +83,22 @@
       })($, localforage);
     });
 
+    //Variables
+    var alert_success = '<div  class="uk-alert-success" uk-alert>\
+      <a class="uk-alert-close" uk-close></a>\
+      <p id="alert">';
+    var alert_error = '<div  class="uk-alert-danger" uk-alert>\
+      <a class="uk-alert-close" uk-close></a>\
+      <p id="alert">';
+    var alert_end ='</p></div>';
+
     //Functions
     function verify_lenght(field){
       //This method verify if length of a fields is empty 
       if (field.length == 4){
         return true
       }else {
-        alert("ERROR. Please enter a pin from four digits; Please try again.");
+        $('#alert').html(alert_error+'ERROR. Please enter a pin from four digits; Please try again. '+alert_end);
         return false
       }
     }
@@ -133,7 +127,7 @@
       });
     }
 
-    function download_file(){
+    /*function download_file(){
       //This method download keys files
       //Read keys
       var privatekey = $('#privkey').val();
@@ -151,12 +145,11 @@
         link.href = 'data:application/octet-stream,'+ encodeURIComponent(files[i]);
         link.click();
       }
-    }
+    }*/
 
     //Events
-    $('#download_keys').click(function(){
+    $('#encrypt_privkey').click(function(){
       if (verify_lenght($('#pin_code').val())){
-        download_file();
         save_encrypt_privkey();    
       }
     });
