@@ -39,53 +39,59 @@
   </div>
 </nav>
 <!-- Closing Main menu -->
-
-<div class="uk-grid-medium" align="center">
-  <form class="uk-form-horizontal uk-margin-large">
-    <!-- Alert Invalid Keys-->
-    <div id="alert"></div>
-    <div class="uk-margin">
-      <label class="uk-form-label" for="form-horizontal-text">Private Keys</label>
+<div class="grey-background" style="padding:10px;">
+  <div class="uk-grid-medium" align="center" style="padding:0;"> <!--medium size grid-->
+    <form class="uk-form-horizontal uk-margin-large"> <!--Enterkeys form-->
+      <!-- Alert Invalid Keys-->
+      <div id="alert"></div>
+      <!--Private keys-->
+      <div class="uk-margin">
+        <label class="uk-form-label" for="form-horizontal-text">Private Keys</label>
         <div class="uk-form-controls">
           <textarea id="privkey" name="privkey" class="uk-input" id="form-horizontal-text" type="text" placeholder="Paste keys"></textarea>
         </div>
-    </div>
-    <div class="uk-margin">
-      <label class="uk-form-label" for="form-horizontal-text">Public Keys</label>
+        <div class="js-upload uk-placeholder uk-text-center">
+          <span uk-icon="icon: cloud-upload"></span>
+          <span class="uk-text-middle">Attach your PRIVATE Key by dropping it here or</span>
+          <div uk-form-custom>
+            <input id="privkey_file" type="file">
+            <span id="upload_link" class="uk-link">Select your PRIVATE Key from computer</span>
+          </div>
+        </div>
+      </div>
+      <!--Public keys-->
+      <div class="uk-margin">
+        <label class="uk-form-label" for="form-horizontal-text">Public Keys</label>
         <div class="uk-form-controls">
           <textarea id="pubkey" name="pubkey" class="uk-input" id="form-horizontal-text" type="text" placeholder="Paste keys"></textarea>
         </div>
-    </div>
-    <div id="box_pin_code" class="uk-margin">
-      <label class="uk-form-label" for="form-horizontal-text">Pin Code</label>
-        <div class="uk-form-controls">
-          <input id="pin_code" name="pin_code" class="uk-input" type="text" maxlength="4" placeholder="Enter four digits and remember not to forget this PIN" required />
+        <div class="js-upload uk-placeholder uk-text-center">
+          <span uk-icon="icon: cloud-upload"></span>
+          <span class="uk-text-middle">Attach your PUBLIC Key by dropping it here or</span>
+          <div uk-form-custom>
+            <input id="pubkey_file" type="file">
+            <span id="upload_link" class="uk-link">Select your PUBLIC Key from computer</span>
+          </div>
         </div>
-    </div>
-    <div id="success_button" >
-      <button class="uk-button uk-button-default" id="verify_keys"> Verify </button>
-    </div>
-  </form>
-  <!--Upload section-->
-  <div class="js-upload uk-placeholder uk-text-center">
-    <span uk-icon="icon: cloud-upload"></span>
-    <span class="uk-text-middle">Attach your PRIVATE Key by dropping it here or</span>
-    <div uk-form-custom>
-      <input id="privkey_file" type="file">
-      <span id="upload_link" class="uk-link">Select your PRIVATE Key from computer</span>
-    </div>
-  </div>
-
-  <div class="js-upload uk-placeholder uk-text-center">
-    <span uk-icon="icon: cloud-upload"></span>
-    <span class="uk-text-middle">Attach your PUBLIC Key by dropping it here or</span>
-    <div uk-form-custom>
-      <input id="pubkey_file" type="file">
-      <span id="upload_link" class="uk-link">Select your PUBLIC Key from computer</span>
-    </div>
-  </div>
-  <!-- Closing upload section-->
+      </div>
+    </form>
+  </div> <!--Closing Medium size div-->
 </div>
+<!--Pin code section-->
+<div class="uk-grid-medium" align="center" style="padding:30px 0 20px 0;">
+  <div id="box_pin_code" class="uk-margin" align="center">
+    <h2><img style="height:40px;margin-bottom:10px;" src="media/dark-locker.svg" alt=""> PIN</h2>
+    <p><strong>Enter a 4 digits pin code</strong><br>Make sure you remember it, you’ll need it for all your transactions.</p>
+    <div class="uk-form-controls">
+      <input id="pin_code" name="pin_code" class="uk-input" type="text" maxlength="4" placeholder="Enter PIN code" required />
+    </div>
+    <br>
+    <div id="success_button" >
+      <button class="uk-button uk-button-default" id="verify_keys"> Verify Keys</button>
+    </div>
+  </div>
+</div>  
+    
 
 <script src="js/localforage.min.js"></script>
 <script src="https://code.jquery.com/jquery-1.8.3.min.js"></script>
@@ -97,68 +103,58 @@
 <script src="js/wallet.js"></script>
 <script>
   // Functions
-  function verify_lenght(field){
-    //This method verify if length of a fields is empty 
-    if (field.length == 4){
-      return true
-    }else {
-      alert("ERROR. Please enter a pin from four digits; Please try again.");
-      return false
-    }
-  }
-
-  function hash_string(){
+  function hash_string(pin_code){
     //This method calculate hash for the  value from pin
-    var pin = CryptoJS.SHA256($('#pin_code').val());
+    var pin = CryptoJS.SHA256(pin_code);
     var pin_hash = pin.toString(CryptoJS.enc.b64);  
     return pin_hash
   }
   
-  function encrypt_privkey(){
+  function encrypt_privkey(pin){
     //Encrypt private key and save in localforage
     var privatekey = $('#privkey').val();
     //Encrypt private key
-    var encrypt = CryptoJS.AES.encrypt(privatekey, hash_string());
+    var encrypt = CryptoJS.AES.encrypt(privatekey, hash_string(pin));
     var encrypt_b64 =  encrypt.toString(CryptoJS.enc.b64);
     //Input private key in the field privkey 
     $('#privkey').val(encrypt_b64);  
   }
 
-  function validate_pubkey(){
+  function validate_pubkey(pubkey){
     // Verify if the field pubkey is empty
-    if ($("#pubkey").val().length===0){
+    if (pubkey.length===0){
       return false
     }else{
       return true
     }
   }
 
-  function validate_privkey(){
+  function validate_privkey(privkey){
     // Verify if the field privkey is empty
-    if($("#privkey").val().lengthh===0){
+    if(privkey.lengthh===0){
         return false
     }else{
         return true
     }
   }
 
-  function validate_keys(){
+  function validate_keys(pubkey, privkey){
     // Is a small test for validate the keys
     var alert_danger_keys = '<div  class="uk-alert-danger" uk-alert>\
       <a class="uk-alert-close" uk-close></a>\
       <p id="alert">Error. You have entered invalid keys; Please try again.</p>\
       </div>'
 
-    if (validate_privkey() && validate_pubkey()){
+    if (validate_privkey(privkey) && validate_pubkey(pubkey)){
       // Encrypt with the public key
       var encrypt = new JSEncrypt();
       var test = 'This a test';
-      encrypt.setPublicKey($("#pubkey").val());
+      encrypt.setPublicKey(pubkey);
       var encrypted = encrypt.encrypt(test);
 
       // Decrypt with the private key
       var decrypt = new JSEncrypt();
-      decrypt.setPrivateKey($("#privkey").val());
+      decrypt.setPrivateKey(privkey);
       var uncrypted = decrypt.decrypt(encrypted);
 
       //The keys are valid
@@ -204,24 +200,62 @@
     read.readAsText(file);
   }
 
-  // Events
-  $('#verify_keys').on('click', function(e) {
-    var success_button = '\
-        <a id="next_button" class="uk-button uk-button-default" href="genometrics.html"> Next </a>'
+  function decrypt_privkey(pin){
+    //Encrypt private key and save in localforage
+    var privatekey = $('#privkey').val();
+    //Encrypt private key
+    var decrypt = CryptoJS.AES.decrypt(privatekey, hash_string(pin));
+    var decrypt_string = null;
+    try{
+      var decrypt_string = decrypt.toString(CryptoJS.enc.Utf8);
+    }catch(err){
+      alert("PIN CODE invalid");
+      console.log(err);  
+    }
+    return decrypt_string
+  }
 
-    e.preventDefault();
-    console.log("Click saved keys");
-    if (verify_lenght($('#pin_code').val())){
-        if (validate_keys()){
-          //Symmetric encrypt private key
-          encrypt_privkey();          
+  function verify_files_keys(){
+    //Variables 
+    var success_button = '\
+    <a id="next_button" class="uk-button uk-button-default" href="genometrics.html"> Next </a>'
+    var alert_success = '<div  class="uk-alert-success" uk-alert>\
+      <a class="uk-alert-close" uk-close></a>\
+      <p id="alert">';
+    var alert_error = '<div  class="uk-alert-danger" uk-alert>\
+      <a class="uk-alert-close" uk-close></a>\
+      <p id="alert">';
+    var alert_end ='</p></div>';
+    var pin_code = $('#pin_code').val();
+    var pubkey = $('#pubkey').val();
+    
+    if(pin_code.length == 0){
+      $('#alert').html(alert_success+'Please enter your PIN CODE'+alert_end);
+    }else{
+      if (validate_keys(pubkey, $('#privkey').val())){ 
+        $('#alert').html(alert_success+'Your private key is not encrypted, we encrypt it with your PIN'+alert_end);
+        //Symmetric encrypt private key
+        encrypt_privkey(pin_code);          
+        //Save keys
+        save_key($("#privkey").val(), $("#pubkey").val());
+        $('#success_button').html(success_button);
+      }else{
+        var privkey = decrypt_privkey(pin_code);
+        if (validate_keys(pubkey, privkey)){
           //Save keys
           save_key($("#privkey").val(), $("#pubkey").val());
+          $('#alert').html(alert_success+'Valid Keys, please give click in button next'+alert_end);
           $('#success_button').html(success_button);  
         }
-    }
-  });
+      } 
+    }    
+  }
 
+  // Events
+  $('#verify_keys').on('click', function(e){ 
+    e.preventDefault();
+    verify_files_keys();
+  });
 
   document.getElementById('pubkey_file')
   .addEventListener('change', read_pubkey_file, false);
@@ -239,3 +273,5 @@
 </script>
 </body>
 </html>
+ 
+

@@ -89,19 +89,22 @@
                     </div>
                   </div>
                   <div id="transfer_button">
-                    <a id="transferdata"  class="uk-button uk-button-default" style="font-weight: 700;background-color: #fff; color:#3C3C3C;" disabled> Transfer </a>
+                    <button id="transferdata"  class="uk-button uk-button-default" style="font-weight: 700;background-color: #fff; color:#3C3C3C;" disabled> Transfer </button>
                   </div>
                 </form>
             </div>
         </div>
       </div>
       <h3>Ancestry</h3>
-      <h5><a id="tx_link" href="#" target="_blank">Show on navigator</a></h5>
+      <div style="width:100%">
+        <label id="hash_id_label">Hash Id: </label>
+      </div>
+      <h5 style="width:100%;"><a id="tx_link" href="#" target="_blank"><img style="height:30px;" src="media/navigator.svg"> Show on Navigator</a></h5>
       <table id="tx_table" class="uk-table uk-table-divider">
       	<thead>
           <tr>
-            <th>Region</th>
-            <th>Percentage</th>
+            <th><span id="data1">Data 1</span></th>
+            <th><span id="data2">Data 2</span></th>
           </tr>
       	</thead>
       	<tbody id="tx_table_content">
@@ -146,6 +149,16 @@
       <td><%= data.percentage %></td> \
       </tr>'
 
+  $(document).ready(function() {
+    var searchParams = new URLSearchParams(window.location.search);
+
+    if(searchParams.has("hash_id")){
+            var txid = searchParams.get('hash_id');
+            $('#hash_id_label').append('<pre>'+txid+'</pre>');
+            $('#tx_link').attr("href", 'http://127.0.0.1:8000/?hash_id='+txid);
+    }
+  });
+
   // Functions
   function validate_key(key_id){
     // Verify if the field pubkey is empty
@@ -180,8 +193,8 @@
   }
 
   function validate_transfer(){
-    var transfer_button = '<a onclick="transfer_data()" id="transferdata"  class="uk-button uk-button-default" style="font-weight: 700;background-color: #3C3C3C; color:#fff;"> Transfer </a>';
-    var transfer_button_disabled = '<a onclick="transfer_data()" id="transferdata"  class="uk-button uk-button-default" style="font-weight: 700;background-color: #fff; color:#3C3C3C;" disabled> Transfer </a>';
+    var transfer_button = '<button onclick="transfer_data()" id="transferdata"  class="uk-button uk-button-default" style="font-weight: 700;background-color: #3C3C3C; color:#fff;"> Transfer </button>';
+    var transfer_button_disabled = '<button onclick="transfer_data()" id="transferdata"  class="uk-button uk-button-default" style="font-weight: 700;background-color: #fff; color:#3C3C3C;" disabled> Transfer </button>';
 
     var alert_key = '<div  class="uk-alert-danger" uk-alert>\
       <a class="uk-alert-close" uk-close></a>\
@@ -244,13 +257,14 @@
         }
 
         var prk = $('#priv_key').val();
-
+        var privkey = null;
         var pin_flag = true;
+
         while (pin_flag){
           if(form_pin.length == 4){
             var privkey_decrypt = CryptoJS.AES.decrypt(prk, hash_string(form_pin));
             try{
-              var privkey = privkey_decrypt.toString(CryptoJS.enc.Utf8);
+              privkey = privkey_decrypt.toString(CryptoJS.enc.Utf8);
               pin_flag = false;
             }catch(err){
               alert("PIN CODE invalid, try again.");
@@ -301,8 +315,10 @@
       else{
          console.log("No Public Key found");
           $('#alert').html(alert_not_found);
+          $('#newpubkey').val('');
           document.getElementById("transferdata").disabled = true;
       }
+
   }
 
   function read_pubkey_file(e) {
@@ -318,7 +334,8 @@
     var read = new FileReader();
     read.onload = function(e) {
       var content = e.target.result;
-      $("#newpubkey").html(content);
+      console.log('file readed', content);
+      $("#newpubkey").val(content);
       validate_transfer();
     };
     read.readAsText(file);
