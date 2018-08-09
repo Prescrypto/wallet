@@ -62,7 +62,7 @@
   <footer class="footer">
     <div class="uk-navbar-container uk-navbar-transparent">
     <a class="footer-btn uk-button uk-button-default" href="#modal-full" uk-toggle>New Genomic</a>
-    <button class="footer-btn uk-button uk-button-default" type="button" uk-toggle="target: #modal-receive">Receive</button>
+    <button id="recieve_button" class="footer-btn uk-button uk-button-default" type="button" uk-toggle="target: #modal-receive">Receive</button>
     <button class="footer-btn uk-button uk-button-default" type="button" uk-toggle="target: #modal-decrypt-file">Decrypt File</button>
     <button id="js-modal-dialog"  class="footer-btn uk-button uk-button-default" type="button">Export keys</button>
   </div>
@@ -75,7 +75,8 @@
           <h2 id="light-h2">Upload File</h2>
           <h3 id="light-h2">Please upload your Geno file</h3>
           <form class="uk-form-stacked">
-            <div id="alert"></div>
+            <div id="alert_new"></div>
+            <div id="uploaded_list"></div>
             <div class="uk-margin-large">
               <div class="uk-form-controls">
                 <!--Upload section-->
@@ -90,14 +91,15 @@
               </div>
             </div>
           </form>
-          <div class="uk-inline">
-              <h2 id="light-h2"><img style="height:40px;margin-bottom:10px;" src="media/light-locker.svg" alt=""> PIN</h2>
-              <div class="uk-form-controls">
-                <input style="width:150px;" id="pin_code" name="pin_code" class="uk-input" type="text" maxlength="4" placeholder="Enter PIN code" required />
-              </div>
-          </div>
           <div id="done_action" class="uk-modal-footer" style="background-color:transparent;margin-top:40px;">
-            <button id="done_button" type="button" class="uk-button uk-button-default uk-modal-close" style="font-weight: 700;background-color: #fff; color:#3C3C3C;"> Done</button>
+             <div class="uk-inline">
+                  <h2 id="light-h2"><img style="height:40px;margin-bottom:10px;" src="media/light-locker.svg" alt=""> PIN</h2>
+                  <div class="uk-form-controls">
+                    <input style="width:150px;" id="pin_code" name="pin_code" class="uk-input" type="text" maxlength="4" placeholder="Enter PIN code" required/>
+                  </div>
+                  <button id="done_button" type="button" class="uk-button uk-button-default" style="background-color:#fff;margin-top:40px;" disabled> Upload Files</button>
+              </div>
+            
           </div>
       <!--Right column Modal (White)-->
       </div>
@@ -129,7 +131,7 @@
               <div id="formButtons">
                 <button name="add_field" id="add_field" class="uk-button uk-button-default" type="button" uk-icon="icon:plus"> Add New  </button>
                 <button name="remove_field" id="remove_field" class="uk-button uk-button-default" type="button" uk-close> Remove  </button>
-                <button id="send_data" class="uk-button uk-button-default" type="submit"> Submit </button>
+                <button id="send_data" class="uk-button uk-button-default" type="submit" disabled> Submit </button>
               </div>
         </div>
       </div>
@@ -144,7 +146,7 @@
     <h2 class="uk-modal-title">Public Keys</h2>
     <p>If someone wishes to send you encrypted data, you must provide them with your public key.</p>
     <div class="uk-margin">
-      <textarea id="pubkey" name="pubkey" class="uk-input" type="text" placeholder="---Public Key---"></textarea>
+      <textarea id="pubkey" name="pubkey" class="uk-input" type="text" placeholder="---Public Key---" ></textarea>
     </div>
   </div>
 </div>
@@ -158,44 +160,37 @@
       <h2 class="uk-modal-title">Decrypt your files</h2>
     </div>
     <div class="uk-modal-body">
+      
       <table id="decrypt_filePath_table" class="uk-table uk-table-divider">
         <thead>
           <tr>
-            <th>Files</th>
+            <th>Please select the file to decrypt</th>
          </tr>
         </thead>
         <tbody id="filePath_content">
         <!-- Render here File Path names for decryption -->
         </tbody>
       </table>
+      <div id="alert_decrypt"></div>
       <hr>
       <div class="js-upload uk-placeholder uk-text-center">
         <span uk-icon="icon: cloud-upload"></span>
         <span class="uk-text-middle">Attach your FILE by dropping it here or</span>
-        <div uk-form-custom>
-          <input type="file">
+        <div uk-form-custom> 
+          <input id="encryptedfileobj" type="file">
           <span id="upload_link" class="uk-link">Select it from computer</span>
         </div>
       </div>
+      <a id="link" href="#" download hidden></a>
     </div>
     <div class="uk-modal-footer">
-      <button id="backbtn" class="uk-button uk-button-default">Decrypt</button>
+      <button id="decrypt_button" class="uk-button uk-button-default" disabled>Decrypt</button>
     </div>
   </div>
 </div>
   <!--Closing Decrypt file Modal-->
-
-<!--Export Keys Alert Modal-->
-<script>
-  UIkit.util.on('#js-modal-dialog', 'click', function (e) {
-    e.preventDefault();
-    e.target.blur();
-    UIkit.modal.dialog('<p class="uk-modal-body">Your keys are now being exported!</p>');
-  });
-</script>
-<!-- closing Export keys modal alert-->
-
   </footer>
+
   <script src="js/localforage.min.js"></script>
   <script src="https://code.jquery.com/jquery-1.8.3.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/components/core-min.js"></script>
@@ -219,6 +214,9 @@
       <a class="uk-alert-close" uk-close></a>';
     var alert_end ='</p></div>';
     var local_file_url = '#';
+    var file_count = 0;
+    var files_list = {};
+    var url_files_list = [];
     AWS.config.region = AWS_Region;
     AWS.config.update({accessKeyId: AWS_AccessKeyId, secretAccessKey: AWS_SecretAccessKey}); //login to aws with credentials
     var bucket = new AWS.S3({params: {Bucket: AWS_BucketName}, apiVersion: '2006-03-01'});
@@ -231,7 +229,9 @@
     };
     var numPartsLeft = 0;
     var multipartResponse = null;
-
+    var file_template ='<p id="<%= data.filename %>" style="color:#fff;"><%= data.filename %>.txt <span uk-icon="icon: upload"\ style="color:#fff;margin-left:10px;margin-right:10px;"></span><button onclick="remove_file(<%= data.filename %>)" uk-icon="icon:close"\ style="color:#fff;margin-right:10px;"></button></p>';
+    var file_uploaded_template ='<%= data.filename %>.txt <span uk-icon="icon: check"\ style="color:#fff;margin-left:10px;margin-right:10px;"></span>';
+    var file_working_template ='<%= data.filename %>.txt <div style="color:#fff;margin-left:10px;margin-right:10px;" uk-spinner="ratio: 0.5"></div>';
     // Tx template
     var tx_template = '<a id="genome" href="genodetails.html?hash_id=<%= tx.hash_id %>"> \
         <div class="uk-margin"> \
@@ -242,7 +242,7 @@
             </div> \
           </div> \
         </div> \
-        </a>'
+        </a>';
 
           
     function add_tx_markup(data, color){
@@ -311,19 +311,6 @@
       })($, localforage);
     });
     // Functions
-    function add_field(){
-      // Add a field in table
-      $('#table_fields tr:last').after('\
-        <tr>\
-          <td>\
-            <input class="uk-input" type="text" placeholder=" Country" required>\
-          </td>\
-          <td>\
-            <input class="uk-input" type="number" placeholder="   Percentage (Only numbers)" required>\
-          </td>\
-        </tr>');
-    }
-
     function sign(msg, priv_key, hash_alg){
       //Create a signature of payload
       var rsa = new RSAKey();
@@ -332,11 +319,6 @@
       return sign_msg;
     }
     
-    function remove_field(){
-      // Remove a field in table
-      $('#table_fields tr:last').remove();
-    }
-
     function read_input(){
       // Read all the inputs in form and make a list
       var list_input = [];
@@ -412,6 +394,8 @@
       payload.data = JSON.stringify(data_payload);
       payload.location = "Mexico";
 
+      payload.files = url_files_list;
+
       var msg = payload.data;
       var hash_alg = 'sha1';
       payload.signature = sign(msg, privkey, hash_alg);
@@ -434,9 +418,28 @@
       });
     }
 
+  function finish_uploads(){
+
+      if(url_files_list.length == $('p', '#uploaded_list').length){
+        $('#alert_new').html( alert_success+'<p id="alert_new">Finish uploading all files'+ alert_end);
+          document.getElementById('send_data').disabled = false;
+      }
+      else{
+
+
+         // $('p','#uploaded_list').each(function() {
+           // var file_id = $(this).attr('id');
+            //var phtml ='<p id="'+file_id+'">Geno_File'+file_count+'.txt  <span uk-icon="icon: upload"></span></p>';
+            //$(this).html(phtml);
+ 
+            //});
+
+      }
+
+  }
 
     //Upload file to s3 functions>>>>>>>>
-function completeMultipartUpload(doneParams) {
+function completeMultipartUpload(doneParams, fileKey) {
   //complete the upload of a file when we get to the end
   bucket.completeMultipartUpload(doneParams, function(err, data) {
     if (err) {
@@ -447,12 +450,23 @@ function completeMultipartUpload(doneParams) {
       var delta = (new Date() - startTime) / 1000;
       console.log('Completed upload in', delta, 'seconds');
       console.log('Final upload data:', data);
-      $('#alert_transfer').html( alert_success+'<p id="alert_transfer">Uploaded To: <a href="'+data.Location +'">'+data.Location+'</a> '+ alert_end);
+      try{
+          var _filetemplate = _.template(file_uploaded_template);
+          var _filecompiled = _filetemplate({"data":{"filename":fileKey}});
+          document.getElementById(fileKey).innerHTML = _filecompiled;
+          url_files_list.push(data.Location);
+          finish_uploads();
+
+        }
+        catch(err){
+          console.log(err);
+        }
     }
   });
 }
 function uploadPart(multipart, partParams, fileKey, tryNum) {
   //upload a part from a file sliced by 5mb
+    var fileName = 'test/'+fileKey+'.txt';
     var tryNum = tryNum || 1;
     bucket.uploadPart(partParams, function(multiErr, mData) {
       if (multiErr){
@@ -476,27 +490,27 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
       if (--numPartsLeft > 0) return; // complete only when all parts uploaded
       var doneParams = {
         Bucket: AWS_BucketName,
-        Key: fileKey,
+        Key: fileName,
         MultipartUpload: multipartMap,
         UploadId: multipart.UploadId
       };
       console.log("Completing upload...");
-      completeMultipartUpload(doneParams);
+      completeMultipartUpload(doneParams, fileKey);
     });
   }
   
-  function uploadMultipart(fileName, fileData) {
+  function uploadMultipart(fileKey, fileData) {
     //upload a file by parts because of the size
-    var fileKey = 'test/'+fileName;
+    var fileName = 'test/'+fileKey+'.txt';
     var fileLength = fileData.length;
     var partNum = 0;
     multipartMap = {
       Parts: []
     };
     numPartsLeft = Math.ceil(fileLength / partSize);
-    bucket.createMultipartUpload({ Bucket: AWS_BucketName, Key: fileKey,ContentType: fileData.type, ACL:AWS_ACL }, function(mpErr, multipart) {  
+    bucket.createMultipartUpload({ Bucket: AWS_BucketName, Key: fileName,ContentType: fileData.type, ACL:AWS_ACL }, function(mpErr, multipart) {  
       if(!mpErr){
-         console.log("multipart created", multipart.UploadId);
+         console.log("multipart created", multipart.UploadId, multipart);
           
           try{
             for (var rangeStart = 0; rangeStart < fileLength; rangeStart += partSize) {
@@ -506,7 +520,7 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
                 var partParams = { //create the part
                   Body: fileData.slice(rangeStart, end),
                   Bucket: AWS_BucketName,
-                  Key: fileKey,
+                  Key: fileName,
                   PartNumber: String(partNum),
                   UploadId: multipart.UploadId
                 };
@@ -528,22 +542,33 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
       }
     });
   }
-  function uploadNormal(myfile){
+  function uploadNormal(myfile, fileName){
      // See the Configuring section to configure credentials in the SDK
     var today = new Date();
+    var fileNameNew = 'test/'+fileName+'.txt';
     var timestamp = today.toISOString();
-    var parameters = {Key: 'test/file'+timestamp+'.txt', 
+    var parameters = {Key: fileNameNew, 
         Body: myfile,
         ContentType: myfile.type,
         ACL: AWS_ACL};
     bucket.upload(parameters, function (err, data) {
       if (err){
         console.log(err);
-        $('#alert_transfer').html(alert_error+'<p id="alert_transfer">Error on Upload!'+alert_end);
+        $('#alert_new').html(alert_error+'<p id="alert_new">Error on Upload!'+alert_end);
       }
       if(data){
         console.log("done uploading");
-        $('#alert_transfer').html( alert_success+'<p id="alert_transfer">Uploaded To: <a href="'+data.Location +'">'+data.Location+'</a> '+ alert_end);
+        try{
+          var _filetemplate = _.template(file_uploaded_template);
+          var _filecompiled = _filetemplate({"data":{"filename":fileName}});
+          document.getElementById(fileName).innerHTML = _filecompiled;
+          url_files_list.push(data.Location);
+          finish_uploads();
+
+        }
+        catch(err){
+          console.log(err);
+        }
       }
      
     });
@@ -590,50 +615,90 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
     local_file_url = URL.createObjectURL(file);
     download_link.href = local_file_url;
     download_link.download = name;
-    document.getElementById('down_button').disabled = false;
   }
-  function upload_file(e) {
-    //uploads a file from local storage to memory
+
+  function encrypt_and_upload_files(my_files_list){
     // Variables
     var encrypted_file = null;
-    var rawdata = null;
     var today = new Date();
     var timestamp = today.toISOString();
-    var file = e.target.files[0];
+    
     var pub_key = $('#pub_key').val();
-
     var priv_key = null;
     var pin_attempts = 3;
-    var privkey_encrypt =  $("#priv_key").val(); 
+    var privkey_encrypt = $("#priv_key").val(); 
     var pin_flag = true;
-    while (pin_flag){
-      pin_attempts = pin_attempts - 1 ; 
-      var pin_code = prompt("Please, enter your PIN CODE");
-      if (pin_attempts < 0){
-        alert("You have no more attempts");
-        return window.open("./genometrics.html","_self");    
-      }else if (pin_code.length==4){
-        if (validate_pin(pin_code)){
-          var privkey_decrypt = CryptoJS.AES.decrypt(privkey_encrypt, hash_string(pin_code));
-          try{
-            priv_key = privkey_decrypt.toString(CryptoJS.enc.Utf8);
-            pin_flag = false;
-          }catch(err){
-            alert("PIN CODE invalid,  remaining attempts: "+ pin_attempts);
-            console.log(err);  
-          }        
-        }
-      }else{    
-        alert("PIN CODE invalid,  remaining attempts: "+ pin_attempts);
-      }
+    var static_pin_code = $('#pin_code').val();
+    if((static_pin_code == null)|| (static_pin_code == '') || (static_pin_code.length != 4)){
+      $('#alert_new').html(alert_error+'<p id="alert_new">PIN CODE invalid, enter the code again'+alert_end);
+      $('#pin_code').val('');
+      return;
+    }
+    else{
+        try{
+          var privkey_decrypt = CryptoJS.AES.decrypt(privkey_encrypt, hash_string(static_pin_code));
+          priv_key = privkey_decrypt.toString(CryptoJS.enc.Utf8);
 
-      
-    }//finish while
+        }catch(err){
+          $('#alert_new').html(alert_error+'<p id="alert_new">PIN CODE invalid, enter the code again'+alert_end);
+          $('#pin_code').val('');
+          console.log(err);  
+          return;
+        }        
 
-    if((priv_key.length < 1)||(pub_key.length < 1)){
+    }
+
+    if((priv_key == null)||(priv_key.length < 1)||(pub_key.length < 1)){
+      $('#alert_new').html(alert_error+'<p id="alert_new">No private or public keys'+alert_end);
+      $('#pin_code').val('');
       console.log("no private or public keys");
       return;
     }
+
+    $('#alert_new').html(alert_success+'<p id="alert_new">PIN CODE correct, Uploading the files!'+alert_end);
+
+    $.each(my_files_list, function(key, value) {
+      var _filetemplate = _.template(file_working_template);
+      var _filecompiled = _filetemplate({"data":{"filename":key}});
+      document.getElementById(key).innerHTML = _filecompiled;
+
+      encrypted_file = ecrypt_file_symm(value, priv_key, pub_key); 
+      if(encrypted_file.length > partSize){
+        console.log("starting multipart upload");
+        uploadMultipart(key, encrypted_file);
+      }
+      else{
+        console.log("starting normal upload");
+        uploadNormal(encrypted_file, key);
+      }
+    });
+    
+
+  }
+  function remove_field(table_id){
+      // Remove a field in table
+      $(table_id+' tr:last').remove();
+  }
+  function add_field(){
+    // Add a field in table
+    $('#table_fields tr:last').after('\
+      <tr>\
+        <td>\
+          <input class="uk-input" type="text" placeholder=" Country" required>\
+        </td>\
+        <td>\
+          <input class="uk-input" type="number" placeholder="   Percentage (Only numbers)" required>\
+        </td>\
+      </tr>');
+  }
+  function remove_file(pid){
+    $('#'+pid).remove();
+    delete files_list[pid];
+
+  }
+  function upload_file(e) {
+    //uploads a file from local storage to memory  
+    var file = e.target.files[0];
     //Small Validation
     if (!file) {
       return;
@@ -643,20 +708,21 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
     read.readAsText(file);
     read.onload = function(e) {
       var content = e.target.result;
-      encrypted_file = ecrypt_file_symm(content, priv_key, pub_key); 
-      $('#alert_transfer').html(alert_success+'<p id="alert_transfer">File Loaded, waiting to Upload it...'+alert_end);
-      if(encrypted_file.length > partSize){
-        console.log("starting multipart upload");
-        uploadMultipart("myfile"+timestamp+".txt", encrypted_file);
-      }
-      else{
-        console.log("starting normal upload");
-        uploadNormal(encrypted_file);
-      }
+      var filename = Date.now();//CryptoJS.SHA256(content) + Date.now();
+      var file_id = 'genofile'+file_count;
+      //files_list.push(content);
+      files_list[filename] = content;
+      
+      $('#alert_new').html(alert_success+'<p id="alert_new">File Loaded, waiting to Upload it...'+alert_end);
+      var _filetemplate = _.template(file_template);
+      var _filecompiled = _filetemplate({"data":{"filename":filename}});
+      $('#uploaded_list').append(_filecompiled);
+      file_count++;      
       
     };
     
   }
+ 
   function decrypt_from_file(e) {
     //decrypts the content of a file
     // Variables
@@ -665,8 +731,11 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
     var today = new Date();
     var timestamp = today.toISOString();
     var pub_key = $('#pub_key').val();
-    var file = e.target.files[0];
 
+    //change the status of the alert
+     $('#alert_decrypt').html(alert_success+'<p id="alert_decrypt"><div style="color:#000;margin-left:1px;" uk-spinner="ratio: 1"></div> Loading the file'+alert_end);
+
+    var file = e.target.files[0];
     var priv_key = null;
     var pin_attempts = 3;
     var privkey_encrypt = $("#priv_key").val(); 
@@ -712,12 +781,14 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
       try{
         var decrypted_content = decrypt_file_symm(content, priv_key, pub_key);
         download_file(decrypted_content, "mydecryptedfile.txt", "text/plain");
-        $('#alert_decrypt').html(alert_success+'<p id="alert_decrypt">File decrypted correctly'+alert_end);
+        document.getElementById('decrypt_button').disabled = false;
+        $('#alert_decrypt').html(alert_success+'<p id="alert_decrypt">File loaded correctly yo can decrypt now'+alert_end);
+        
 
       }
       catch(err){
         console.log(err);
-        $('#alert_decrypt').html(alert_success+'<p id="alert_decrypt">Failed to decrypt the file'+alert_end);
+        $('#alert_decrypt').html(alert_error+'<p id="alert_decrypt">Failed to decrypt the file'+alert_end);
       }
       
       
@@ -725,7 +796,44 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
     
   }
 
-    // Events
+  function download_keys(){
+    //This method download keys files
+    //Read keys
+    var privatekey = $('#priv_key').val();
+    var publickey = $('#pub_key').val();
+    
+    //Make a list for create the download link  
+    var files = [privatekey, publickey]
+    var names_files = ["Pivate_Key.pem", "Public_Key.pem"]
+    var link = document.getElementById('link');
+
+    for (var i=0; i<files.length; i++){
+      // Add attributes to label type a
+      link.download = names_files[i]
+      link.href = 'data:application/octet-stream,'+ encodeURIComponent(files[i]);
+      link.click();
+    }
+  }
+
+    // Events---->>>>
+
+    //Export Keys Alert Modal
+    UIkit.util.on('#js-modal-dialog', 'click', function (e) {
+      download_keys();
+      e.preventDefault();
+      e.target.blur();
+      UIkit.modal.dialog('<p class="uk-modal-body">Your keys are now being exported!</p>');
+    });
+
+    //closing Export keys modal alert-->
+
+    function enable_upload(){
+      document.getElementById('done_button').disabled = false;
+
+    }
+
+    document.getElementById('pin_code')
+    .addEventListener('change', enable_upload, false);
 
     document.getElementById('fileobj')
     .addEventListener('change', upload_file, false);
@@ -740,24 +848,55 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
     $('#remove_field').on('click',function(){
       var length_table = $('#table_fields tr').length;
       if(length_table >= 3){
-        remove_field();
+        remove_field('#table_fields');
       }
     });
-    $('#down_button').on('click', function(){
-       document.getElementById('link').click();
+    $('#remove_file').on('click',function(){
+      preventDefault();
+      var uploaded_length = $('#uploaded_list').length;
+      if(uploaded_length > 0){
+        files_list.pop();
+        $('#uploaded_list p:last').remove();
+        file_count--;
+      }
     });
-    $('#decrypt_done_button').on('click', function(){
-      document.getElementById('down_button').disabled = true;
+    $('#decrypt_button').on('click', function(){
+      document.getElementById('decrypt_button').disabled = true;
+      document.getElementById("link").click();
        $('#alert_decrypt').html('<p id="alert_decrypt"></p></div>');
     });
-     $('#done_button').on('click', function(){
-       $('#alert_transfer').html('<p id="alert_transfer"></p></div>');
+     $('#done_button').on('click', function(evt){
+       evt.preventDefault();
+       encrypt_and_upload_files(files_list);
+
     });
 
     $('#send_data').on('click', function(){
-      create_payload();
       $(this).attr("disabled","disabled");
+      document.getElementById('done_button').disabled = true;
+      create_payload();
+      
     });
+     $('#modal-full').on('hide.uk.modal', function(){
+      //clean the modal for new genomics
+        url_files_list = [];
+        uploaded_list =  {};
+        $('#pin_code').val('');
+        document.getElementById('done_button').disabled = true;
+        document.getElementById('send_data').disabled = true;
+        $('#alert_new').html('<p id="alert_transfer"></p></div>');
+        $('#uploaded_list').html('<div id="uploaded_list"></div>');
+    });
+      $('#modal-receive').on('show.uk.modal', function(){
+      //clean the modal for new genomics
+
+        $('#pubkey').val($('#pub_key').val());
+    });
+
+     
+
+
+
   </script>
 </body>
 </html>
