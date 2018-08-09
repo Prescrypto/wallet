@@ -65,17 +65,33 @@
         <div class="uk-form-controls">
           <textarea id="pubkey" name="pubkey" class="uk-input" id="form-horizontal-text" type="text" placeholder="Paste keys"></textarea>
         </div>
+        <div class="js-upload uk-placeholder uk-text-center">
+          <span uk-icon="icon: cloud-upload"></span>
+          <span class="uk-text-middle">Attach your PUBLIC Key by dropping it here or</span>
+          <div uk-form-custom>
+            <input id="pubkey_file" type="file">
+            <span id="upload_link" class="uk-link">Select your PUBLIC Key from computer</span>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div> <!--Closing Medium size div-->
+</div>
+<!--Pin code section-->
+<div class="uk-grid-medium" align="center" style="padding:30px 0 20px 0;">
+  <div id="box_pin_code" class="uk-margin" align="center">
+    <h2><img style="height:40px;margin-bottom:10px;" src="media/dark-locker.svg" alt=""> PIN</h2>
+    <p><strong>Enter a 4 digits pin code</strong><br>Make sure you remember it, you’ll need it for all your transactions.</p>
+    <div class="uk-form-controls">
+      <input id="pin_code" name="pin_code" class="uk-input" type="text" maxlength="4" placeholder="Enter PIN code" required />
     </div>
-    <div id="box_pin_code" class="uk-margin">
-
-    </div>
-    <div id="success_button">
+    <br>
+    <div id="success_button" >
       <button class="uk-button uk-button-default" id="verify_keys"> Verify Keys</button>
     </div>
   </div>
-</div>
+</div>  
     
-
 
 <script src="js/localforage.min.js"></script>
 <script src="https://code.jquery.com/jquery-1.8.3.min.js"></script>
