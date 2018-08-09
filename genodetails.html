@@ -334,7 +334,8 @@
     var read = new FileReader();
     read.onload = function(e) {
       var content = e.target.result;
-      $("#newpubkey").html(content);
+      console.log('file readed', content);
+      $("#newpubkey").val(content);
       validate_transfer();
     };
     read.readAsText(file);
