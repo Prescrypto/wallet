@@ -87,16 +87,6 @@
 <script src="js/wallet.js"></script>
 <script>
   // Functions
-  function verify_lenght(field){
-    //This method verify if length of a fields is empty 
-    if (field.length == 4){
-      return true
-    }else {
-      alert("ERROR. Please enter a pin from four digits; Please try again.");
-      return false
-    }
-  }
-
   function hash_string(pin_code){
     //This method calculate hash for the  value from pin
     var pin = CryptoJS.SHA256(pin_code);
@@ -192,14 +182,6 @@
       $("#privkey").html(content);
     };
     read.readAsText(file);
-  }
-
-  function validate_pin(pin){
-    if (!/^([0-9])*$/.test(pin)){
-      return false
-    }else{
-      return true
-    }
   }
 
   function decrypt_privkey(pin){
