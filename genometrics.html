@@ -145,8 +145,12 @@
   <div class="uk-modal-dialog uk-modal-body uk-margin-auto-vertical">
     <h2 class="uk-modal-title">Public Keys</h2>
     <p>If someone wishes to send you encrypted data, you must provide them with your public key.</p>
-    <div class="uk-margin">
-      <textarea id="pubkey" name="pubkey" class="uk-input" type="text" placeholder="---Public Key---" ></textarea>
+    <div class="uk-margin uk-grid">
+      <div id="qrcode">
+      </div>
+      <div class="uk-width-2-3">
+        <textarea style="width:100%" id="pubkey" name="pubkey" class="uk-input" type="text" placeholder="---Public Key---" ></textarea>
+      </div>  
     </div>
   </div>
 </div>
@@ -199,6 +203,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/components/hmac.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/components/pbkdf2.js"></script>
+  <script type="text/javascript" src="js/jquery.qrcode.min.js"></script>
   <script src="js/jsencrypt.js"></script>
   <script src="js/jsrsasign-all-min.js"></script>
   <script src="js/underscore-min.js"></script>
@@ -888,13 +893,15 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
         $('#uploaded_list').html('<div id="uploaded_list"></div>');
     });
       $('#modal-receive').on('show.uk.modal', function(){
-      //clean the modal for new genomics
-
-        $('#pubkey').val($('#pub_key').val());
+      //Receive Modal data
+      $('#qrcode').qrcode($('#pub_key').val());  
+      $('#pubkey').val($('#pub_key').val());
     });
 
-     
-
+ $('#modal-receive').on('hide.uk.modal', function(){
+      //
+      $('#qrcode').empty();  
+    });
 
 
   </script>

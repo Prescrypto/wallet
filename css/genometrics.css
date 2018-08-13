@@ -126,7 +126,13 @@ div.uk-child-width-expand.uk-grid{
 #tx_link{
   color:#303030;
 }
-
+#pubkey{
+  height:150px;
+}
+#qrcode{
+  height:150px;
+  width:150px;
+}
 @media (max-width: 1200px){
   div.uk-grid-medium{
     width:100%;
