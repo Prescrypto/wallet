@@ -10,9 +10,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.5/js/uikit.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.5/js/uikit-icons.min.js"></script>
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-  <script scr="js/jquery.js"></script>
-  <script scr="js/jsqrcode-combined.min.js"></script>
-  <script scr="js/html5-qrcode.min.js"></script>
 </head>
 <body>
   <!-- Main menu -->
@@ -71,19 +68,7 @@
                     <div class="uk-form-controls">
                       <textarea id="newpubkey" name="newpubkey" class="uk-input" type="text" placeholder="Paste Public key" onchange="validate_transfer()" required></textarea>
                       <p id="message">Or scan Qr Code with your WebCam</p>
-                      <div style="width:100%;height:150px" id="reader">
-                        <script>
-                          $('#reader').html5_qrcode(function(data){
-                          /* do something when code is read */
-                          $('#message').html("QR found");
-                          $('#newpubkey').val(data);
-                          }, function(error){
-                          /* show read errors */
-                          }, function(videoError){
-                          /* the video stream could be opened */
-                          });
-                        </script>
-                      </div>
+                      <div style="width:100%;height:150px" id="reader"></div>
                         <div class="js-upload uk-placeholder uk-text-center">
                           <span uk-icon="icon: cloud-upload"></span>
                           <span class="uk-text-middle">Attach your PUBLIC Key by dropping it here or</span>
@@ -151,6 +136,9 @@
   <script src="js/jsrsasign-all-min.js"></script>
   <script src="js/underscore-min.js"></script>
   <script src="js/wallet.js"></script>
+  <script scr="js/jquery.js"></script>
+  <script scr="js/jsqrcode-combined.min.js"></script>
+  <script scr="js/html5-qrcode.min.js"></script>
   <script>
   // Global variables
   var data_country = null;
@@ -582,6 +570,16 @@
       draw_chart();
     });
   });
+    //Qr reader code
+    $('#reader').html5_qrcode(function(data){
+    /* do something when code is read */
+    $('#message').html("QR found");
+    $('#newpubkey').val(data);
+    }, function(error){
+    /* show read errors */
+    }, function(videoError){
+    /* the video stream could be opened */
+    });
   </script>
 </body>
 </html>
