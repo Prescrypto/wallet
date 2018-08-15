@@ -577,8 +577,10 @@
     $('#newpubkey').val(data);
     }, function(error){
     /* show read errors */
+    $("#message").html('Unable to scan the code!')
     }, function(videoError){
     /* the video stream could be opened */
+    $("#message").html('Video error');
     });
   </script>
 </body>
