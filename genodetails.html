@@ -10,9 +10,9 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.5/js/uikit.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.5/js/uikit-icons.min.js"></script>
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-  <script scr="./jqeury.js"></script>
-  <script scr="./jsqrcode-combined.js"></script>
-  <script scr="./html5-qrcode.js"></script>
+  <script scr="js/jquery.js"></script>
+  <script scr="js/jsqrcode-combined.min.js"></script>
+  <script scr="js/html5-qrcode.min.js"></script>
 </head>
 <body>
   <!-- Main menu -->
@@ -74,12 +74,15 @@
                       <div style="width:100%;height:150px" id="reader">
                         <script>
                           $('#reader').html5_qrcode(function(data){
-                            // do something when code is ready
-                              $('#message').html("QR found");
-                              $('#newpubkey').val(data);
-                              }
-                            );
-                          </script>
+                          /* do something when code is read */
+                          $('#message').html("QR found");
+                          $('#newpubkey').val(data);
+                          }, function(error){
+                          /* show read errors */
+                          }, function(videoError){
+                          /* the video stream could be opened */
+                          });
+                        </script>
                       </div>
                         <div class="js-upload uk-placeholder uk-text-center">
                           <span uk-icon="icon: cloud-upload"></span>
