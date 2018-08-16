@@ -149,6 +149,11 @@ div.uk-child-width-expand.uk-grid{
     width:100%;
   }
 }
+@media (max-width:900px){
+  .modal-footer-left{
+    border-right: none;
+  }
+}
 @media (max-width:400px){
   .uk-table td {
     border-top: 0px;
