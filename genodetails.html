@@ -73,7 +73,7 @@
                         <canvas id="canvas" hidden></canvas>
                         <div id="output" hidden>
                           <div id="outputMessage">No QR code detected.</div>
-                          <div hidden><b>Data:</b> <span id="outputData"></span></div>
+                          <div hidden><b>Found it!</b> <span id="outputData"></span></div>
                         </div>
                       </div>
                         <div class="js-upload uk-placeholder uk-text-center">
@@ -623,8 +623,8 @@
           drawLine(code.location.bottomLeftCorner, code.location.topLeftCorner, "#FF3B58");
           outputMessage.hidden = true;
           outputData.parentElement.hidden = false;
-          outputData.innerText = code.data;
           pubKey.innerText = code.data;
+          console.log(code.data);
         } else {
           outputMessage.hidden = false;
           outputData.parentElement.hidden = true;
