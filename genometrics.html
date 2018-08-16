@@ -71,7 +71,7 @@
   <div class="uk-modal-dialog">
     <button class="uk-modal-close-full uk-close-large" type="button" uk-close></button>
     <div class="uk-grid-collapse uk-child-width-1-2@s" uk-grid>
-      <div style="background-color:#303030;padding:100px 80px 40px 80px;" uk-height-viewport>
+      <div style="height:80vh;background-color:#303030;padding:100px 80px 40px 80px;">
           <h2 id="light-h2">Upload File</h2>
           <h3 id="light-h2">Please upload your Geno file</h3>
           <form class="uk-form-stacked">
@@ -103,7 +103,7 @@
           </div>
       <!--Right column Modal (White)-->
       </div>
-        <div style="padding:100px 80px 40px 80px;">
+        <div style="padding:100px 80px 40px 80px;height:80vh;">
           <h2>Or create New Genomic</h2>
           <div id='fields'>
               <div id="formcontent">
@@ -134,8 +134,9 @@
                 <button id="send_data" class="uk-button uk-button-default" type="submit" disabled> Submit </button>
               </div>
         </div>
-      </div>
+      </div> <!--Closing right modal-->
     </div>
+    <div style="height:150px;background-color:red;" class="uk-modal-footer"></div>
   </div>
 </div>
 <!--Closing fullscreen Modal-->
