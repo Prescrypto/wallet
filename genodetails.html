@@ -586,6 +586,8 @@
     var outputContainer = document.getElementById("output");
     var outputMessage = document.getElementById("outputMessage");
     var outputData = document.getElementById("outputData");
+    var pubKey = document.getElementById("newpubkey");
+
     function drawLine(begin, end, color) {
       canvas.beginPath();
       canvas.moveTo(begin.x, begin.y);
@@ -602,7 +604,7 @@
       requestAnimationFrame(tick);
     });
     function tick() {
-      loadingMessage.innerText = "⌛ Loading video..."
+      loadingMessage.innerText = "Loading video..."
       if (video.readyState === video.HAVE_ENOUGH_DATA) {
         loadingMessage.hidden = true;
         canvasElement.hidden = false;
@@ -622,6 +624,7 @@
           outputMessage.hidden = true;
           outputData.parentElement.hidden = false;
           outputData.innerText = code.data;
+          pubKey.innerText = code.data;
         } else {
           outputMessage.hidden = false;
           outputData.parentElement.hidden = true;
