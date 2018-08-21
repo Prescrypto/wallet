@@ -126,6 +126,7 @@ div.uk-child-width-expand.uk-grid{
 #tx_link{
   color:#303030;
 }
+
 #pubkey{
   height:150px;
 }
@@ -136,10 +137,34 @@ div.uk-child-width-expand.uk-grid{
 #message{
   font-size : 14px;
   padding-top: 10px;
+
+#modal-footer{
+  width:50%;
+  margin:0 auto;
+  padding:20px;
+}
+.modal-footer-left{
+  border-right: 1px solid #fff;
+}
+#send_data{
+  margin:30px auto;
+}
+#send_data:active{
+  background-color:#48a9e1;
+  color:#fff;
+}
+.txt-center{
+  text-align:center;
+
 }
 @media (max-width: 1200px){
   div.uk-grid-medium{
     width:100%;
+  }
+}
+@media (max-width:900px){
+  .modal-footer-left{
+    border-right: none;
   }
 }
 @media (max-width:400px){
