@@ -71,7 +71,7 @@
   <div class="uk-modal-dialog">
     <button class="uk-modal-close-full uk-close-large" type="button" uk-close></button>
     <div class="uk-grid-collapse uk-child-width-1-2@s" uk-grid>
-      <div style="background-color:#303030;padding:100px 80px 40px 80px;" uk-height-viewport>
+      <div style="height:80vh!important; min-height:80vh!important;background-color:#303030;padding:100px 80px 40px 80px;">
           <h2 id="light-h2">Upload File</h2>
           <h3 id="light-h2">Please upload your Geno file</h3>
           <form class="uk-form-stacked">
@@ -93,17 +93,13 @@
           </form>
           <div id="done_action" class="uk-modal-footer" style="background-color:transparent;margin-top:40px;">
              <div class="uk-inline">
-                  <h2 id="light-h2"><img style="height:40px;margin-bottom:10px;" src="media/light-locker.svg" alt=""> PIN</h2>
-                  <div class="uk-form-controls">
-                    <input style="width:150px;" id="pin_code" name="pin_code" class="uk-input" type="text" maxlength="4" placeholder="Enter PIN code" required/>
-                  </div>
                   <button id="done_button" type="button" class="uk-button uk-button-default" style="background-color:#fff;margin-top:40px;" disabled> Upload Files</button>
               </div>
             
           </div>
       <!--Right column Modal (White)-->
       </div>
-        <div style="padding:100px 80px 40px 80px;">
+        <div style="padding:100px 80px 40px 80px;min-height:80vh!important;height:80vh!important;">
           <h2>Or create New Genomic</h2>
           <div id='fields'>
               <div id="formcontent">
@@ -131,8 +127,21 @@
               <div id="formButtons">
                 <button name="add_field" id="add_field" class="uk-button uk-button-default" type="button" uk-icon="icon:plus"> Add New  </button>
                 <button name="remove_field" id="remove_field" class="uk-button uk-button-default" type="button" uk-close> Remove  </button>
-                <button id="send_data" class="uk-button uk-button-default" type="submit" disabled> Submit </button>
               </div>
+        </div>
+      </div> <!--Closing right modal-->
+    </div>
+    <!--Modal footer-->
+    <div style="background-color:#1a1a1a;color:#fff;" class="uk-modal-footer">
+      <div id="modal-footer" class="uk-child-width-expand@s" uk-grid>
+        <div class="modal-footer-left txt-center">
+          <h2 id="light-h2"><img style="height:30px;margin-bottom:10px;" src="media/light-locker.svg" alt=""> PIN</h2>
+          <div class="uk-form-controls">
+            <input style="width:150px;" id="pin_code" name="pin_code" class="uk-input" type="text" maxlength="4" placeholder="Enter PIN code" required/>
+          </div>
+        </div>
+        <div class="txt-center">
+          <button id="send_data" class="uk-button uk-button-default" type="submit" disabled> Submit </button>
         </div>
       </div>
     </div>
