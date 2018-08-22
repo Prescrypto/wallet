@@ -411,14 +411,17 @@
             // Render no tx label
             $("#tx_table_content").html("<span id='non-item'>Without data :( Something missing!</span>");
           }else{
+            console.log(data);
             data.data.forEach(function(item) {
               // Add tx to template
               add_tx_markup(item);
             });
             data.files.forEach(function(item_file){
+              console.log(item_file);
               // Render the item file
               var name = item_file.split("/");
               name = name.pop() || name.pop(); // handle potential trailing slash
+              name = decodeURIComponent(name);
               add_tx_files(item_file, name);
             });
 

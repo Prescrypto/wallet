@@ -136,7 +136,7 @@
           </div>
         </div>
         <div class="txt-center">
-          <button id="send_data" class="uk-button uk-button-default" type="submit" disabled> Submit </button>
+          <button id="send_data" style="background-color:#1a1a1a;color:#fff;" class="uk-button uk-button-default" type="submit" disabled> Submit </button>
         </div>
       </div>
     </div>
@@ -400,7 +400,8 @@
       payload.data = JSON.stringify(data_payload);
       payload.location = "Mexico";
 
-      payload.files = url_files_list;
+      payload.files = JSON.stringify(url_files_list);
+      console.log(payload.files);
 
       var msg = payload.data;
       var hash_alg = 'sha1';
@@ -877,15 +878,14 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
     $('#send_data').on('click', function(){
       $(this).attr("disabled","disabled");
 
-      if(url_files_list.length < 1){
+      if($('p', '#uploaded_list').length < 1){
+        //if there are no files then upload the percentages
         create_payload();
       }
       else{
+        //if there are files then upload it first
         encrypt_and_upload_files(files_list);
-
       }
-      
-      
       
     });
      $('#modal-full').on('hide.uk.modal', function(){
@@ -898,13 +898,13 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
         $('#alert_new').html('<p id="alert_transfer"></p></div>');
         $('#uploaded_list').html('<div id="uploaded_list"></div>');
     });
-      $('#modal-receive').on('show.uk.modal', function(){
+    $('#modal-receive').on('show.uk.modal', function(){
       //Receive Modal data
       $('#qrcode').qrcode($('#pub_key').val());  
       $('#pubkey').val($('#pub_key').val());
     });
 
- $('#modal-receive').on('hide.uk.modal', function(){
+    $('#modal-receive').on('hide.uk.modal', function(){
       //
       $('#qrcode').empty();  
     });
