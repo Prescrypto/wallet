@@ -10,7 +10,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.5/js/uikit.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.5/js/uikit-icons.min.js"></script>
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-  <script type="text/javascript" src="js/qr-code.js"></script>
+ 
 </head>
 <body>
   <!-- Main menu -->
@@ -64,6 +64,7 @@
                 <h2 class="uk-modal-title">Transfer your genomic Data</h2>
                 <form class="uk-form-stacked">
                   <div id="alert"></div>
+                  <div id="video"></div>
                   <div class="uk-margin">
                     <label class="uk-form-label" for="form-stacked-text">To: </label>
                     <div class="uk-form-controls">
@@ -656,7 +657,8 @@
           outputMessage.hidden = true;
           outputData.parentElement.hidden = false;
           pubKey.innerText = code.data;
-          console.log(code.data);
+          validate_transfer();
+
         } else {
           outputMessage.hidden = false;
           outputData.parentElement.hidden = true;
