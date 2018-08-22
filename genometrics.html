@@ -91,12 +91,7 @@
               </div>
             </div>
           </form>
-          <div id="done_action" class="uk-modal-footer" style="background-color:transparent;margin-top:40px;">
-             <div class="uk-inline">
-                  <button id="done_button" type="button" class="uk-button uk-button-default" style="background-color:#fff;margin-top:40px;" disabled> Upload Files</button>
-              </div>
-            
-          </div>
+        
       <!--Right column Modal (White)-->
       </div>
         <div style="padding:100px 80px 40px 80px;min-height:80vh!important;height:80vh!important;">
@@ -367,29 +362,26 @@
       var pin_attempts = 3;
       var privkey_encrypt =  $("#priv_key").val(); 
       var pin_flag = true;
-      while (pin_flag){
-        pin_attempts = pin_attempts - 1 ; 
-        var pin_code = prompt("Please, enter your PIN CODE");
-        if (pin_attempts <0){
-          alert("You have no more attempts");
-          return window.open("./genometrics.html","_self");    
-        }else if (pin_code.length==4){
-          if (validate_pin(pin_code)){
-            var privkey_decrypt = CryptoJS.AES.decrypt(privkey_encrypt, hash_string(pin_code));
-            try{
-              privkey = privkey_decrypt.toString(CryptoJS.enc.Utf8);
-              pin_flag = false;
-            }catch(err){
-              alert("PIN CODE invalid,  remaining attempts: "+ pin_attempts);
-              console.log(err);  
-            }        
-          }
-        }else{    
-          alert("PIN CODE invalid,  remaining attempts: "+ pin_attempts);
-        }
-
-        
+      var static_pin_code = $('#pin_code').val();
+      if((static_pin_code == null)|| (static_pin_code == '') || (static_pin_code.length != 4)){
+        $('#alert_new').html(alert_error+'<p id="alert_new">PIN CODE invalid, enter the code again'+alert_end);
+        $('#pin_code').val('');
+        return;
       }
+      else{
+          try{
+            var privkey_decrypt = CryptoJS.AES.decrypt(privkey_encrypt, hash_string(static_pin_code));
+            privkey = privkey_decrypt.toString(CryptoJS.enc.Utf8);
+
+          }catch(err){
+            $('#alert_new').html(alert_error+'<p id="alert_new">PIN CODE invalid, enter the code again'+alert_end);
+            $('#pin_code').val('');
+            console.log(err);  
+            return;
+          }        
+
+      }
+
       
 
       encrypt.setPrivateKey(pubkey);
@@ -436,7 +428,8 @@
 
       if(url_files_list.length == $('p', '#uploaded_list').length){
         $('#alert_new').html( alert_success+'<p id="alert_new">Finish uploading all files'+ alert_end);
-          document.getElementById('send_data').disabled = false;
+          
+          create_payload();
       }
       else{
 
@@ -842,7 +835,8 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
     //closing Export keys modal alert-->
 
     function enable_upload(){
-      document.getElementById('done_button').disabled = false;
+      document.getElementById('send_data').disabled = false;
+
 
     }
 
@@ -879,16 +873,19 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
       document.getElementById("link").click();
        $('#alert_decrypt').html('<p id="alert_decrypt"></p></div>');
     });
-     $('#done_button').on('click', function(evt){
-       evt.preventDefault();
-       encrypt_and_upload_files(files_list);
-
-    });
 
     $('#send_data').on('click', function(){
       $(this).attr("disabled","disabled");
-      document.getElementById('done_button').disabled = true;
-      create_payload();
+
+      if(url_files_list.length < 1){
+        create_payload();
+      }
+      else{
+        encrypt_and_upload_files(files_list);
+
+      }
+      
+      
       
     });
      $('#modal-full').on('hide.uk.modal', function(){
@@ -896,7 +893,7 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
         url_files_list = [];
         uploaded_list =  {};
         $('#pin_code').val('');
-        document.getElementById('done_button').disabled = true;
+
         document.getElementById('send_data').disabled = true;
         $('#alert_new').html('<p id="alert_transfer"></p></div>');
         $('#uploaded_list').html('<div id="uploaded_list"></div>');
