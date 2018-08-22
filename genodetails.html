@@ -124,6 +124,16 @@
       <div id="readable_status" >
         <!-- Status of the Transaction-->
       </div>
+      <table id="table_files" class="uk-table uk-table-divider">
+        <thead>
+          <tr>
+            <th><span id="table_files_title">File List</span></th>
+          </tr>
+        </thead>
+        <tbody id="tx_table_files">
+          <!-- Render here tx data -->
+        </tbody>
+    </table>
     </div>
   </div>
 
@@ -161,6 +171,12 @@
   var tx_data_template = '<tr> \
       <td><%= data.country_name %></td> \
       <td><%= data.percentage %></td> \
+      </tr>'
+
+  var tx_files_template = '<tr> \
+      <td><a href="<%= file %>" title="Dowload file: <%= name %>" download> \
+        <%= name %> \
+      </a></td> \
       </tr>'
 
   $(document).ready(function() {
@@ -362,6 +378,12 @@
     var _compiled = _template({"data":data});
     $('#tx_table_content').append(_compiled);
   }
+  function add_tx_files(item_file, name){
+    // add a file on markup
+    var _template = _.template(tx_files_template);
+    var _compiled = _template({"file":item_file, "name": name});
+    $('#tx_table_files').append(_compiled);
+  }
 
   $(document).ready(function() {
     (function ($, localforage){
@@ -392,6 +414,12 @@
             data.data.forEach(function(item) {
               // Add tx to template
               add_tx_markup(item);
+            });
+            data.files.forEach(function(item_file){
+              // Render the item file
+              var name = item_file.split("/");
+              name = name.pop() || name.pop;
+              add_tx_files(item_file, name);
             });
 
             var color= "#fff";
