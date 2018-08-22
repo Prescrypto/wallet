@@ -418,7 +418,7 @@
             data.files.forEach(function(item_file){
               // Render the item file
               var name = item_file.split("/");
-              name = name.pop() || name.pop;
+              name = name.pop() || name.pop(); // handle potential trailing slash
               add_tx_files(item_file, name);
             });
 
