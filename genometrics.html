@@ -401,12 +401,12 @@
       payload.location = "Mexico";
 
       payload.files = JSON.stringify(url_files_list);
-      console.log(payload.files);
+      
 
       var msg = payload.data;
       var hash_alg = 'sha1';
       payload.signature = sign(msg, privkey, hash_alg);
-
+      console.log(payload);
 
       // Make POST
       var posting = $.post(window.baseurl + "api/v1/rx-endpoint/",

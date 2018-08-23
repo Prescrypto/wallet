@@ -62,7 +62,7 @@
         <div id="modal-transact" uk-modal>
             <div class="uk-modal-dialog uk-modal-body">
                 <h2 class="uk-modal-title">Transfer your genomic Data</h2>
-                <form class="uk-form-stacked">
+                
                   <div id="alert"></div>
                   <div id="video"></div>
                   <div class="uk-margin">
@@ -102,7 +102,7 @@
                   <div id="transfer_button">
                     <button id="transferdata"  class="uk-button uk-button-default" style="font-weight: 700;background-color: #fff; color:#3C3C3C;" disabled> Transfer </button>
                   </div>
-                </form>
+                
             </div>
         </div>
       </div>
@@ -162,6 +162,7 @@
   <script>
   // Global variables
   var data_country = null;
+  var TX_FILE_LIST = [];
   var list_decrypt = [];
   google.charts.load('current', {
     'packages':['geochart'],
@@ -317,6 +318,8 @@
         payload.data = JSON.stringify(data_payload);
         payload.location = "Mexico";
 
+        payload.files = JSON.stringify(TX_FILE_LIST);
+
         var msg = payload.data;
         var hash_alg = 'sha1';
 
@@ -417,14 +420,18 @@
               // Add tx to template
               add_tx_markup(item);
             });
-            data.files.forEach(function(item_file){
-              console.log(item_file);
-              // Render the item file
-              var name = item_file.split("/");
-              name = name.pop() || name.pop(); // handle potential trailing slash
-              name = decodeURIComponent(name);
-              add_tx_files(item_file, name);
-            });
+            if (data.files != null || data.files != {}){
+               TX_FILE_LIST= data.files;
+               data.files.forEach(function(item_file){
+                  console.log(item_file);
+                  // Render the item file
+                  var name = item_file.split("/");
+                  name = name.pop() || name.pop(); // handle potential trailing slash
+                  name = decodeURIComponent(name);
+                  add_tx_files(item_file, name);
+                });
+            }
+           
 
             var color= "#fff";
             if(data.readable == true){
