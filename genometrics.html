@@ -406,7 +406,6 @@
       var msg = payload.data;
       var hash_alg = 'sha1';
       payload.signature = sign(msg, privkey, hash_alg);
-      console.log(payload);
 
       // Make POST
       var posting = $.post(window.baseurl + "api/v1/rx-endpoint/",
@@ -431,17 +430,6 @@
         $('#alert_new').html( alert_success+'<p id="alert_new">Finish uploading all files'+ alert_end);
           
           create_payload();
-      }
-      else{
-
-
-         // $('p','#uploaded_list').each(function() {
-           // var file_id = $(this).attr('id');
-            //var phtml ='<p id="'+file_id+'">Geno_File'+file_count+'.txt  <span uk-icon="icon: upload"></span></p>';
-            //$(this).html(phtml);
- 
-            //});
-
       }
 
   }
