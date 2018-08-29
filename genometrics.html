@@ -450,7 +450,7 @@ function completeMultipartUpload(doneParams, fileKey) {
           var _filetemplate = _.template(file_uploaded_template);
           var _filecompiled = _filetemplate({"data":{"filename":fileKey}});
           document.getElementById(fileKey).innerHTML = _filecompiled;
-          url_files_list.push(data.Location);
+          url_files_list.push(decodeURIComponent(data.Location));
           finish_uploads();
 
         }

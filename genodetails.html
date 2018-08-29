@@ -62,10 +62,10 @@
         <div id="modal-transact" uk-modal>
             <div class="uk-modal-dialog uk-modal-body">
                 <h2 class="uk-modal-title">Transfer your genomic Data</h2>
-                  <div id="uploaded_list"></div>
-                  <div id="alert"></div>
                   <div id="video"></div>
                   <div class="uk-margin">
+                    <div id="uploaded_list"></div>
+                    <div id="alert"></div>
                     <label class="uk-form-label" for="form-stacked-text">To: </label>
                     <div class="uk-form-controls">
                       <textarea id="newpubkey" name="newpubkey" class="uk-input" type="text" placeholder="Paste Public key" onchange="validate_transfer()" required></textarea>
@@ -355,13 +355,13 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
           catch(err){
             console.log(err);
             $('#alert').html(alert_error+'Error on Upload!'+alert_end);
-            return;
+            return false;
           }
      
       }else{
         console.log(mpErr);
         $('#alert').html(alert_error+'Error on Upload!'+alert_end);
-        return;
+        return false;
       }
     });
   }
@@ -379,6 +379,7 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
       if (err){
         console.log(err);
         $('#alert').html(alert_error+'<p id="alert">Error on Upload!'+alert_end);
+        return false;
       }
       if(data){
         console.log("done uploading");
@@ -392,6 +393,8 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
         }
         catch(err){
           console.log(err);
+          $('#alert').html(alert_error+'<p id="alert">Error on Upload!'+alert_end);
+          return false;
         }
       }
      
@@ -429,20 +432,20 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
         if(encrypted_file != null){
         
           if(encrypted_file.length > partSize){
-            console.log("starting multipart upload");
             uploadMultipart(file_name, encrypted_file);
           }
           else{
-            console.log("starting normal upload");
             uploadNormal(encrypted_file, file_name);
           }
         }
         else{
+          $('#alert').html(alert_error+'<p id="alert">Error re-encrypting the file'+alert_end);
           console.log("couldnt encrypt the file")
         }
       
     }
     catch(err){
+      $('#alert').html(alert_error+'<p id="alert">Error on Upload!'+alert_end);
       console.log("failed encrypting and uploading files");
       console.log(err);
       
@@ -623,28 +626,36 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
               decrypted_file = decrypt_file_symm(cipherfile, privkey, mypub_key);
                 
                 if(decrypted_file == null){
+                  console.log("there was an error decrypting the file");
                   $('#alert').html( alert_error+'<p id="alert">There was an error decrypting and encrypting the files for the transference, please try again'+ alert_end);
                   return null;
                 }
 
                 files_list[filename] = decrypted_file;
               
-              encrypt_and_upload_file(filename, decrypted_file, privkey, new_pub_key);
+              var finish_upload = encrypt_and_upload_file(filename, decrypted_file, privkey, new_pub_key);
+
+              if(finish_upload == false){
+                console.log("there was an error un encrypt and upload");
+                $('#alert').html( alert_error+'<p id="alert">There was an error uploading the files for the transference, please try again'+ alert_end);
+              }
             }
             catch(err){
+              console.log("error getting the object");
               console.log(err);
+               $('#alert').html( alert_error+'<p id="alert">There was an error decrypting and encrypting the files for the transference, please try again'+ alert_end);
               return null;
             }
 
-            //bucket.deleteObject(params, function(err, data) {
-              //if (err){
-                //console.log(err, err.stack); // an error occurred
-                //return null;
-              //}
-              //else{
+            bucket.deleteObject(params, function(err, data) {
+              if (err){
+                console.log(err, err.stack); // an error occurred
+                return null;
+              }
+              else{
                 return "done";
-              //}
-            //});
+              }
+            });
 
 
           }                
@@ -682,6 +693,9 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
         if(result == null){
           $('#alert').html( alert_error+'<p id="alert">There was an error decrypting and encrypting the files for the transference, please try again'+ alert_end);
           return;
+        }
+        else{
+           $('#alert').html( alert_success+'<p id="alert">Successfully started the transference'+ alert_end);
         }
              
       
