@@ -252,7 +252,8 @@
   return pin_hash
   }
   function finish_uploads(){
-
+    console.log("lenght of uploaded list");
+      console.log($('p', '#uploaded_list').length);
       if(url_files_list.length == $('p', '#uploaded_list').length){
         $('#alert').html( alert_success+'<p id="alert">Finish uploading all files'+ alert_end);
         TX_FILE_LIST = url_files_list;
@@ -277,7 +278,7 @@ function completeMultipartUpload(doneParams, fileKey) {
           var _filetemplate = _.template(file_uploaded_template);
           var _filecompiled = _filetemplate({"data":{"filename":fileKey}});
           document.getElementById(fileKey).innerHTML = _filecompiled;
-          url_files_list.push(data.Location);
+          url_files_list.push(decodeURIComponent(data.Location));
           finish_uploads();
 
         }
@@ -428,11 +429,15 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
         var _filetemplate = _.template(file_working_template);
         var _filecompiled = _filetemplate({"data":{"filename":file_name}});
         document.getElementById(file_name).innerHTML = _filecompiled;
+        //var randomNumber = Math.floor(Math.random() * 255);
+        //var res = String.fromCharCode(65);
+
         encrypted_file = ecrypt_file_symm(file_value, mypriv_key, newpub_key); 
         if(encrypted_file != null){
         
           if(encrypted_file.length > partSize){
             uploadMultipart(file_name, encrypted_file);
+            console.log("after uploading multipart");
           }
           else{
             uploadNormal(encrypted_file, file_name);
@@ -595,8 +600,19 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
       /* The following example deletes an object from a non-versioned bucket. */
       var decrypted_file = null;
       var new_pub_key = $("#newpubkey").val();
-
+      var new_key_file_list = {};
+      
+      /* the initialization of uploaded_list is made here so we can have right away the complete list of files to upload not depending on the asynchronous operations*/
       $.each(key_file_list, function(i, key_file){
+        var filename = Date.now();
+        var _filetemplate = _.template(file_template);
+        var _filecompiled = _filetemplate({"data":{"filename":filename}});
+        $('#uploaded_list').append(_filecompiled);
+        new_key_file_list[filename]= key_file;
+
+      }); 
+
+      $.each(new_key_file_list, function(filename, key_file){
 
         var name = key_file.split("/");
         name = name.pop() || name.pop(); // handle potential trailing slash
@@ -618,10 +634,6 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
           else{
             try{
               console.log("almost done");
-              var filename = Date.now();
-              var _filetemplate = _.template(file_template);
-              var _filecompiled = _filetemplate({"data":{"filename":filename}});
-              $('#uploaded_list').append(_filecompiled);
               var cipherfile = data.Body.toString('utf-8');
               decrypted_file = decrypt_file_symm(cipherfile, privkey, mypub_key);
                 
