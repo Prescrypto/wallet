@@ -416,7 +416,7 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
         $('#alert').html(alert_key);
       }
   }
-  function encrypt_and_upload_file(file_name, file_value, mypriv_key, mypub_key){
+  function encrypt_and_upload_file(file_name, file_value, mypriv_key, newpub_key){
     console.log("encrypting files");
     var encrypted_file = null;
 
@@ -425,7 +425,7 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
         var _filetemplate = _.template(file_working_template);
         var _filecompiled = _filetemplate({"data":{"filename":file_name}});
         document.getElementById(file_name).innerHTML = _filecompiled;
-        encrypted_file = ecrypt_file_symm(file_value, mypriv_key, mypub_key); 
+        encrypted_file = ecrypt_file_symm(file_value, mypriv_key, newpub_key); 
         if(encrypted_file != null){
         
           if(encrypted_file.length > partSize){
@@ -573,17 +573,17 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
       //convert word array to string base 64
           return CryptoJS.enc.Base64.stringify(words);
     }
-    function decrypt_file_symm(cipherfile, mypriv_key, mypub_key){
+    function decrypt_file_symm(cipherfile, sympriv_key, sympub_key){
       // convert payload encoded in base64 to words
-      var secret_key = CryptoJS.SHA256(mypriv_key);
-      var iv = toWordArray(mypub_key);//CryptoJS.lib.WordArray.random(16);
+      var secret_key = CryptoJS.SHA256(sympub_key);
+      var iv = toWordArray(sympriv_key);//CryptoJS.lib.WordArray.random(16);
       var decrypted = CryptoJS.AES.decrypt(cipherfile, secret_key, {iv: iv});
       return toString(decrypted);
     }
-    function ecrypt_file_symm(myfile, mypriv_key, mypub_key){
+    function ecrypt_file_symm(myfile, symmpriv_key, symmpub_key){
       //encrypt file with a symmetric key
-      var secret_key = CryptoJS.SHA256(mypriv_key);
-      var iv = toWordArray(mypub_key);//CryptoJS.lib.WordArray.random(16);
+      var secret_key = CryptoJS.SHA256(symmpub_key);
+      var iv = toWordArray(symmpriv_key);//CryptoJS.lib.WordArray.random(16);
       var encryptedfile = CryptoJS.AES.encrypt(myfile, secret_key, {iv: iv});
       // encode in base64
       return encryptedfile.toString();
@@ -597,7 +597,7 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
 
         var name = key_file.split("/");
         name = name.pop() || name.pop(); // handle potential trailing slash
-        name = "test/" + decodeURIComponent(name);
+        name = "test/"+decodeURIComponent(name);
         console.log("before get download");
 
         var params = {
@@ -614,6 +614,7 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
           }
           else{
             try{
+              console.log("almost done");
               var filename = Date.now();
               var _filetemplate = _.template(file_template);
               var _filecompiled = _filetemplate({"data":{"filename":filename}});

@@ -583,15 +583,15 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
   }
   function decrypt_file_symm(cipherfile, mypriv_key, mypub_key){
       // convert payload encoded in base64 to words
-      var secret_key = CryptoJS.SHA256(mypriv_key);
-      var iv = toWordArray(mypub_key);//CryptoJS.lib.WordArray.random(16);
+      var secret_key = CryptoJS.SHA256(mypub_key);
+      var iv = toWordArray(mypriv_key);//CryptoJS.lib.WordArray.random(16);
       var decrypted = CryptoJS.AES.decrypt(cipherfile, secret_key, {iv: iv});
       return toString(decrypted);
   }
   function ecrypt_file_symm(myfile, mypriv_key, mypub_key){
       //encrypt file with a symmetric key
-      var secret_key = CryptoJS.SHA256(mypriv_key);
-      var iv = toWordArray(mypub_key);//CryptoJS.lib.WordArray.random(16);
+      var secret_key = CryptoJS.SHA256(mypub_key);
+      var iv = toWordArray(mypriv_key);//CryptoJS.lib.WordArray.random(16);
       var encryptedfile = CryptoJS.AES.encrypt(myfile, secret_key, {iv: iv});
       // encode in base64
       return encryptedfile.toString();
