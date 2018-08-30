@@ -135,6 +135,7 @@
           <!-- Render here tx data -->
         </tbody>
     </table>
+    <a id="link" href="#" download hidden></a>
     </div>
   </div>
 
@@ -182,6 +183,8 @@
   var data_country = null;
   var TX_FILE_LIST = [];
   var list_decrypt = [];
+  var encryption_secret_key = ""; // the new key to decrypt the files
+  var actual_secret_key = ""; //the encrypted key to decrypt the files
   var alert_success = '<div  class="uk-alert-success" uk-alert>\
       <a class="uk-alert-close" uk-close></a>';
   var alert_error = '<div  class="uk-alert-danger" uk-alert>\
@@ -204,9 +207,9 @@
       </tr>'
 
   var tx_files_template = '<tr> \
-      <td><a href="<%= file %>" title="Dowload file: <%= name %>" download> \
-        <%= name %> \
-      </a></td> \
+      <td><%= name %>\
+         <a href="<%= file %>" title="Dowload file: <%= name %>" download> download\
+      </a><button id="<%= name %>" class="uk-button uk-button-default" style="font-weight: 700;background-color:\ white" uk-icon="icon: cloud-download" onclick="download_decrypt_file(\'<%= name %>\')"></button></td> \
       </tr>'
 
   $(document).ready(function() {
@@ -420,6 +423,54 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
         $('#alert').html(alert_key);
       }
   }
+  function toWordArray(str){
+    //convert string to word array
+        return CryptoJS.enc.Utf8.parse(str);
+  }
+  function toString(words){
+    //convert word array to string
+        return CryptoJS.enc.Utf8.stringify(words);
+  }
+  function toBase64String(words){
+    //convert word array to string base 64
+        return CryptoJS.enc.Base64.stringify(words);
+  }
+  function decrypt_file_symm(cipherfile, symm_key){
+      // convert payload encoded in base64 to words
+    var iv = toWordArray(symm_key);//CryptoJS.lib.WordArray.random(16);
+    var decrypted = CryptoJS.AES.decrypt(cipherfile, symm_key, {iv: iv});
+    return toString(decrypted);
+  }
+  function ecrypt_file_symm(myfile, symm_key){
+      //encrypt file with a symmetric key
+     var iv = toWordArray(symm_key);//CryptoJS.lib.WordArray.random(16);
+    var encryptedfile = CryptoJS.AES.encrypt(myfile, symm_key, {iv: iv});
+      // encode in base64
+    return encryptedfile.toString(CryptoJS.enc.Utf8);
+  }
+  function generateECDSA() {
+    var curve = 'secp256r1';
+    var ec = new KJUR.crypto.ECDSA({"curve": curve});
+    var keypair = ec.generateKeyPairHex();
+    // this generates a key pair named keypair.ecpubhex and keypair.ecprvhex
+
+    return keypair;
+  }
+  function encrypt_string(mystring, mypub_key){
+    // Encrypt data
+    var encrypt = new JSEncrypt();
+    encrypt.setPublicKey(mypub_key);
+
+    return encrypt.encrypt(mystring);
+  }
+  function decrypt_string(mystring, private_key){
+    // Encrypt data
+    var decrypt = new JSEncrypt();
+    decrypt.setPrivateKey(private_key);
+
+    return decrypt.decrypt(mystring);
+  }
+
   function encrypt_and_upload_file(file_name, file_value, mypriv_key, newpub_key){
     console.log("encrypting files");
     var encrypted_file = null;
@@ -429,10 +480,19 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
         var _filetemplate = _.template(file_working_template);
         var _filecompiled = _filetemplate({"data":{"filename":file_name}});
         document.getElementById(file_name).innerHTML = _filecompiled;
-        //var randomNumber = Math.floor(Math.random() * 255);
-        //var res = String.fromCharCode(65);
 
-        encrypted_file = ecrypt_file_symm(file_value, mypriv_key, newpub_key); 
+        var keypair = generateECDSA();
+        var new_key = "";
+        if(newpub_key.length < 512){
+          console.log("this is a short public key");
+          new_key = keypair.ecprvhex.slice(0, 50);
+        }
+        else{
+          new_key = keypair.ecprvhex;
+        }
+        encryption_secret_key = encrypt_string(new_key, newpub_key);
+        
+        encrypted_file = ecrypt_file_symm(file_value, new_key); 
         if(encrypted_file != null){
         
           if(encrypted_file.length > partSize){
@@ -535,6 +595,10 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
         payload.data = JSON.stringify(data_payload);
         payload.location = "Mexico";
 
+        if(TX_FILE_LIST.length > 0){ //we add the secret encrypted key to the payload
+          TX_FILE_LIST.unshift(encryption_secret_key);
+        }
+
         payload.files = JSON.stringify(TX_FILE_LIST);
 
         var msg = payload.data;
@@ -569,34 +633,8 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
       }
 
   }
-  function toWordArray(str){
-    //convert string to word array
-        return CryptoJS.enc.Utf8.parse(str);
-    }
-    function toString(words){
-      //convert word array to string
-          return CryptoJS.enc.Utf8.stringify(words);
-    }
-    function toBase64String(words){
-      //convert word array to string base 64
-          return CryptoJS.enc.Base64.stringify(words);
-    }
-    function decrypt_file_symm(cipherfile, sympriv_key, sympub_key){
-      // convert payload encoded in base64 to words
-      var secret_key = CryptoJS.SHA256(sympub_key);
-      var iv = toWordArray(sympriv_key);//CryptoJS.lib.WordArray.random(16);
-      var decrypted = CryptoJS.AES.decrypt(cipherfile, secret_key, {iv: iv});
-      return toString(decrypted);
-    }
-    function ecrypt_file_symm(myfile, symmpriv_key, symmpub_key){
-      //encrypt file with a symmetric key
-      var secret_key = CryptoJS.SHA256(symmpub_key);
-      var iv = toWordArray(symmpriv_key);//CryptoJS.lib.WordArray.random(16);
-      var encryptedfile = CryptoJS.AES.encrypt(myfile, secret_key, {iv: iv});
-      // encode in base64
-      return encryptedfile.toString();
-    }
-    function get_and_remove_s3_object(key_file_list, privkey, mypub_key){
+
+  function get_and_remove_s3_object(key_file_list, privkey, mypub_key){
       /* The following example deletes an object from a non-versioned bucket. */
       var decrypted_file = null;
       var new_pub_key = $("#newpubkey").val();
@@ -635,7 +673,7 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
             try{
               console.log("almost done");
               var cipherfile = data.Body.toString('utf-8');
-              decrypted_file = decrypt_file_symm(cipherfile, privkey, mypub_key);
+              decrypted_file = decrypt_file_symm(cipherfile, decrypt_string(actual_secret_key, privkey));
                 
                 if(decrypted_file == null){
                   console.log("there was an error decrypting the file");
@@ -713,6 +751,68 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
       
     }
 
+  function download_file(text, name, type) {
+    var file = new Blob([text], {type: type});
+    var download_link = document.getElementById("link");
+    local_file_url = URL.createObjectURL(file);
+    download_link.href = local_file_url;
+    download_link.download = name;
+    download_link.click();
+  }
+
+  function download_decrypt_file(filename){
+    var prk = $('#priv_key').val();
+    var privkey = null;
+    var decrypted_file = "";
+    var pin_flag = true;
+    while (pin_flag){
+      var pin_code = prompt("Please, enter your PIN CODE");
+      if (pin_code.length==4){
+        if (validate_pin(pin_code)){
+          var privkey_decrypt = CryptoJS.AES.decrypt(prk, hash_string(pin_code));
+          try{
+            privkey = privkey_decrypt.toString(CryptoJS.enc.Utf8);
+            pin_flag = false
+          }catch(err){
+            alert("PIN CODE invalid");
+            console.log(err);
+            return null;  
+          }                            
+        }
+      }else{
+        alert("PIN CODE invalid");
+        return null;
+      }
+    }
+    var params = {
+      Bucket: AWS_BucketName,
+      Key: "test/"+filename       
+    };
+    /* The following example retrieves an object for an S3 bucket. */
+    bucket.getObject(params, function(err, data) {
+      if (err){
+        console.log(err, err.stack); // an error occurred
+        return null;
+      }
+      else{
+        try{
+          console.log("trying to decrypt the file");
+          var cipherfile = data.Body.toString('utf-8');
+          var decrypted_secret_key = decrypt_string(actual_secret_key, privkey);
+          decrypted_file = decrypt_file_symm(cipherfile, decrypted_secret_key); 
+          download_file(decrypted_file, filename, "text/plain");
+
+        }
+        catch(err){
+          console.log(err);
+          return null;
+        }
+      }
+    });
+
+
+  }
+
   function read_pubkey_file(e) {
     // Variable
     var file = e.target.files[0];
@@ -779,13 +879,21 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
             });
             if (data.files != null || data.files != {}){
                TX_FILE_LIST= data.files;
-               data.files.forEach(function(item_file){
-                  console.log(item_file);
+
+               data.files.forEach(function(item_file, i){
+                console.log(item_file);
+                var name = "";
+                if(i == 0){
+                  actual_secret_key = item_file; // we save the encrypted key to decrypt this files
+                }
+                else{
                   // Render the item file
-                  var name = item_file.split("/");
+                  name = item_file.split("/");
                   name = name.pop() || name.pop(); // handle potential trailing slash
                   name = decodeURIComponent(name);
                   add_tx_files(item_file, name);
+                }
+                
                 });
             }
            
@@ -815,6 +923,7 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
     function decrypt_data(){
        // Decrypt data and create list
       var data_decrypt = [];
+      var files_decrypt = [];
       var isValidData = false;
       var alert_not_found = '<div  class="uk-alert-danger" uk-alert>\
       <a class="uk-alert-close" uk-close></a>\
@@ -835,6 +944,8 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
         var index = 1;
         list_decrypt = [['Country', 'Popularity'],];
         var tx_table = $('#tx_table_content tr').children();
+        var tx_table_files = $('#tx_table_files tr').children();
+
         var decrypt = new JSEncrypt();
         
         var privkey_encrypt =  $("#priv_key").val(); 
@@ -863,14 +974,16 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
 
         $.each(tx_table, function(){
           var value_input = $(this).html();
-          // Decrypt data          
+          // Decrypt data      
+          if(value_input != null && value_input != ""){    
             $(this).html(decrypt.decrypt(value_input));
             // Create list with decrypt data
             data_decrypt.push($(this).html());
-          
+          }
           
         });
         
+        //we push the genomic data into list_decrypt for further uses (transference)
         for (index; index<data_decrypt.length; index++){
           if (index%2){
             var percent_decrypt = 0;
@@ -890,7 +1003,7 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
             
           }
         }
-
+          
         if (!isValidData){
           return null;
         }

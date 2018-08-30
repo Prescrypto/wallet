@@ -61,9 +61,9 @@
   <br>
   <footer class="footer">
     <div class="uk-navbar-container uk-navbar-transparent">
+    <a id="link" href="#" download hidden></a>
     <a class="footer-btn uk-button uk-button-default" href="#modal-full" uk-toggle>New Genomic</a>
     <button id="recieve_button" class="footer-btn uk-button uk-button-default" type="button" uk-toggle="target: #modal-receive">Receive</button>
-    <button class="footer-btn uk-button uk-button-default" type="button" uk-toggle="target: #modal-decrypt-file">Decrypt File</button>
     <button id="js-modal-dialog"  class="footer-btn uk-button uk-button-default" type="button">Export keys</button>
   </div>
 <!-- This is the fullscreen Create New Modal-->
@@ -159,44 +159,6 @@
   </div>
 </div>
 <!--Closing receive Modal-->
-
-<!-- This is the Decrypt file modal -->
-<div id="modal-decrypt-file" uk-modal>
-  <div class="uk-modal-dialog uk-margin-auto-vertical">
-    <button class="uk-modal-close-default" type="button" uk-close></button>
-    <div class="uk-modal-header">
-      <h2 class="uk-modal-title">Decrypt your files</h2>
-    </div>
-    <div class="uk-modal-body">
-      
-      <table id="decrypt_filePath_table" class="uk-table uk-table-divider">
-        <thead>
-          <tr>
-            <th>Please select the file to decrypt</th>
-         </tr>
-        </thead>
-        <tbody id="filePath_content">
-        <!-- Render here File Path names for decryption -->
-        </tbody>
-      </table>
-      <div id="alert_decrypt"></div>
-      <hr>
-      <div class="js-upload uk-placeholder uk-text-center">
-        <span uk-icon="icon: cloud-upload"></span>
-        <span class="uk-text-middle">Attach your FILE by dropping it here or</span>
-        <div uk-form-custom> 
-          <input id="encryptedfileobj" type="file">
-          <span id="upload_link" class="uk-link">Select it from computer</span>
-        </div>
-      </div>
-      <a id="link" href="#" download hidden></a>
-    </div>
-    <div class="uk-modal-footer">
-      <button id="decrypt_button" class="uk-button uk-button-default" disabled>Decrypt</button>
-    </div>
-  </div>
-</div>
-  <!--Closing Decrypt file Modal-->
   </footer>
 
   <script src="js/localforage.min.js"></script>
@@ -226,6 +188,7 @@
     var file_count = 0;
     var files_list = {};
     var url_files_list = [];
+    var encryption_secret_key = "";
     AWS.config.region = AWS_Region;
     AWS.config.update({accessKeyId: AWS_AccessKeyId, secretAccessKey: AWS_SecretAccessKey}); //login to aws with credentials
     var bucket = new AWS.S3({params: {Bucket: AWS_BucketName}, apiVersion: '2006-03-01'});
@@ -309,6 +272,7 @@
                     color= "#f5c5d2";
                   }
                   add_tx_markup(item, color);
+
                 });
               }
               // Finish get
@@ -399,6 +363,10 @@
       payload.public_key = encrypt.getPublicKeyB64();
       payload.data = JSON.stringify(data_payload);
       payload.location = "Mexico";
+
+      if(url_files_list.length > 0){//we add the secret encrypted key to the payload
+        url_files_list.unshift(encryption_secret_key);
+      }
 
       payload.files = JSON.stringify(url_files_list);
       
@@ -581,20 +549,18 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
     //convert word array to string base 64
         return CryptoJS.enc.Base64.stringify(words);
   }
-  function decrypt_file_symm(cipherfile, mypriv_key, mypub_key){
+  function decrypt_file_symm(cipherfile, symm_key){
       // convert payload encoded in base64 to words
-      var secret_key = CryptoJS.SHA256(mypub_key);
-      var iv = toWordArray(mypriv_key);//CryptoJS.lib.WordArray.random(16);
-      var decrypted = CryptoJS.AES.decrypt(cipherfile, secret_key, {iv: iv});
-      return toString(decrypted);
+    var iv = CryptoJS.lib.WordArray.random(16);
+    var decrypted = CryptoJS.AES.decrypt(cipherfile, symm_key, {iv: iv});
+    return toString(decrypted);
   }
-  function ecrypt_file_symm(myfile, mypriv_key, mypub_key){
+  function ecrypt_file_symm(myfile, symm_key){
       //encrypt file with a symmetric key
-      var secret_key = CryptoJS.SHA256(mypub_key);
-      var iv = toWordArray(mypriv_key);//CryptoJS.lib.WordArray.random(16);
-      var encryptedfile = CryptoJS.AES.encrypt(myfile, secret_key, {iv: iv});
+     var iv = CryptoJS.lib.WordArray.random(16);
+    var encryptedfile = CryptoJS.AES.encrypt(myfile, symm_key, {iv: iv});
       // encode in base64
-      return encryptedfile.toString();
+    return encryptedfile.toString();
   }
   function encrypt_file(myfile){
     // Encrypt data
@@ -612,13 +578,35 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
     download_link.href = local_file_url;
     download_link.download = name;
   }
+  function generateECDSA() {
+    var curve = 'secp256r1';
+    var ec = new KJUR.crypto.ECDSA({"curve": curve});
+    var keypair = ec.generateKeyPairHex();
+    // this generates a key pair named keypair.ecpubhex and keypair.ecprvhex
+
+    return keypair;
+  }
+  function encrypt_string(mystring, public_key){
+    // Encrypt data
+    var encrypt = new JSEncrypt();
+    encrypt.setPublicKey(public_key);
+
+    return encrypt.encrypt(mystring);
+  }
+  function decrypt_string(mystring, private_key){
+    // Encrypt data
+    var decrypt = new JSEncrypt();
+    decrypt.setPrivateKey(private_key);
+
+    return decrypt.decrypt(mystring);
+  }
 
   function encrypt_and_upload_files(my_files_list){
     // Variables
     var encrypted_file = null;
     var today = new Date();
     var timestamp = today.toISOString();
-    
+    var new_key = "";
     var pub_key = $('#pub_key').val();
     var priv_key = null;
     var pin_attempts = 3;
@@ -653,12 +641,21 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
 
     $('#alert_new').html(alert_success+'<p id="alert_new">PIN CODE correct, Uploading the files!'+alert_end);
 
+    var keypair = generateECDSA();
+    if(pub_key.length < 512){
+      console.log("this is a short public key");
+      new_key = keypair.ecprvhex.slice(0, 50);    }
+    else{
+      new_key = keypair.ecprvhex;
+    }
+    encryption_secret_key = encrypt_string(new_key, pub_key);
+
     $.each(my_files_list, function(key, value) {
       var _filetemplate = _.template(file_working_template);
       var _filecompiled = _filetemplate({"data":{"filename":key}});
       document.getElementById(key).innerHTML = _filecompiled;
 
-      encrypted_file = ecrypt_file_symm(value, priv_key, pub_key); 
+      encrypted_file = ecrypt_file_symm(value, new_key); 
       if(encrypted_file.length > partSize){
         console.log("starting multipart upload");
         uploadMultipart(key, encrypted_file);
@@ -775,7 +772,7 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
     read.onload = function(e) {
       var content = e.target.result;
       try{
-        var decrypted_content = decrypt_file_symm(content, priv_key, pub_key);
+        var decrypted_content = decrypt_file_symm(content, "sec_key");
         download_file(decrypted_content, "mydecryptedfile.txt", "text/plain");
         document.getElementById('decrypt_button').disabled = false;
         $('#alert_decrypt').html(alert_success+'<p id="alert_decrypt">File loaded correctly yo can decrypt now'+alert_end);
@@ -835,9 +832,6 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
     document.getElementById('fileobj')
     .addEventListener('change', upload_file, false);
 
-    document.getElementById('encryptedfileobj')
-    .addEventListener('change', decrypt_from_file, false);
-
     $('#add_field').on('click', function(){
       add_field();
     });
@@ -856,11 +850,6 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
         $('#uploaded_list p:last').remove();
         file_count--;
       }
-    });
-    $('#decrypt_button').on('click', function(){
-      document.getElementById('decrypt_button').disabled = true;
-      document.getElementById("link").click();
-       $('#alert_decrypt').html('<p id="alert_decrypt"></p></div>');
     });
 
     $('#send_data').on('click', function(){
