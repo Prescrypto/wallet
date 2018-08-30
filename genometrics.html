@@ -913,7 +913,7 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
 
     $('#modal-decrypt-file').on('hide.uk.modal', function(){
       //clean the modal
-      console.log($("#encryptedfileobj").val(""));
+      $("#encryptedfileobj").val("");
       //Clean message of Error or Success
       UIkit.alert(alert_decrypt_test).close();
     });
