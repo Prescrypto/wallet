@@ -917,6 +917,11 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
       //Clean message of Error or Success
       UIkit.alert(alert_decrypt_test).close();
     });
+
+    $('#modal-full').on('hide.uk.modal', function(){
+      //clean the modal
+      $(this).find("input").val('').end();
+    });
   </script>
 </body>
 </html>

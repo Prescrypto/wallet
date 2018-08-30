@@ -673,6 +673,11 @@
       }
       requestAnimationFrame(tick);
     }
+    $('#modal-transact').on('hide.uk.modal', function(){
+      //clean the modal
+      $(this).find("input,textarea").val('').end();
+    });
+
   </script>
 </body>
 </html>
