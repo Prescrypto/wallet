@@ -3,7 +3,7 @@ body{
   min-height: 100vh;
 }
 nav.uk-navbar-container.uk-navbar{
-  background-color:#000;
+  background-color:#303030;
   font-size:20px;
   padding:0 40px 0 40px;
 }
@@ -28,10 +28,13 @@ form.uk-search.uk-search-default{
 }
 div.uk-grid-medium{
   text-align: left;
-  padding-top: 150px;
+  padding-top: 30px;
   width:800px;
   margin: auto;
   padding-right: 20px;
+}
+.grey-background{
+  background-color:#303030;
 }
 #genome{
   max-width:200px;
@@ -40,6 +43,7 @@ div.uk-grid-medium{
   max-width:500px; /* Customise it accordingly */
   overflow: hidden;
   text-overflow: ellipsis;
+  margin:0 auto;
 }
 .uk-table td{
   border-top: 0px;
@@ -81,7 +85,7 @@ div.uk-child-width-expand.uk-grid{
   margin:10px;
 }
 #backbtn{
-  background-color: #666666;
+  background-color: #303030;
   font-family: 'Source Sans Pro' !important;
   color: white;
 }
@@ -96,13 +100,73 @@ div.uk-child-width-expand.uk-grid{
 #formButtons{
   margin-top:10px;
 }
+.footer {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  background-color: #303030;
+  color: white;
+  text-align: center;
+}
+.footer-btn.uk-button.uk-button-default{
+  border: 1px solid #48a9e1;
+  border-radius:40px;
+  margin-top:10px;
+  margin-right:20px;
+  color:#fff;
+  background-color:transparent;
+}
+.footer-btn.uk-button.uk-button-default:active{
+  background-color:#48a9e1;
+}
+#light-h2{
+  color:#fff!important;
+}
+#tx_link{
+  color:#303030;
+}
 
+#pubkey{
+  height:150px;
+}
+#qrcode{
+  height:150px;
+  width:150px;
+}
+#message{
+  font-size : 14px;
+  padding-top: 10px;
+
+#modal-footer{
+  width:50%;
+  margin:0 auto;
+  padding:20px;
+}
+.modal-footer-left{
+  border-right: 1px solid #fff;
+}
+#send_data{
+  margin:30px auto;
+}
+#send_data:active{
+  background-color:#48a9e1;
+  color:#fff;
+}
+.txt-center{
+  text-align:center;
+
+}
 @media (max-width: 1200px){
   div.uk-grid-medium{
     width:100%;
   }
 }
-
+@media (max-width:900px){
+  .modal-footer-left{
+    border-right: none;
+  }
+}
 @media (max-width:400px){
   .uk-table td {
     border-top: 0px;
@@ -112,3 +176,4 @@ div.uk-child-width-expand.uk-grid{
     text-overflow: ellipsis;
   }
 }
+
