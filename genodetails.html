@@ -1088,9 +1088,7 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
 
       chart.draw(data, options);
     }
-
     
-
     // Events
     $('#decrypt').on('click', function(){
       data_country = decrypt_data();
@@ -1121,9 +1119,32 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
     });
   });
     
+    //Qr reader code
+    var video = document.createElement("video");
+    var canvasElement = document.getElementById("canvas");
+    var canvas = canvasElement.getContext("2d");
+    var loadingMessage = document.getElementById("loadingMessage");
+    var outputContainer = document.getElementById("output");
+    var outputMessage = document.getElementById("outputMessage");
+    var outputData = document.getElementById("outputData");
+    var pubKey = document.getElementById("newpubkey");
+
+
     $('#modal-transact').on('hide.uk.modal', function(){
       //clean the modal (MIGUEL) CHECK
       $(this).find("input,textarea").val('').end();
+      //This method are from MediaStreamTrack.stop documentation
+      function stop_stream(videoElem) {
+        let stream = videoElem.srcObject;
+        let tracks = stream.getTracks();
+
+        tracks.forEach(function(track) {
+          track.stop();
+        });
+        videoElem.srcObject = null;
+      }
+      
+      stop_stream(video);
       // Valery
       url_files_list = [];
       $('#pin').val('');
@@ -1134,16 +1155,7 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
     });
 
     $('#modal-transact').on('show.uk.modal', function(){
-      //Qr reader code
-      var video = document.createElement("video");
-      var canvasElement = document.getElementById("canvas");
-      var canvas = canvasElement.getContext("2d");
-      var loadingMessage = document.getElementById("loadingMessage");
-      var outputContainer = document.getElementById("output");
-      var outputMessage = document.getElementById("outputMessage");
-      var outputData = document.getElementById("outputData");
-      var pubKey = document.getElementById("newpubkey");
-
+        
       function drawLine(begin, end, color) {
         canvas.beginPath();
         canvas.moveTo(begin.x, begin.y);
