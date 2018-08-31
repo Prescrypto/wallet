@@ -1131,7 +1131,6 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
 
 
     $('#modal-transact').on('hide.uk.modal', function(){
-      //clean the modal (MIGUEL) CHECK
       $(this).find("input,textarea").val('').end();
       //This method are from MediaStreamTrack.stop documentation
       function stop_stream(videoElem) {
@@ -1143,9 +1142,8 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
         });
         videoElem.srcObject = null;
       }
-      
+
       stop_stream(video);
-      // Valery
       url_files_list = [];
       $('#pin').val('');
 
