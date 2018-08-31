@@ -132,7 +132,7 @@
         <div class="modal-footer-left txt-center">
           <h2 id="light-h2"><img style="height:30px;margin-bottom:10px;" src="media/light-locker.svg" alt=""> PIN</h2>
           <div class="uk-form-controls">
-            <input style="width:150px;" id="pin_code" name="pin_code" class="uk-input" type="text" maxlength="4" placeholder="Enter PIN code" required/>
+            <input style="width:150px;" id="pin_code" name="pin_code" class="uk-input" type="password" maxlength="4" pattern="[0-9]*" placeholder="Enter PIN code" required/>
           </div>
         </div>
         <div class="txt-center">
@@ -159,8 +159,8 @@
   </div>
 </div>
 <!--Closing receive Modal-->
+    
   </footer>
-
   <script src="js/localforage.min.js"></script>
   <script src="https://code.jquery.com/jquery-1.8.3.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/components/core-min.js"></script>
