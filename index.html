@@ -100,7 +100,7 @@
 
   function create_keys(){
     // Create RSA keysan and save in local forage
-    var crypt = new JSEncrypt({default_key_size: 512});
+    var crypt = new JSEncrypt({default_key_size: 2048});
     crypt.getKey();
     var private_key = crypt.getPrivateKey();
     var public_key = crypt.getPublicKey();
