@@ -108,6 +108,7 @@
       </div>
       <h3>Ancestry</h3>
       <div style="width:100%">
+        <div id="alert-page"></div>
         <label id="hash_id_label">Hash Id: </label>
       </div>
       <h5 style="width:100%;"><a id="tx_link" href="#" target="_blank"><img style="height:30px;" src="media/navigator.svg"> Show on Navigator</a></h5>
@@ -168,7 +169,12 @@
   // Global variables
   var files_list = {};
   var url_files_list = [];
+  var genomic_status = false;
   AWS.config.region = AWS_Region;
+  var AWS_AccessKeyId = decrypt_file_symm(conf_AWS_AccessKeyId, Unlock_k);
+  var AWS_SecretAccessKey = decrypt_file_symm(conf_AWS_SecretAccessKey, Unlock_k);
+  var AWS_BucketName = decrypt_file_symm(conf_AWS_BucketName, Unlock_k);
+
   AWS.config.update({accessKeyId: AWS_AccessKeyId, secretAccessKey: AWS_SecretAccessKey}); //login to aws with credentials
   var bucket = new AWS.S3({params: {Bucket: AWS_BucketName}, apiVersion: '2006-03-01'});
   // Upload
@@ -212,13 +218,11 @@
       <a id="a<%= name %>" href="<%= file %>" download hidden></a>\
       </td>\
       <td>\
-      <button title="Dowload file: <%= name %>" \
-      style="font-weight: 700;background-color:\ white" \
-      uk-icon="icon: cloud-download" \
-      onclick="download_url(\'<%= name %>\')"></button>\
-         <button title="Dowload and Decrypt file: <%= name %>"\
-          style="font-weight: 700;background-color:\ white" \
-          uk-icon="icon: unlock" onclick="download_decrypt_file(\'<%= name %>\')"></button>\
+      <a class="uk-icon-button" title="Dowload file: <%= name %>" \
+      uk-icon="ratio: 1.2; icon: cloud-download" \
+      onclick="download_url(\'<%= name %>\')"></a>\
+      <a class="uk-icon-button" title="Dowload and Decrypt file: <%= name %>"\
+          uk-icon="ratio: 1.2; icon: unlock" onclick="download_decrypt_file(\'<%= name %>\')"></a>\
         </td> \
       </tr>'
 
@@ -230,6 +234,7 @@
             $('#hash_id_label').append('<pre>'+txid+'</pre>');
             $('#tx_link').attr("href", 'http://127.0.0.1:8000/?hash_id='+txid);
     }
+
   });
 
   // Functions
@@ -301,7 +306,7 @@ function completeMultipartUpload(doneParams, fileKey) {
 }
 function uploadPart(multipart, partParams, fileKey, tryNum) {
   //upload a part from a file sliced by 5mb
-    var fileName = 'test/'+fileKey+'.txt';
+    var fileName = AWS_Folder +fileKey+'.txt';
     var tryNum = tryNum || 1;
     bucket.uploadPart(partParams, function(multiErr, mData) {
       if (multiErr){
@@ -333,7 +338,7 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
   
   function uploadMultipart(fileKey, fileData) {
     //upload a file by parts because of the size
-    var fileName = 'test/'+fileKey+'.txt';
+    var fileName = AWS_Folder +fileKey+'.txt';
     var fileLength = fileData.length;
     var partNum = 0;
     multipartMap = {
@@ -376,7 +381,7 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
   function uploadNormal(myfile, fileName){
      // See the Configuring section to configure credentials in the SDK
     var today = new Date();
-    var fileNameNew = 'test/'+fileName+'.txt';
+    var fileNameNew = AWS_Folder +fileName+'.txt';
     var timestamp = today.toISOString();
     var parameters = {Key: fileNameNew, 
         Body: myfile,
@@ -419,7 +424,6 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
       </div>';
 
       if (validate_key("#newpubkey")){
-        console.log("Valid Key");
         $('#transfer_button').html(transfer_button);
 
       }else{
@@ -479,7 +483,6 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
     var encrypted_file = null;
 
     try{
-      console.log(file_name);
         var _filetemplate = _.template(file_working_template);
         var _filecompiled = _filetemplate({"data":{"filename":file_name}});
         document.getElementById(file_name).innerHTML = _filecompiled;
@@ -615,7 +618,6 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
 
         posting.done(function(data, text_status){
           console.log("Transfer success!");
-          console.log(data);
           window.open("./genometrics.html", "_self");
         });
 
@@ -645,6 +647,10 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
       var new_key_file_list = {};
       
       /* the initialization of uploaded_list is made here so we can have right away the complete list of files to upload not depending on the asynchronous operations*/
+      $('#alert').html( alert_success+'<p id="alert">Successfully started the transference'
+        + '<div style="color:#000;margin-left:1px;" uk-spinner="ratio: 2"></div>'
+        + alert_end);
+
       $.each(key_file_list, function(i, key_file){
         if(i!= 0){
           var filename = Date.now();
@@ -660,7 +666,7 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
 
         var name = key_file.split("/");
         name = name.pop() || name.pop(); // handle potential trailing slash
-        name = "test/"+decodeURIComponent(name);
+        name = AWS_Folder+decodeURIComponent(name);
 
         var params = {
           Bucket: AWS_BucketName,
@@ -693,10 +699,11 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
                 if(finish_upload == false){
                   console.log("there was an error un encrypt and upload");
                   $('#alert').html( alert_error+'<p id="alert">There was an error uploading the files for the transference, please try again'+ alert_end);
+                    return null;
                 }
               }
               else{
-                $('#alert').html( alert_error+'<p id="alert">There was an error decrypting and encrypting the files for the transference, please try again'+ alert_end);
+                $('#alert').html( alert_error+'<p id="alert">There was an error Cipher file is null'+ alert_end);
                 console.log("theres no body for the file");
                 return null;
               }
@@ -704,7 +711,7 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
             catch(err){
               console.log("error getting the object");
               console.log(err);
-               $('#alert').html( alert_error+'<p id="alert">There was an error decrypting and encrypting the files for the transference, please try again'+ alert_end);
+               $('#alert').html( alert_error+'<p id="alert">There was an error getting the file decrypted, please try again'+ alert_end);
               return null;
             }
 
@@ -714,15 +721,16 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
                 console.log(err, err.stack); // an error occurred
                 return null;
               }
-              else{
-                return "done";
-              }
             });
 
 
-          }                
+          }   
+
          });
+
       });
+
+      return "done";
      
     }
     function start_transfering_files(){
@@ -755,9 +763,6 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
           $('#alert').html( alert_error+'<p id="alert">There was an error decrypting and encrypting the files for the transference, please try again'+ alert_end);
           return;
         }
-        else{
-           $('#alert').html( alert_success+'<p id="alert">Successfully started the transference'+ alert_end);
-        }
              
       
     }
@@ -771,8 +776,13 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
     download_link.click();
   }
   function download_url(name) {
-    var download_a = document.getElementById("a"+name);
-    download_a.click();
+    if(genomic_status == true){
+      var download_a = document.getElementById("a"+name);
+      download_a.click(); 
+    }
+    else{
+       $('#alert-page').html( alert_error+'<p id="alert-page">The files have been transfered already'+ alert_end);
+    }
   }
 
   function download_decrypt_file(filename){
@@ -780,52 +790,59 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
     var privkey = null;
     var decrypted_file = "";
     var pin_flag = true;
-    while (pin_flag){
-      var pin_code = prompt("Please, enter your PIN CODE");
-      if (pin_code.length==4){
-        if (validate_pin(pin_code)){
-          var privkey_decrypt = CryptoJS.AES.decrypt(prk, hash_string(pin_code));
-          try{
-            privkey = privkey_decrypt.toString(CryptoJS.enc.Utf8);
-            pin_flag = false
-          }catch(err){
-            alert("PIN CODE invalid");
-            console.log(err);
-            return null;  
-          }                            
-        }
-      }else{
-        alert("PIN CODE invalid");
-        return null;
-      }
-    }
-    var params = {
-      Bucket: AWS_BucketName,
-      Key: "test/"+filename       
-    };
-    /* The following example retrieves an object for an S3 bucket. */
-    bucket.getObject(params, function(err, data) {
-      if (err){
-        console.log("error downloading the file from s3");
-        console.log(err, err.stack); // an error occurred
-        return null;
-      }
-      else{
-        try{
-          var cipherfile = data.Body.toString('utf-8');
-          var decrypted_secret_key = decrypt_string(actual_secret_key, privkey);
-          decrypted_file = decrypt_file_symm(cipherfile, decrypted_secret_key); 
-          download_file(decrypted_file, filename, "text/plain");
 
-        }
-        catch(err){
-          console.log("error downloading the file from s3");
-          console.log(err);
+    if(genomic_status == true){
+      while (pin_flag){
+        var pin_code = prompt("Please, enter your PIN CODE");
+        if (pin_code.length==4){
+          if (validate_pin(pin_code)){
+            var privkey_decrypt = CryptoJS.AES.decrypt(prk, hash_string(pin_code));
+            try{
+              privkey = privkey_decrypt.toString(CryptoJS.enc.Utf8);
+              pin_flag = false
+            }catch(err){
+              alert("PIN CODE invalid");
+              console.log(err);
+              return null;  
+            }                            
+          }
+        }else{
+          alert("PIN CODE invalid");
           return null;
         }
       }
-    });
+      var params = {
+        Bucket: AWS_BucketName,
+        Key: AWS_Folder +filename       
+      };
+      /* The following example retrieves an object for an S3 bucket. */
+      bucket.getObject(params, function(err, data) {
+        if (err){
+          $('#alert-page').html( alert_error+'<p id="alert-page">The files have been transfered already'+ alert_end);
+          console.log("error downloading the file from s3");
+          console.log(err, err.stack); // an error occurred
+          return null;
+        }
+        else{
+          try{
+            var cipherfile = data.Body.toString('utf-8');
+            var decrypted_secret_key = decrypt_string(actual_secret_key, privkey);
+            decrypted_file = decrypt_file_symm(cipherfile, decrypted_secret_key); 
+            download_file(decrypted_file, filename, "text/plain");
 
+          }
+          catch(err){
+            $('#alert-page').html( alert_error+'<p id="alert-page">There was an error decrypting the file'+ alert_end);
+            console.log("error decrypting the file");
+            console.log(err);
+            return null;
+          }
+        }
+      });
+    }//readable true
+    else{
+      $('#alert-page').html( alert_error+'<p id="alert-page">The files have been transfered already'+ alert_end);
+    }
 
   }
 
@@ -842,7 +859,6 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
     var read = new FileReader();
     read.onload = function(e) {
       var content = e.target.result;
-      console.log('file readed', content);
       $("#newpubkey").val(content);
       validate_transfer();
     };
@@ -921,7 +937,8 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
               color= "#f5c5d2";
             }
 
-            $("#readable_status").html('<div id="readable_status"><p style="background-color:'+color+';color:#000">Readable: '+data.readable+'</p></div>')
+            $("#readable_status").html('<div id="readable_status"><p style="background-color:'+color+';color:#000">Readable: '+data.readable+'</p></div>');
+            genomic_status = data.readable;
           }
           console.log("Finish get!");
         });
@@ -942,12 +959,12 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
       var isValidData = false;
       var alert_not_found = '<div  class="uk-alert-danger" uk-alert>\
       <a class="uk-alert-close" uk-close></a>\
-      <p id="alert">Error. No Private key found.</p>\
+      <p id="alert-page">Error. No Private key found.</p>\
       </div>'
 
       if(!validate_key("#priv_key")){
         console.log("No Priv Key found");
-        $('#alert').html(alert_not_found);
+        $('#alert-page').html(alert_not_found);
         document.getElementById("transferaction").disabled = true;
         return null;
 
@@ -1020,6 +1037,7 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
         }
           
         if (!isValidData){
+           $('#alert-page').html( alert_error+'<p id="alert-page">Unable to decrypt the data'+ alert_end);
           return null;
         }
         
@@ -1077,17 +1095,12 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
       chart.draw(data, options);
     }
 
-    
-
     // Events
     $('#decrypt').on('click', function(){
       data_country = decrypt_data();
       if(data_country!=null){
         google.charts.setOnLoadCallback(draw_map);
         google.charts.setOnLoadCallback(draw_chart);
-      }
-      else{
-        location.reload();
       }
       
     });
@@ -1179,6 +1192,7 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
         requestAnimationFrame(tick);
       }
     });
+
 
   </script>
 </body>

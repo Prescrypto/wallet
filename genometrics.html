@@ -190,6 +190,9 @@
     var url_files_list = [];
     var encryption_secret_key = "";
     AWS.config.region = AWS_Region;
+    var AWS_AccessKeyId = decrypt_file_symm(conf_AWS_AccessKeyId, Unlock_k);
+    var AWS_SecretAccessKey = decrypt_file_symm(conf_AWS_SecretAccessKey, Unlock_k);
+    var AWS_BucketName = decrypt_file_symm(conf_AWS_BucketName, Unlock_k);
     AWS.config.update({accessKeyId: AWS_AccessKeyId, secretAccessKey: AWS_SecretAccessKey}); //login to aws with credentials
     var bucket = new AWS.S3({params: {Bucket: AWS_BucketName}, apiVersion: '2006-03-01'});
     // Upload
@@ -348,7 +351,7 @@
 
       
 
-      encrypt.setPrivateKey(pubkey);
+      encrypt.setPublicKey(pubkey);
 
       for (index_encrypt; index_encrypt<data_payload.length; index_encrypt++){
         data_payload[index_encrypt].country_name = encrypt.encrypt(data_payload[index_encrypt].country_name);
@@ -380,7 +383,6 @@
                       payload);
 
       posting.done(function(data, text_status){
-        console.log(text_status);
         // reload page to see new items
         location.reload();
       });
@@ -430,7 +432,7 @@ function completeMultipartUpload(doneParams, fileKey) {
 }
 function uploadPart(multipart, partParams, fileKey, tryNum) {
   //upload a part from a file sliced by 5mb
-    var fileName = 'test/'+fileKey+'.txt';
+    var fileName = AWS_Folder +fileKey+'.txt';
     var tryNum = tryNum || 1;
     bucket.uploadPart(partParams, function(multiErr, mData) {
       if (multiErr){
@@ -463,7 +465,7 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
   
   function uploadMultipart(fileKey, fileData) {
     //upload a file by parts because of the size
-    var fileName = 'test/'+fileKey+'.txt';
+    var fileName = AWS_Folder +fileKey+'.txt';
     var fileLength = fileData.length;
     var partNum = 0;
     multipartMap = {
@@ -505,7 +507,7 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
   function uploadNormal(myfile, fileName){
      // See the Configuring section to configure credentials in the SDK
     var today = new Date();
-    var fileNameNew = 'test/'+fileName+'.txt';
+    var fileNameNew = AWS_Folder +fileName+'.txt';
     var timestamp = today.toISOString();
     var parameters = {Key: fileNameNew, 
         Body: myfile,
