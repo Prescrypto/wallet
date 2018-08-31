@@ -1060,13 +1060,15 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
 
     function draw_chart() {
       // Create a pie graph
-      var data = google.visualization.arrayToDataTable(data_country);
-      var options = {
-        title: 'Ancestry Chart'
-      };
-      var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+      if(data_country != null && data_country.length > 0){
+        var data = google.visualization.arrayToDataTable(data_country);
+        var options = {
+          title: 'Ancestry Chart'
+        };
+        var chart = new google.visualization.PieChart(document.getElementById('piechart'));
 
-      chart.draw(data, options);
+        chart.draw(data, options);
+      }
     }
 
     function map_test(){
