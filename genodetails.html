@@ -212,11 +212,11 @@
       <a id="a<%= name %>" href="<%= file %>" download hidden></a>\
       </td>\
       <td>\
-      <button id="<%= name %>" title="Dowload file: <%= name %>" \
+      <button title="Dowload file: <%= name %>" \
       style="font-weight: 700;background-color:\ white" \
       uk-icon="icon: cloud-download" \
       onclick="download_url(\'<%= name %>\')"></button>\
-         <button id="<%= name %>" title="Dowload and Decrypt file: <%= name %>"\
+         <button title="Dowload and Decrypt file: <%= name %>"\
           style="font-weight: 700;background-color:\ white" \
           uk-icon="icon: unlock" onclick="download_decrypt_file(\'<%= name %>\')"></button>\
         </td> \
@@ -265,8 +265,6 @@
   return pin_hash
   }
   function finish_uploads(){
-    console.log("lenght of uploaded list");
-      console.log($('p', '#uploaded_list').length);
       if(url_files_list.length == $('p', '#uploaded_list').length){
         $('#alert').html( alert_success+'<p id="alert">Finish uploading all files'+ alert_end);
         TX_FILE_LIST = url_files_list;
@@ -286,7 +284,7 @@ function completeMultipartUpload(doneParams, fileKey) {
     } else {
       var delta = (new Date() - startTime) / 1000;
       console.log('Completed upload in', delta, 'seconds');
-      console.log('Final upload data:', data);
+      console.log('Final upload');
       try{
           var _filetemplate = _.template(file_uploaded_template);
           var _filecompiled = _filetemplate({"data":{"filename":fileKey}});
@@ -322,8 +320,6 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
         PartNumber: Number(this.request.params.PartNumber)
       };
       console.log("Completed part", this.request.params.PartNumber);
-      console.log('mData', mData);
-      console.log(numPartsLeft);
       if (--numPartsLeft > 0) return; // complete only when all parts uploaded
       var doneParams = {
         Bucket: AWS_BucketName,
@@ -331,7 +327,6 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
         MultipartUpload: multipartMap,
         UploadId: multipart.UploadId
       };
-      console.log("Completing upload...");
       completeMultipartUpload(doneParams, fileKey);
     });
   }
@@ -347,7 +342,6 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
     numPartsLeft = Math.ceil(fileLength / partSize);
     bucket.createMultipartUpload({ Bucket: AWS_BucketName, Key: fileName,ContentType: fileData.type, ACL:AWS_ACL }, function(mpErr, multipart) {  
       if(!mpErr){
-         console.log("multipart created", multipart.UploadId, multipart);
           
           try{
             for (var rangeStart = 0; rangeStart < fileLength; rangeStart += partSize) {
@@ -381,7 +375,6 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
   }
   function uploadNormal(myfile, fileName){
      // See the Configuring section to configure credentials in the SDK
-     console.log("start normal upload");
     var today = new Date();
     var fileNameNew = 'test/'+fileName+'.txt';
     var timestamp = today.toISOString();
@@ -391,12 +384,12 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
         ACL: AWS_ACL};
     bucket.upload(parameters, function (err, data) {
       if (err){
+        console.log("error uploading files whitout parts");
         console.log(err);
         $('#alert').html(alert_error+'<p id="alert">Error on Upload!'+alert_end);
         return false;
       }
       if(data){
-        console.log("done uploading");
         try{
           var _filetemplate = _.template(file_uploaded_template);
           var _filecompiled = _filetemplate({"data":{"filename":fileName}});
@@ -406,6 +399,7 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
 
         }
         catch(err){
+          console.log("error finishing normal uploads");
           console.log(err);
           $('#alert').html(alert_error+'<p id="alert">Error on Upload!'+alert_end);
           return false;
@@ -482,7 +476,6 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
   }
 
   function encrypt_and_upload_file(file_name, file_value, mypriv_key, newpub_key){
-    console.log("encrypting files");
     var encrypted_file = null;
 
     try{
@@ -501,16 +494,14 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
           new_key = keypair.ecprvhex;
         }
         encryption_secret_key = encrypt_string(new_key, newpub_key);
-        console.log("after key encryption");
-        
         encrypted_file = ecrypt_file_symm(file_value, new_key); 
-        console.log("after file encrypted");
+
         if(encrypted_file != null && encrypted_file.length > 0 ){
-          console.log("file is not null");
+ 
         
           if(encrypted_file.length > partSize){
             uploadMultipart(file_name, encrypted_file);
-            console.log("after uploading multipart");
+
           }
           else{
             uploadNormal(encrypted_file, file_name);
@@ -670,7 +661,6 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
         var name = key_file.split("/");
         name = name.pop() || name.pop(); // handle potential trailing slash
         name = "test/"+decodeURIComponent(name);
-        console.log("before get download");
 
         var params = {
           Bucket: AWS_BucketName,
@@ -686,7 +676,6 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
           }
           else{
             try{
-              console.log("almost done");
               var cipherfile = data.Body.toString('utf-8');
               if(cipherfile != null && cipherfile.length > 0){
                 decrypted_file = decrypt_file_symm(cipherfile, decrypt_string(actual_secret_key, privkey));
@@ -721,6 +710,7 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
 
             bucket.deleteObject(params, function(err, data) {
               if (err){
+                console.log("error deleting file");
                 console.log(err, err.stack); // an error occurred
                 return null;
               }
@@ -736,7 +726,6 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
      
     }
     function start_transfering_files(){
-      console.log("transfer data start");
       var prk = $('#priv_key').val();
         var privkey = null;
         var pin_flag = true;
@@ -783,8 +772,6 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
   }
   function download_url(name) {
     var download_a = document.getElementById("a"+name);
-    //download_link.href = url;
-    //download_link.download = name;
     download_a.click();
   }
 
@@ -819,12 +806,12 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
     /* The following example retrieves an object for an S3 bucket. */
     bucket.getObject(params, function(err, data) {
       if (err){
+        console.log("error downloading the file from s3");
         console.log(err, err.stack); // an error occurred
         return null;
       }
       else{
         try{
-          console.log("trying to decrypt the file");
           var cipherfile = data.Body.toString('utf-8');
           var decrypted_secret_key = decrypt_string(actual_secret_key, privkey);
           decrypted_file = decrypt_file_symm(cipherfile, decrypted_secret_key); 
@@ -832,6 +819,7 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
 
         }
         catch(err){
+          console.log("error downloading the file from s3");
           console.log(err);
           return null;
         }
@@ -1122,7 +1110,8 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
   });
     
     $('#modal-transact').on('hide.uk.modal', function(){
-      //clean the modal (MIGUEL) CHECK
+      //clean the modal (MIGUEL) CHECK 
+      //TODO: shutdown the camera when finish or close the transference
       $(this).find("input,textarea").val('').end();
       // Valery
       url_files_list = [];

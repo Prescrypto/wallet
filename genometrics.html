@@ -413,7 +413,7 @@ function completeMultipartUpload(doneParams, fileKey) {
     } else {
       var delta = (new Date() - startTime) / 1000;
       console.log('Completed upload in', delta, 'seconds');
-      console.log('Final upload data:', data);
+      console.log('Final upload');
       try{
           var _filetemplate = _.template(file_uploaded_template);
           var _filecompiled = _filetemplate({"data":{"filename":fileKey}});
@@ -449,8 +449,6 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
         PartNumber: Number(this.request.params.PartNumber)
       };
       console.log("Completed part", this.request.params.PartNumber);
-      console.log('mData', mData);
-      console.log(numPartsLeft);
       if (--numPartsLeft > 0) return; // complete only when all parts uploaded
       var doneParams = {
         Bucket: AWS_BucketName,
@@ -474,7 +472,6 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
     numPartsLeft = Math.ceil(fileLength / partSize);
     bucket.createMultipartUpload({ Bucket: AWS_BucketName, Key: fileName,ContentType: fileData.type, ACL:AWS_ACL }, function(mpErr, multipart) {  
       if(!mpErr){
-         console.log("multipart created", multipart.UploadId, multipart);
           
           try{
             for (var rangeStart = 0; rangeStart < fileLength; rangeStart += partSize) {
@@ -489,7 +486,6 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
                   UploadId: multipart.UploadId
                 };
                 // Send a single part
-                console.log('Uploading part: #', partParams.PartNumber, ', Range start:', rangeStart);
                 uploadPart(multipart, partParams, fileKey);
             }
           }
@@ -521,7 +517,6 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
         $('#alert_new').html(alert_error+'<p id="alert_new">Error on Upload!'+alert_end);
       }
       if(data){
-        console.log("done uploading");
         try{
           var _filetemplate = _.template(file_uploaded_template);
           var _filecompiled = _filetemplate({"data":{"filename":fileName}});
@@ -531,6 +526,7 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
 
         }
         catch(err){
+          console.log("finishing upload on normal upload");
           console.log(err);
         }
       }
@@ -657,11 +653,9 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
 
       encrypted_file = ecrypt_file_symm(value, new_key); 
       if(encrypted_file.length > partSize){
-        console.log("starting multipart upload");
         uploadMultipart(key, encrypted_file);
       }
       else{
-        console.log("starting normal upload");
         uploadNormal(encrypted_file, key);
       }
     });
@@ -822,8 +816,6 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
 
     function enable_upload(){
       document.getElementById('send_data').disabled = false;
-
-
     }
 
     document.getElementById('pin_code')
@@ -870,6 +862,7 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
         url_files_list = [];
         uploaded_list =  {};
         $('#pin_code').val('');
+         $(this).find("input,textarea").val('').end();
 
         document.getElementById('send_data').disabled = true;
         $('#alert_new').html('<p id="alert_transfer"></p></div>');
