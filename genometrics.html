@@ -179,9 +179,9 @@
   <script>
     //variables
     //Variables
-    var alert_success = '<div  id="alert_decrypt_test" class="uk-alert-success" uk-alert>\
+    var alert_success = '<div  class="uk-alert-success" uk-alert>\
       <a class="uk-alert-close" uk-close></a>';
-    var alert_error = '<div id="alert_decrypt_test" class="uk-alert-danger" uk-alert>\
+    var alert_error = '<div  class="uk-alert-danger" uk-alert>\
       <a class="uk-alert-close" uk-close></a>';
     var alert_end ='</p></div>';
     var local_file_url = '#';
@@ -884,21 +884,9 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
     $('#modal-receive').on('hide.uk.modal', function(){
       //
       $('#qrcode').empty();  
-
-
-    });    
-
-    $('#modal-decrypt-file').on('hide.uk.modal', function(){
-      //clean the modal
-      $("#encryptedfileobj").val("");
-      //Clean message of Error or Success
-      UIkit.alert(alert_decrypt_test).close();
     });
 
-    $('#modal-full').on('hide.uk.modal', function(){
-      //clean the modal
-      $(this).find("input").val('').end();
-    });
+
   </script>
 </body>
 </html>
