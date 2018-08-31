@@ -52,7 +52,7 @@
 
 <div class="uk-child-width-expand@s" uk-grid>
   <div class="uk-grid-item-match">
-    <div class="uk-child-width-1-2 uk-card uk-card-default uk-card-body">
+    <div class="uk-card uk-card-default uk-card-body">
       <div class="uk-inline" style="width: 100%">
         <button id="decrypt" class="uk-button uk-button-default" style="font-weight: 700;background-color: white">Decrypt</button>
         <!-- Transfer Data button calling modal-->
@@ -129,6 +129,7 @@
         <thead>
           <tr>
             <th><span id="table_files_title">File List</span></th>
+            <th><span id="table_files_title">Options</span></th>
           </tr>
         </thead>
         <tbody id="tx_table_files">
@@ -208,8 +209,17 @@
 
   var tx_files_template = '<tr> \
       <td><%= name %>\
-         <a href="<%= file %>" title="Dowload file: <%= name %>" download> download\
-      </a><button id="<%= name %>" class="uk-button uk-button-default" style="font-weight: 700;background-color:\ white" uk-icon="icon: cloud-download" onclick="download_decrypt_file(\'<%= name %>\')"></button></td> \
+      <a id="a<%= name %>" href="<%= file %>" download hidden></a>\
+      </td>\
+      <td>\
+      <button id="<%= name %>" title="Dowload file: <%= name %>" \
+      style="font-weight: 700;background-color:\ white" \
+      uk-icon="icon: cloud-download" \
+      onclick="download_url(\'<%= name %>\')"></button>\
+         <button id="<%= name %>" title="Dowload and Decrypt file: <%= name %>"\
+          style="font-weight: 700;background-color:\ white" \
+          uk-icon="icon: unlock" onclick="download_decrypt_file(\'<%= name %>\')"></button>\
+        </td> \
       </tr>'
 
   $(document).ready(function() {
@@ -435,18 +445,18 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
     //convert word array to string base 64
         return CryptoJS.enc.Base64.stringify(words);
   }
-  function decrypt_file_symm(cipherfile, symm_key){
+   function decrypt_file_symm(cipherfile, symm_key){
       // convert payload encoded in base64 to words
-    var iv = toWordArray(symm_key);//CryptoJS.lib.WordArray.random(16);
+    var iv = CryptoJS.lib.WordArray.random(16);
     var decrypted = CryptoJS.AES.decrypt(cipherfile, symm_key, {iv: iv});
     return toString(decrypted);
   }
   function ecrypt_file_symm(myfile, symm_key){
       //encrypt file with a symmetric key
-     var iv = toWordArray(symm_key);//CryptoJS.lib.WordArray.random(16);
+     var iv = CryptoJS.lib.WordArray.random(16);
     var encryptedfile = CryptoJS.AES.encrypt(myfile, symm_key, {iv: iv});
       // encode in base64
-    return encryptedfile.toString(CryptoJS.enc.Utf8);
+    return encryptedfile.toString();
   }
   function generateECDSA() {
     var curve = 'secp256r1';
@@ -491,9 +501,12 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
           new_key = keypair.ecprvhex;
         }
         encryption_secret_key = encrypt_string(new_key, newpub_key);
+        console.log("after key encryption");
         
         encrypted_file = ecrypt_file_symm(file_value, new_key); 
-        if(encrypted_file != null){
+        console.log("after file encrypted");
+        if(encrypted_file != null && encrypted_file.length > 0 ){
+          console.log("file is not null");
         
           if(encrypted_file.length > partSize){
             uploadMultipart(file_name, encrypted_file);
@@ -642,11 +655,13 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
       
       /* the initialization of uploaded_list is made here so we can have right away the complete list of files to upload not depending on the asynchronous operations*/
       $.each(key_file_list, function(i, key_file){
-        var filename = Date.now();
-        var _filetemplate = _.template(file_template);
-        var _filecompiled = _filetemplate({"data":{"filename":filename}});
-        $('#uploaded_list').append(_filecompiled);
-        new_key_file_list[filename]= key_file;
+        if(i!= 0){
+          var filename = Date.now();
+          var _filetemplate = _.template(file_template);
+          var _filecompiled = _filetemplate({"data":{"filename":filename}});
+          $('#uploaded_list').append(_filecompiled);
+          new_key_file_list[filename]= key_file;    
+        }
 
       }); 
 
@@ -673,21 +688,28 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
             try{
               console.log("almost done");
               var cipherfile = data.Body.toString('utf-8');
-              decrypted_file = decrypt_file_symm(cipherfile, decrypt_string(actual_secret_key, privkey));
+              if(cipherfile != null && cipherfile.length > 0){
+                decrypted_file = decrypt_file_symm(cipherfile, decrypt_string(actual_secret_key, privkey));
+                  
+                  if(decrypted_file == null){
+                    console.log("there was an error decrypting the file");
+                    $('#alert').html( alert_error+'<p id="alert">There was an error decrypting and encrypting the files for the transference, please try again'+ alert_end);
+                    return null;
+                  }
+
+                  files_list[filename] = decrypted_file;
                 
-                if(decrypted_file == null){
-                  console.log("there was an error decrypting the file");
-                  $('#alert').html( alert_error+'<p id="alert">There was an error decrypting and encrypting the files for the transference, please try again'+ alert_end);
-                  return null;
+                var finish_upload = encrypt_and_upload_file(filename, decrypted_file, privkey, new_pub_key);
+
+                if(finish_upload == false){
+                  console.log("there was an error un encrypt and upload");
+                  $('#alert').html( alert_error+'<p id="alert">There was an error uploading the files for the transference, please try again'+ alert_end);
                 }
-
-                files_list[filename] = decrypted_file;
-              
-              var finish_upload = encrypt_and_upload_file(filename, decrypted_file, privkey, new_pub_key);
-
-              if(finish_upload == false){
-                console.log("there was an error un encrypt and upload");
-                $('#alert').html( alert_error+'<p id="alert">There was an error uploading the files for the transference, please try again'+ alert_end);
+              }
+              else{
+                $('#alert').html( alert_error+'<p id="alert">There was an error decrypting and encrypting the files for the transference, please try again'+ alert_end);
+                console.log("theres no body for the file");
+                return null;
               }
             }
             catch(err){
@@ -758,6 +780,12 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
     download_link.href = local_file_url;
     download_link.download = name;
     download_link.click();
+  }
+  function download_url(name) {
+    var download_a = document.getElementById("a"+name);
+    //download_link.href = url;
+    //download_link.download = name;
+    download_a.click();
   }
 
   function download_decrypt_file(filename){
@@ -881,7 +909,6 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
                TX_FILE_LIST= data.files;
 
                data.files.forEach(function(item_file, i){
-                console.log(item_file);
                 var name = "";
                 if(i == 0){
                   actual_secret_key = item_file; // we save the encrypted key to decrypt this files
@@ -1017,10 +1044,12 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
 
     function draw_map(){
       // Create a map graph
-      var data = google.visualization.arrayToDataTable(data_country);
-      var options = {};
-      var chart = new google.visualization.GeoChart(document.getElementById('regions_div'));
-      chart.draw(data, options);
+      if(data_country != null && data_country.length > 0){
+        var data = google.visualization.arrayToDataTable(data_country);
+        var options = {};
+        var chart = new google.visualization.GeoChart(document.getElementById('regions_div'));
+        chart.draw(data, options);
+      }
     }
 
     function draw_chart() {
