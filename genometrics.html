@@ -49,15 +49,28 @@
   <div class="grey-background" align="center">
     <h2 style="color:#fff!important;padding-bottom:30px;">Your Genomics</h2>
   </div>
+  <div  style=" position:fixed;bottom:1;left:0;padding-left:20%;" >
+    <a class="uk-icon-button" title="previous"
+    uk-icon="ratio: 4; icon: chevron-left" onclick="" id="genoprevious" disabled></a>
+  </div>
+  <div  style=" position: fixed;bottom:1;right:0;padding-right:20%;" >
+    <a class="uk-icon-button" title="next" uk-icon="ratio: 4; icon: chevron-right"
+    id="genonext" onclick="" disabled></a>
+  </div>
+
   <div class="uk-grid-medium" align="center">
     <div class="uk-child-width-1-1@s" uk-grid>
       <div>
+
         <div id="genocontent" uk-sortable="group: sortable-group">
           <!-- Initial Items -->
         </div>
         <br>
       </div>
     </div>
+  </div>
+   
+
   <br>
   <footer class="footer">
     <div class="uk-navbar-container uk-navbar-transparent">
@@ -220,29 +233,76 @@
         </a>';
 
           
-    function add_tx_markup(data, color){
-      // A tx data provided compile and render item
-      $('#non-item').remove();
-      var _template = _.template(tx_template);
-      var _compiled = _template({"tx":data, "txcolor":color});
-      $('#genocontent').append(_compiled);
+  function add_tx_markup(data, color){
+    // A tx data provided compile and render item
+    $('#non-item').remove();
+    var _template = _.template(tx_template);
+    var _compiled = _template({"tx":data, "txcolor":color});
+    $('#genocontent').append(_compiled);
+  }
+  function clean_tx_markups(){
+    // A tx data provided compile and render item
+    $('#genocontent').empty();
+  }
+  function validate_pin(pin){
+    if (!/^([0-9])*$/.test(pin)){
+      return false
+    }else{
+      return true
     }
+  }
 
-    function validate_pin(pin){
-      if (!/^([0-9])*$/.test(pin)){
-        return false
-      }else{
-        return true
+  function hash_string(value){
+  //This method calculate hash for the  value from pin
+  var pin = CryptoJS.SHA256(value);
+  var pin_hash = pin.toString(CryptoJS.enc.b64);  
+  return pin_hash
+  }
+  function repost(new_url){
+    clean_tx_markups();
+
+    $.get(new_url, function(data) {
+      // Get data from server
+      if (data.results.length == 0){
+        // Render no tx label
+        $("#genocontent").html("<span id='non-item'>Without Txs :( Start creating new one!</span>");
       }
-    }
+      else{
 
-    function hash_string(value){
-    //This method calculate hash for the  value from pin
-    var pin = CryptoJS.SHA256(value);
-    var pin_hash = pin.toString(CryptoJS.enc.b64);  
-    return pin_hash
-    }
+        if(data.next != null){
+          $("#genonext").removeAttr("disabled");
+          $("#genonext").attr("onclick", 'repost("'+data.next+'")');
+        }
+        else{
+          document.getElementById("genonext").disabled = true;
+        }
+        if(data.previous != null){
+          $("#genoprevious").removeAttr("disabled");
+          $("#genoprevious").attr("onclick", 'repost("'+data.previous+'")');
 
+        }
+        else{
+          document.getElementById("genoprevious").disabled = true;
+        }
+
+
+        data.results.forEach(function(item) {
+          // Add tx to template
+          var color= "#fff";
+          if(item.readable == true){
+            color= "#d9f7ec";
+          }
+          else{
+            color= "#f5c5d2";
+          }
+          add_tx_markup(item, color);
+
+        });
+      }
+      // Finish get
+    });
+
+  }
     $(document).ready(function() {
       (function ($, localforage){
         function setKeys(){
@@ -265,6 +325,23 @@
                 // Render no tx label
                 $("#genocontent").html("<span id='non-item'>Without Txs :( Start creating new one!</span>");
               }else{
+
+                if(data.next != null){
+                  $("#genonext").removeAttr("disabled");                  
+                  $("#genonext").attr("onclick", 'repost("'+data.next+'")');
+                }
+                else{
+                  document.getElementById("genonext").disabled = true;
+                }
+                if(data.previous != null){
+                  $("#genoprevious").removeAttr("disabled");
+                  $("#genoprevious").attr("onclick", 'repost("'+data.previous+'")');
+
+                }
+                else{
+                  document.getElementById("genoprevious").disabled = true;
+                }
+
                 data.results.forEach(function(item) {
                   // Add tx to template
                   var color= "#fff";
