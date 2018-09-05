@@ -7,10 +7,11 @@ Day=`date +"%d-%m-%Y"`
 Hour=`date +"%H:%M"`
 
 folder="$Day-$Hour"
-
+replace ="_"
 # Get your branch name 
 branch_name="$(git branch | grep \* | cut -d ' ' -f2)" || branch_name="(unnamed branch)"
-echo "you are now in: $branch_name"
+new_branch_name="$($orig_var | sed -e 's/\//_/g')"
+echo "you are now in: $branch_name, $new_branch_name"
 
 # Move all files to file temporal   
 cp -r ./ ./../$folder
@@ -63,4 +64,6 @@ git commit -m "Deploy Branch"
 # Git push 
 git push || git push --set-upstream origin gh-pages
 
+#get back to the initial branch
+git checkout $branch_name
 echo "finish deployment"
