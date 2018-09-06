@@ -21,6 +21,7 @@ rm -rf ./../$folder/deploy.sh
 
 #check if gh-pages exists in remote
 git fetch
+git branch -d gh-pages
 gh_pages_exists="$(git branch --list gh-pages)"
 echo $gh_pages_exists
 if ["$gh_pages_exists" = "" ]; then
