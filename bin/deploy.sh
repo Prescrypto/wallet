@@ -24,13 +24,14 @@ git fetch
 git branch -d gh-pages
 gh_pages_exists="$(git branch --list gh-pages)"
 echo $gh_pages_exists
-if ["$gh_pages_exists" = "" ]; then
+if [ "$gh_pages_exists" = "" ]; then
     #if it doesnt exists then create it
     echo "gh-pages doesnt exists"
-    git checkout -b gh-pages
+    git branch gh-pages
 else
     echo "gh-pages branch already exists."
     git checkout gh-pages 
+    git pull
     
 fi
 
