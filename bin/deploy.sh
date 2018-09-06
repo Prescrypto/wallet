@@ -62,7 +62,6 @@ fi
 
 #Remove folder auxiliar
 rm -rf ./../$folder
-
 # Add all files
 git add --all
 
