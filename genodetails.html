@@ -1127,13 +1127,10 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
     $('#transferdata').on('click', function(){
        if($('p', '#uploaded_list').length < 1){
         //if there are no files then upload the percentages
-        console.log("no files to transfer");
         transfer_data();
       }
       else{
         //if there are files then upload it first
-        console.log("list size");
-        console.log($('p', '#uploaded_list').length);
         start_transfering_files();
       }
       
