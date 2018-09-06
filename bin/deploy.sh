@@ -10,6 +10,7 @@ folder="$Day-$Hour"
 
 # Get your branch name 
 branch_name="$(git branch | grep \* | cut -d ' ' -f2)" || branch_name="(unnamed branch)"
+new_branch_name="$(echo $branch_name | sed -e 's/\//_/g')"
 echo "you are now in: $branch_name"
 
 # Move all files to file temporal   
@@ -44,22 +45,22 @@ if [ "$branch_name" = "master" ]; then
 else
 
 	#check if there is a folder with the name of the current branch if it does, remove it
-	if [ -d "deploy/$branch_name" ]; then
+	if [ -d "deploy/$new_branch_name" ]; then
 	    echo "this directory already exists"
 	    cd deploy
-	    rm -rf $branch_name/*
+	    rm -rf $new_branch_name/*
 	    cd ../
 	else
 	    echo "this directory doesnt exists"
 	    # Create and Move to folder deploy   
 	    mkdir deploy
 	    cd deploy
-	    mkdir $branch_name
+	    mkdir $new_branch_name
 	    cd ../
 	fi
 
 	#copy all the temp folder to the gh-pages folder
-	cp -r ./../$folder/* deploy/$branch_name
+	cp -r ./../$folder/* deploy/$new_branch_name
 
 fi
 
