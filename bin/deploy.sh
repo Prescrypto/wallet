@@ -23,7 +23,7 @@ rm -rf ./../$folder/deploy.sh
 git fetch
 git branch -d gh-pages
 gh_pages_exists="$(git branch --list gh-pages)"
-echo $gh_pages_exists
+
 if [ "$gh_pages_exists" = "" ]; then
     #if it doesnt exists then create it
     echo "gh-pages doesnt exists"
@@ -72,7 +72,12 @@ git add --all
 git commit -m "Deploy Branch"
 
 # Git push 
-git push || git push --set-upstream origin gh-pages
+if [ "$gh_pages_exists" = "" ]; then
+    #if it doesnt exists then create it
+    git push --set-upstream origin gh-pages
+else
+    git push
+fi
 
 #get back to the original branch
 git checkout $branch_name
