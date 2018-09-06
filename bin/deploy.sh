@@ -28,6 +28,7 @@ if [ "$gh_pages_exists" = "" ]; then
     #if it doesnt exists then create it
     echo "gh-pages doesnt exists"
     git branch gh-pages
+    git checkout gh-pages
 else
     echo "gh-pages branch already exists."
     git checkout gh-pages 
