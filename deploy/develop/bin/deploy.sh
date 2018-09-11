@@ -10,7 +10,6 @@ folder="$Day-$Hour"
 
 # Get your branch name 
 branch_name="$(git branch | grep \* | cut -d ' ' -f2)" || branch_name="(unnamed branch)"
-new_branch_name="$(echo $branch_name | sed -e 's/\//_/g')"
 echo "you are now in: $branch_name"
 
 # Move all files to file temporal   
@@ -24,12 +23,11 @@ rm -rf ./../$folder/deploy.sh
 git fetch
 git branch -d gh-pages
 gh_pages_exists="$(git branch --list gh-pages)"
-
+echo $gh_pages_exists
 if [ "$gh_pages_exists" = "" ]; then
     #if it doesnt exists then create it
     echo "gh-pages doesnt exists"
     git branch gh-pages
-    git checkout gh-pages
 else
     echo "gh-pages branch already exists."
     git checkout gh-pages 
@@ -45,22 +43,22 @@ if [ "$branch_name" = "master" ]; then
 else
 
 	#check if there is a folder with the name of the current branch if it does, remove it
-	if [ -d "deploy/$new_branch_name" ]; then
+	if [ -d "deploy/$branch_name" ]; then
 	    echo "this directory already exists"
 	    cd deploy
-	    rm -rf $new_branch_name/*
+	    rm -rf $branch_name/*
 	    cd ../
 	else
 	    echo "this directory doesnt exists"
 	    # Create and Move to folder deploy   
 	    mkdir deploy
 	    cd deploy
-	    mkdir $new_branch_name
+	    mkdir $branch_name
 	    cd ../
 	fi
 
 	#copy all the temp folder to the gh-pages folder
-	cp -r ./../$folder/* deploy/$new_branch_name
+	cp -r ./../$folder/* deploy/$branch_name
 
 fi
 
@@ -73,12 +71,7 @@ git add --all
 git commit -m "Deploy Branch"
 
 # Git push 
-if [ "$gh_pages_exists" = "" ]; then
-    #if it doesnt exists then create it
-    git push --set-upstream origin gh-pages
-else
-    git push
-fi
+git push || git push --set-upstream origin gh-pages
 
 #get back to the original branch
 git checkout $branch_name
