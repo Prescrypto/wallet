@@ -603,6 +603,7 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
         payload.location = "Mexico";
 
         if($('p', '#uploaded_list').length < 1){
+          console.log("no files to transfer");
          payload.files = JSON.stringify([]);
         }
         else{
@@ -612,6 +613,8 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
 
           payload.files = JSON.stringify(TX_FILE_LIST);
         }
+
+        console.log(payload);
 
         var msg = payload.data;
         var hash_alg = 'sha1';
@@ -763,7 +766,7 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
       var old_pub_key = $('#pub_key').val();
       var new_files_list = {};
 
-      if($('p', '#uploaded_list').length < 1){
+      if( TX_FILE_LIST.length < 1){
         //if there are no files then upload the percentages
         console.log("no files to transfer");
         transfer_data();
@@ -771,7 +774,7 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
       else{
         //if there are files then upload it first
         console.log("list size");
-        console.log($('p', '#uploaded_list').length);
+        console.log( TX_FILE_LIST.length);
         var result = get_and_remove_s3_object(TX_FILE_LIST, privkey, old_pub_key);
         if(result == null){
           $('#alert').html( alert_error+'<p id="alert">There was an error decrypting and encrypting the files for the transference, please try again'+ alert_end);
