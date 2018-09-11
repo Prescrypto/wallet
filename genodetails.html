@@ -188,6 +188,7 @@
   var multipartResponse = null;
 
   var data_country = null;
+
   var TX_FILE_LIST = [];
   var list_decrypt = [];
   var encryption_secret_key = ""; // the new key to decrypt the files
@@ -478,6 +479,30 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
 
     return decrypt.decrypt(mystring);
   }
+  function get_pub_key_from_addr(pb_address){
+      var geting = $.get(window.baseurl + "api/v1/address/"+pb_address);
+
+      geting.done(function(data, text_status){
+        // when its done
+        if(data == null || data == ""){
+          console.log("incorrect QR code");
+          $('#alert').html(alert_error+'<p id="alert">Error, Incorrect QR! '+alert_end);
+
+        }
+        else{
+          $("#newpubkey").val(data.pub_key);
+        }
+        
+      });
+      geting.fail(function(xhr, textStatus, errorThrown){
+        console.log(xhr.responseText);
+        $('#alert').html(alert_error+'<p id="alert">Error, Incorrect QR! '+alert_end);
+      });
+      geting.always(function(){
+        // Finish POST!
+      });
+
+    }
 
   function encrypt_and_upload_file(file_name, file_value, mypriv_key, newpub_key){
     var encrypted_file = null;
@@ -1062,6 +1087,8 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
       }
     }
 
+  
+
     function draw_map(){
       // Create a map graph
       if(data_country != null && data_country.length > 0){
@@ -1155,7 +1182,7 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
     var outputContainer = document.getElementById("output");
     var outputMessage = document.getElementById("outputMessage");
     var outputData = document.getElementById("outputData");
-    var pubKey = document.getElementById("newpubkey");
+    
 
 
     $('#modal-transact').on('hide.uk.modal', function(){
@@ -1217,7 +1244,8 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
             drawLine(code.location.bottomLeftCorner, code.location.topLeftCorner, "#FF3B58");
             outputMessage.hidden = true;
             outputData.parentElement.hidden = false;
-            pubKey.innerText = code.data;
+
+            get_pub_key_from_addr(code.data);
             validate_transfer();
 
           } else {

@@ -258,6 +258,30 @@
   var pin_hash = pin.toString(CryptoJS.enc.b64);  
   return pin_hash
   }
+  function get_addr_from_pub_key(pb_key){
+      var geting = $.get(window.baseurl + "api/v1/get_addr/"+pb_key);
+
+      geting.done(function(data, text_status){
+        // when its done
+        if(data == null || data == ""){
+          console.log("incorrect QR code");
+          $('#alert').html(alert_error+'<p id="alert">Error, Public Key! '+alert_end);
+
+        }
+        else{
+          $("#newpubkey").val(data.address);
+        }
+        
+      });
+      geting.fail(function(xhr, textStatus, errorThrown){
+        console.log(xhr.responseText);
+        $('#alert').html(alert_error+'<p id="alert">Error, Incorrect QR! '+alert_end);
+      });
+      geting.always(function(){
+        // Finish POST!
+      });
+
+    }
   function repost(new_url){
     clean_tx_markups();
 
@@ -949,7 +973,8 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
     });
     $('#modal-receive').on('show.uk.modal', function(){
       //Receive Modal data
-      $('#qrcode').qrcode($('#pub_key').val());  
+      var qr_address = get_addr_from_pub_key($('#pub_key').val());
+      $('#qrcode').qrcode(qr_address);  
       $('#pubkey').val($('#pub_key').val());
     });
 
