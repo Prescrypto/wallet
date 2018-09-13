@@ -356,11 +356,14 @@
             }                            
           }
         }else{
-         
+          document.getElementById("transferaction").disabled = true;
+          alert("PIN CODE invalid");
           return null;
         }
 
         if(privkey == null){
+          document.getElementById("transferaction").disabled = true;
+          alert("Private key invalid");
           return null;
         }
 
@@ -371,10 +374,24 @@
         $.each(tx_table, function(){
           var value_input = $(this).html();
           // Decrypt data      
-          if(value_input != null && value_input != ""){    
-            $(this).html(decrypt.decrypt(value_input));
-            // Create list with decrypt data
-            data_decrypt.push($(this).html());
+          if(value_input != null){    
+            if(value_input == ""){
+              $(this).html("");
+            }
+            else{
+              var decrypted_input = decrypt.decrypt(value_input);
+
+              if(decrypted_input == "" || decrypted_input == null){
+                 $(this).html(null);
+
+              }
+              else{
+                $(this).html(decrypted_input);
+              }
+            }
+              
+              // Create list with decrypt data
+              data_decrypt.push($(this).html());
           }
           
         });
@@ -383,13 +400,22 @@
         for (index; index<data_decrypt.length; index++){
           if (index%2){
             var percent_decrypt = 0;
+            var key_data = "";
             try{
-                if(data_decrypt[index] == ""){
+                if(data_decrypt[index] == null){
                   isValidData = false;
                   break;
                 }
-                percent_decrypt = parseFloat(data_decrypt[index]);
-                list_decrypt.push([data_decrypt[index-1],percent_decrypt]);
+                if(data_decrypt[index] == ""){
+                  percent_decrypt = 0;
+                  key_data = "No Data";
+                }
+                else{
+                  percent_decrypt = parseFloat(data_decrypt[index]);
+                  key_data = data_decrypt[index-1];
+                }
+                
+                list_decrypt.push([key_data,percent_decrypt]);
                 isValidData = true;
             }
             catch(err){
@@ -402,6 +428,7 @@
           
         if (!isValidData){
            $('#alert-page').html( alert_error+'<p id="alert-page">Unable to decrypt the data'+ alert_end);
+           document.getElementById("transferaction").disabled = true;
           return null;
         }
         
@@ -648,6 +675,7 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
         }
         else{
           $("#newpubkey").val(data.pub_key);
+          validate_transfer();
         }
         
       });
@@ -955,8 +983,6 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
       }
       else{
         //if there are files then upload it first
-        console.log("list size");
-        console.log( TX_FILE_LIST.length);
         var result = get_and_remove_s3_object(TX_FILE_LIST, privkey, old_pub_key);
         if(result == null){
           $('#alert').html( alert_error+'<p id="alert">There was an error decrypting and encrypting the files for the transference, please try again'+ alert_end);
@@ -1314,7 +1340,7 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
             outputData.parentElement.hidden = false;
 
             get_pub_key_from_addr(code.data);
-            validate_transfer();
+            
 
           } else {
             outputMessage.hidden = false;

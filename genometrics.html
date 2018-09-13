@@ -265,7 +265,7 @@
         // when its done
         if(data == null || data == ""){
           console.log("incorrect QR code");
-          $('#alert').html(alert_error+'<p id="alert">Error, Public Key! '+alert_end);
+          $('#alert').html(alert_error+'<p id="alert">Error, Incorrect Public Key! '+alert_end);
 
         }
         else{
@@ -275,7 +275,7 @@
       });
       geting.fail(function(xhr, textStatus, errorThrown){
         console.log(xhr.responseText);
-        $('#alert').html(alert_error+'<p id="alert">Error, Incorrect QR! '+alert_end);
+        $('#alert').html(alert_error+'<p id="alert">Error, Incorrect Public Key! '+alert_end);
       });
       geting.always(function(){
         // Finish POST!
