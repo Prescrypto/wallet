@@ -824,8 +824,6 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
           payload.files = JSON.stringify(TX_FILE_LIST);
         }
 
-        console.log(payload);
-
         var msg = payload.data;
         var hash_alg = 'sha1';
 
