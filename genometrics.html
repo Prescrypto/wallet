@@ -47,7 +47,7 @@
   </aside>
   <!-- END Aside pub and private keys -->
   <div class="grey-background" align="center">
-    <h2 style="color:#fff!important;padding-bottom:30px;">Your Genomics</h2>
+    <h2 style="color:#fff!important;padding-bottom:30px;">Genomic Datasets</h2>
   </div>
   <div  style=" position:fixed;bottom:1;left:0;padding-left:20%;" >
     <a class="uk-icon-button" title="previous"
@@ -75,12 +75,12 @@
   <footer class="footer">
     <div class="uk-navbar-container uk-navbar-transparent">
     <a id="link" href="#" download hidden></a>
-    <a class="footer-btn uk-button uk-button-default" href="#modal-full" uk-toggle>New Genomic</a>
-    <button id="recieve_button" class="footer-btn uk-button uk-button-default" type="button" uk-toggle="target: #modal-receive">Receive</button>
-    <button id="js-modal-dialog"  class="footer-btn uk-button uk-button-default" type="button">Export keys</button>
+    <a class="footer-btn uk-button uk-button-default" href="#modal-full" title="Create a new genomic dataset" uk-toggle>New Genomic Data</a>
+    <button id="recieve_button" class="footer-btn uk-button uk-button-default" type="button" uk-toggle="target: #modal-receive" title="Receive a genomic dataset">Receive Genomic Data</button>
+    <button id="js-modal-dialog"  class="footer-btn uk-button uk-button-default" title="Export your public and private keys" type="button">Export keys</button>
   </div>
 <!-- This is the fullscreen Create New Modal-->
-<div id="modal-full" class="uk-modal-full" uk-modal>
+<div id="modal-full" class="uk-modal-full" style="background-color:#1a1a1a;color:#fff;margin-bottom: -10px;padding-bottom: -10px;" uk-modal>
   <div class="uk-modal-dialog" >
     <button class="uk-modal-close-full uk-close-large" type="button" uk-close></button>
     <div class="uk-grid-collapse uk-child-width-1-2@s" uk-grid>
@@ -258,6 +258,48 @@
   var pin_hash = pin.toString(CryptoJS.enc.b64);  
   return pin_hash
   }
+  function get_addr_from_pub_key(pb_key){
+    var encrypt = new JSEncrypt();
+    encrypt.setPublicKey(pb_key);
+    var value_b64 = encrypt.getPublicKeyB64();
+    var pubkey_uri= encodeURIComponent(value_b64).replace(/'/g,"%27").replace(/"/g,"%22");
+    var full_uri = window.baseurl + "api/v1/address/?public_key="+pubkey_uri;
+
+    var geting = $.get(full_uri);
+      geting.done(function(data, text_status){
+        // when its done
+        if(data == null || data == ""){
+          console.log("incorrect QR code");
+          $('#alert').html(alert_error+'<p id="alert">Error, Incorrect Public Key! '+alert_end);
+           return null;
+ 
+        }
+        else{
+         if(data.results[0].address != ""){
+ 
+            $('#qrcode').qrcode(data.results[0].address);  
+            $('#pubkey').val($('#pub_key').val());
+ 
+          }
+          else{
+            console.log("error  getting address")
+            $('#alert').html(alert_error+'<p id="alert">Error, Incorrect QR! '+alert_end);
+            return null
+ 
+          }
+ 
+        }
+        
+      });
+      geting.fail(function(xhr, textStatus, errorThrown){
+        console.log(xhr.responseText);
+        $('#alert').html(alert_error+'<p id="alert">Error, Incorrect Public Key! '+alert_end);
+      });
+      geting.always(function(){
+        // Finish POST!
+      });
+
+    }
   function repost(new_url){
     clean_tx_markups();
 
@@ -808,6 +850,7 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
     var pin_flag = true;
     while (pin_flag){
       pin_attempts = pin_attempts - 1 ; 
+      var pin_code = "";
       var pin_code = prompt("Please, enter your PIN CODE");
       if (pin_attempts < 0){
         alert("You have no more attempts");
@@ -936,6 +979,7 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
       }
       
     });
+  
      $('#modal-full').on('hide.uk.modal', function(){
       //clean the modal for new genomics
         url_files_list = [];
@@ -949,8 +993,8 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
     });
     $('#modal-receive').on('show.uk.modal', function(){
       //Receive Modal data
-      $('#qrcode').qrcode($('#pub_key').val());  
-      $('#pubkey').val($('#pub_key').val());
+      get_addr_from_pub_key($('#pub_key').val());
+      
     });
 
     $('#modal-receive').on('hide.uk.modal', function(){

@@ -106,7 +106,7 @@
             </div>
         </div>
       </div>
-      <h3>Ancestry</h3>
+      <h3>Raw dataset</h3>
       <div style="width:100%">
         <div id="alert-page"></div>
         <label id="hash_id_label">Hash Id: </label>
@@ -139,6 +139,33 @@
     </table>
     <a id="link" href="#" download hidden></a>
     </div>
+  </div>
+
+  <!-- This is the pincode modal -->
+  <div id="pincode_modal" uk-modal>
+      <div class="uk-modal-dialog uk-modal-body">
+          <h2 class="uk-modal-title">Please enter your pin code</h2>
+          <div class="uk-margin">
+            <input class="uk-input" type="password" maxlength="4" pattern="[0-9]*" id="pin_code1" >
+          </div>
+          <div class="uk-margin">
+            <button class="uk-modal-close uk-button uk-button-default" type="button"
+            style="background-color: #000; color:#fff;" >Ok</button>
+          </div>
+      </div>
+  </div>
+  <!-- This is the pincode for files modal -->
+  <div id="pincode_file_modal" uk-modal>
+      <div class="uk-modal-dialog uk-modal-body">
+          <h2 class="uk-modal-title">Please enter your pin code</h2>
+          <div class="uk-margin">
+            <input class="uk-input" type="password" maxlength="4" pattern="[0-9]*" id="pin_code2" >
+          </div>
+          <div class="uk-margin">
+            <button class="uk-modal-close uk-button uk-button-default" type="button"
+            style="background-color: #000; color:#fff;" >Ok</button>
+          </div>
+      </div>
   </div>
 
   <div class="uk-child-width-1 uk-card uk-card-default uk-card-body">
@@ -188,6 +215,9 @@
   var multipartResponse = null;
 
   var data_country = null;
+  var global_pin_code = "";
+  var global_file_name = "";
+
   var TX_FILE_LIST = [];
   var list_decrypt = [];
   var encryption_secret_key = ""; // the new key to decrypt the files
@@ -222,7 +252,7 @@
       uk-icon="ratio: 1.2; icon: cloud-download" \
       onclick="download_url(\'<%= name %>\')"></a>\
       <a class="uk-icon-button" title="Dowload and Decrypt file: <%= name %>"\
-          uk-icon="ratio: 1.2; icon: unlock" onclick="download_decrypt_file(\'<%= name %>\')"></a>\
+          uk-icon="ratio: 1.2; icon: unlock" onclick="pincode_for_file(\'<%= name %>\')"></a>\
         </td> \
       </tr>'
 
@@ -277,6 +307,161 @@
       }
 
   }
+
+  function decrypt_data(){
+       // Decrypt data and create list
+      var data_decrypt = [];
+      var files_decrypt = [];
+      var isValidData = false;
+      var alert_not_found = '<div  class="uk-alert-danger" uk-alert>\
+      <a class="uk-alert-close" uk-close></a>\
+      <p id="alert-page">Error. No Private key found.</p>\
+      </div>'
+
+      if(!validate_key("#priv_key")){
+        console.log("No Priv Key found");
+        $('#alert-page').html(alert_not_found);
+        document.getElementById("transferaction").disabled = true;
+        return null;
+
+      }
+      else{
+        
+
+        // Make list for graph
+        var index = 1;
+        list_decrypt = [['Country', 'Popularity'],];
+        var tx_table = $('#tx_table_content tr').children();
+        var tx_table_files = $('#tx_table_files tr').children();
+
+        var decrypt = new JSEncrypt();
+        
+        var privkey_encrypt =  $("#priv_key").val(); 
+        var pin_flag = true;
+        var privkey = null;
+
+
+        
+        if (global_pin_code.length==4){
+          if (validate_pin(global_pin_code)){
+            var privkey_decrypt = CryptoJS.AES.decrypt(privkey_encrypt, hash_string(global_pin_code));
+            try{
+              privkey = privkey_decrypt.toString(CryptoJS.enc.Utf8);
+              pin_flag = false
+            }catch(err){
+              alert("PIN CODE invalid");
+
+              console.log(err);
+              //return null;  
+            }                            
+          }
+        }else{
+          document.getElementById("transferaction").disabled = true;
+          alert("PIN CODE invalid");
+          return null;
+        }
+
+        if(privkey == null){
+          document.getElementById("transferaction").disabled = true;
+          alert("Private key invalid");
+          return null;
+        }
+
+        decrypt.setPrivateKey(privkey);
+
+        global_pin_code = "";
+
+        $.each(tx_table, function(){
+          var value_input = $(this).html();
+          // Decrypt data      
+          if(value_input != null){    
+            if(value_input == ""){
+              $(this).html("");
+            }
+            else{
+              var decrypted_input = decrypt.decrypt(value_input);
+
+              if(decrypted_input == "" || decrypted_input == null){
+                 $(this).html(null);
+
+              }
+              else{
+                $(this).html(decrypted_input);
+              }
+            }
+              
+              // Create list with decrypt data
+              data_decrypt.push($(this).html());
+          }
+          
+        });
+        
+        //we push the genomic data into list_decrypt for further uses (transference)
+        for (index; index<data_decrypt.length; index++){
+          if (index%2){
+            var percent_decrypt = 0;
+            var key_data = "";
+            try{
+                if(data_decrypt[index] == null){
+                  isValidData = false;
+                  break;
+                }
+                if(data_decrypt[index] == ""){
+                  percent_decrypt = 0;
+                  key_data = "No Data";
+                }
+                else{
+                  percent_decrypt = parseFloat(data_decrypt[index]);
+                  key_data = data_decrypt[index-1];
+                }
+                
+                list_decrypt.push([key_data,percent_decrypt]);
+                isValidData = true;
+            }
+            catch(err){
+              isValidData = false;
+              break;
+            }
+            
+          }
+        }
+          
+        if (!isValidData){
+           $('#alert-page').html( alert_error+'<p id="alert-page">Unable to decrypt the data'+ alert_end);
+           document.getElementById("transferaction").disabled = true;
+          return null;
+        }
+        
+        // Here we enable the transfer button and disable de decrypt button
+         $("#decrypt").attr("disabled", "true");
+        document.getElementById("transferaction").disabled = false;
+        return list_decrypt; 
+      }
+    }
+
+    function draw_map(){
+      // Create a map graph
+      if(data_country != null && data_country.length > 0){
+        var data = google.visualization.arrayToDataTable(data_country);
+        var options = {};
+        var chart = new google.visualization.GeoChart(document.getElementById('regions_div'));
+        chart.draw(data, options);
+      }
+    }
+
+    function draw_chart() {
+      // Create a pie graph
+      if(data_country != null && data_country.length > 0){
+        var data = google.visualization.arrayToDataTable(data_country);
+        var options = {
+          title: 'Ancestry Chart'
+        };
+        var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+
+        chart.draw(data, options);
+      }
+    }
+
 
     //Upload file to s3 functions>>>>>>>>
 function completeMultipartUpload(doneParams, fileKey) {
@@ -478,6 +663,31 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
 
     return decrypt.decrypt(mystring);
   }
+  function get_pub_key_from_addr(pb_address){
+      var geting = $.get(window.baseurl + "api/v1/address/"+pb_address);
+
+      geting.done(function(data, text_status){
+        // when its done
+        if(data == null || data == ""){
+          console.log("incorrect QR code");
+          $('#alert').html(alert_error+'<p id="alert">Error, Incorrect QR! '+alert_end);
+
+        }
+        else{
+          $("#newpubkey").val(data.pub_key);
+          validate_transfer();
+        }
+        
+      });
+      geting.fail(function(xhr, textStatus, errorThrown){
+        console.log(xhr.responseText);
+        $('#alert').html(alert_error+'<p id="alert">Error, Incorrect QR! '+alert_end);
+      });
+      geting.always(function(){
+        // Finish POST!
+      });
+
+    }
 
   function encrypt_and_upload_file(file_name, file_value, mypriv_key, newpub_key){
     var encrypted_file = null;
@@ -613,8 +823,6 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
 
           payload.files = JSON.stringify(TX_FILE_LIST);
         }
-
-        console.log(payload);
 
         var msg = payload.data;
         var hash_alg = 'sha1';
@@ -773,8 +981,6 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
       }
       else{
         //if there are files then upload it first
-        console.log("list size");
-        console.log( TX_FILE_LIST.length);
         var result = get_and_remove_s3_object(TX_FILE_LIST, privkey, old_pub_key);
         if(result == null){
           $('#alert').html( alert_error+'<p id="alert">There was an error decrypting and encrypting the files for the transference, please try again'+ alert_end);
@@ -808,26 +1014,27 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
     var decrypted_file = "";
     var pin_flag = true;
 
-    if(genomic_status == true){
-      while (pin_flag){
-        var pin_code = prompt("Please, enter your PIN CODE");
-        if (pin_code.length==4){
-          if (validate_pin(pin_code)){
-            var privkey_decrypt = CryptoJS.AES.decrypt(prk, hash_string(pin_code));
-            try{
-              privkey = privkey_decrypt.toString(CryptoJS.enc.Utf8);
-              pin_flag = false
-            }catch(err){
-              alert("PIN CODE invalid");
-              console.log(err);
-              return null;  
-            }                            
-          }
-        }else{
-          alert("PIN CODE invalid");
-          return null;
+    if(global_file_name != ""){
+      if (global_pin_code.length==4){
+        if (validate_pin(global_pin_code)){
+          var privkey_decrypt = CryptoJS.AES.decrypt(prk, hash_string(global_pin_code));
+          try{
+            privkey = privkey_decrypt.toString(CryptoJS.enc.Utf8);
+            pin_flag = false
+          }catch(err){
+            alert("PIN CODE invalid");
+            console.log(err);
+            return null;  
+          }                            
         }
+      }else{
+        alert("PIN CODE invalid");
+        return null;
       }
+
+      global_file_name = "";
+      global_pin_code = "";
+      
       var params = {
         Bucket: AWS_BucketName,
         Key: AWS_Folder +filename       
@@ -860,6 +1067,11 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
     else{
       $('#alert-page').html( alert_error+'<p id="alert-page">The files have been transfered already'+ alert_end);
     }
+
+  }
+  function pincode_for_file(filename){
+    global_file_name = filename;
+     UIkit.modal($('#pincode_file_modal')).show();
 
   }
 
@@ -969,125 +1181,10 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
     })($, localforage);
 
     // Functions
-    function decrypt_data(){
-       // Decrypt data and create list
-      var data_decrypt = [];
-      var files_decrypt = [];
-      var isValidData = false;
-      var alert_not_found = '<div  class="uk-alert-danger" uk-alert>\
-      <a class="uk-alert-close" uk-close></a>\
-      <p id="alert-page">Error. No Private key found.</p>\
-      </div>'
 
-      if(!validate_key("#priv_key")){
-        console.log("No Priv Key found");
-        $('#alert-page').html(alert_not_found);
-        document.getElementById("transferaction").disabled = true;
-        return null;
+  
 
-      }
-      else{
-        
-
-        // Make list for graph
-        var index = 1;
-        list_decrypt = [['Country', 'Popularity'],];
-        var tx_table = $('#tx_table_content tr').children();
-        var tx_table_files = $('#tx_table_files tr').children();
-
-        var decrypt = new JSEncrypt();
-        
-        var privkey_encrypt =  $("#priv_key").val(); 
-        var pin_flag = true;
-        while (pin_flag){
-          var pin_code = prompt("Please, enter your PIN CODE");
-          if (pin_code.length==4){
-            if (validate_pin(pin_code)){
-              var privkey_decrypt = CryptoJS.AES.decrypt(privkey_encrypt, hash_string(pin_code));
-              try{
-                var privkey = privkey_decrypt.toString(CryptoJS.enc.Utf8);
-                pin_flag = false
-              }catch(err){
-                alert("PIN CODE invalid");
-                console.log(err);
-                return null;  
-              }                            
-            }
-          }else{
-            alert("PIN CODE invalid");
-            return null;
-          }
-        }
-
-        decrypt.setPrivateKey(privkey);
-
-        $.each(tx_table, function(){
-          var value_input = $(this).html();
-          // Decrypt data      
-          if(value_input != null && value_input != ""){    
-            $(this).html(decrypt.decrypt(value_input));
-            // Create list with decrypt data
-            data_decrypt.push($(this).html());
-          }
-          
-        });
-        
-        //we push the genomic data into list_decrypt for further uses (transference)
-        for (index; index<data_decrypt.length; index++){
-          if (index%2){
-            var percent_decrypt = 0;
-            try{
-                if(data_decrypt[index] == ""){
-                  isValidData = false;
-                  break;
-                }
-                percent_decrypt = parseFloat(data_decrypt[index]);
-                list_decrypt.push([data_decrypt[index-1],percent_decrypt]);
-                isValidData = true;
-            }
-            catch(err){
-              isValidData = false;
-              break;
-            }
-            
-          }
-        }
-          
-        if (!isValidData){
-           $('#alert-page').html( alert_error+'<p id="alert-page">Unable to decrypt the data'+ alert_end);
-          return null;
-        }
-        
-        // Here we enable the transfer button and disable de decrypt button
-         $("#decrypt").attr("disabled", "true");
-        document.getElementById("transferaction").disabled = false;
-        return list_decrypt; 
-      }
-    }
-
-    function draw_map(){
-      // Create a map graph
-      if(data_country != null && data_country.length > 0){
-        var data = google.visualization.arrayToDataTable(data_country);
-        var options = {};
-        var chart = new google.visualization.GeoChart(document.getElementById('regions_div'));
-        chart.draw(data, options);
-      }
-    }
-
-    function draw_chart() {
-      // Create a pie graph
-      if(data_country != null && data_country.length > 0){
-        var data = google.visualization.arrayToDataTable(data_country);
-        var options = {
-          title: 'Ancestry Chart'
-        };
-        var chart = new google.visualization.PieChart(document.getElementById('piechart'));
-
-        chart.draw(data, options);
-      }
-    }
-
+    
     function map_test(){
       // Create a map graph
       var data = google.visualization.arrayToDataTable([
@@ -1116,11 +1213,8 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
     
     // Events
     $('#decrypt').on('click', function(){
-      data_country = decrypt_data();
-      if(data_country!=null){
-        google.charts.setOnLoadCallback(draw_map);
-        google.charts.setOnLoadCallback(draw_chart);
-      }
+      UIkit.modal($('#pincode_modal')).show();
+      
       
     });
 
@@ -1158,7 +1252,7 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
     var outputContainer = document.getElementById("output");
     var outputMessage = document.getElementById("outputMessage");
     var outputData = document.getElementById("outputData");
-    var pubKey = document.getElementById("newpubkey");
+    
 
 
     $('#modal-transact').on('hide.uk.modal', function(){
@@ -1181,6 +1275,28 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
       document.getElementById('transfer_button').disabled = true;
       $('#alert').html('<p id="alert"></p></div>');
       $('#uploaded_list').html('<div id="uploaded_list"></div>');
+    });
+
+    $('#pincode_modal').on('hide.uk.modal', function(){
+        // custome js code
+        global_pin_code = $('#pin_code1').val();
+        //var pin_code = prompt("Please, enter your PIN CODE");
+        data_country = decrypt_data();
+        if(data_country!=null){
+          google.charts.setOnLoadCallback(draw_map);
+          google.charts.setOnLoadCallback(draw_chart);
+        }
+        
+        
+    });
+
+    $('#pincode_file_modal').on('hide.uk.modal', function(){
+        // custome js code
+        global_pin_code = $('#pin_code2').val();
+        //var pin_code = prompt("Please, enter your PIN CODE");
+        download_decrypt_file(global_file_name);
+        
+        
     });
 
     $('#modal-transact').on('show.uk.modal', function(){
@@ -1220,8 +1336,9 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
             drawLine(code.location.bottomLeftCorner, code.location.topLeftCorner, "#FF3B58");
             outputMessage.hidden = true;
             outputData.parentElement.hidden = false;
-            pubKey.innerText = code.data;
-            validate_transfer();
+
+            get_pub_key_from_addr(code.data);
+            
 
           } else {
             outputMessage.hidden = false;
