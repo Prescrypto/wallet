@@ -356,7 +356,7 @@
             $('#pub_key').val(value);
             var encrypt = new JSEncrypt();
             encrypt.setPublicKey(value);
-            var value_b64 = encrypt.getPublicKeyB64();
+            value_b64 = encrypt.getPublicKeyB64();
             // Get Txs when load page!
             var list_rx = [];
             var pubkey_uri= encodeURIComponent(value_b64).replace(/'/g,"%27").replace(/"/g,"%22");
