@@ -423,7 +423,6 @@
       var rsa = new RSAKey();
       rsa.readPrivateKeyFromPEMString(priv_key);
       var sign_msg = rsa.sign(msg, hash_alg);
-      console.log(sign_msg);
       return sign_msg;
     }
     
