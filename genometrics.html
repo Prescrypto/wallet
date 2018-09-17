@@ -258,6 +258,18 @@
   var pin_hash = pin.toString(CryptoJS.enc.b64);  
   return pin_hash
   }
+  function doVerify(signature, msg, pubkey) {
+
+    var spubkey =   KEYUTIL.getKey(pubkey);
+    var isValid = spubkey.verify(msg, signature);
+
+    // display verification result
+    if (isValid) {
+      return "valid";
+    } else {
+      return "invalid";
+    }
+  }
   function get_addr_from_pub_key(pb_key){
     var encrypt = new JSEncrypt();
     encrypt.setPublicKey(pb_key);
@@ -411,6 +423,7 @@
       var rsa = new RSAKey();
       rsa.readPrivateKeyFromPEMString(priv_key);
       var sign_msg = rsa.sign(msg, hash_alg);
+      console.log(sign_msg);
       return sign_msg;
     }
     
@@ -435,7 +448,13 @@
 
       for (index; index<list_input.length; index++){
         if (index%2){
-          data_payload.push({"country_name":list_input[index-1],"percentage":list_input[index]});
+          if(list_input[index] == "" ||  list_input[index-1] == ""){
+            console.log("no data");
+          }
+          else{
+            data_payload.push({"country_name":list_input[index-1],"percentage":list_input[index]});
+          }
+          
         }
       }
 
@@ -495,6 +514,7 @@
 
       var msg = payload.data;
       var hash_alg = 'sha1';
+
       payload.signature = sign(msg, privkey, hash_alg);
 
       // Make POST

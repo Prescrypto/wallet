@@ -397,32 +397,40 @@
         });
         
         //we push the genomic data into list_decrypt for further uses (transference)
-        for (index; index<data_decrypt.length; index++){
-          if (index%2){
-            var percent_decrypt = 0;
-            var key_data = "";
-            try{
-                if(data_decrypt[index] == null){
-                  isValidData = false;
-                  break;
-                }
-                if(data_decrypt[index] == ""){
-                  percent_decrypt = 0;
-                  key_data = "No Data";
-                }
-                else{
-                  percent_decrypt = parseFloat(data_decrypt[index]);
-                  key_data = data_decrypt[index-1];
-                }
-                
-                list_decrypt.push([key_data,percent_decrypt]);
-                isValidData = true;
+        var percent_decrypt = 0;
+        var key_data = "";
+
+        if(data_decrypt.length < 1){
+          isValidData = true;
+        }
+        else{
+          for (index; index<data_decrypt.length; index++){
+            if (index%2){
+              percent_decrypt = 0;
+              key_data = "";
+              try{
+                  if(data_decrypt[index] == null){
+                    isValidData = false;
+                    break;
+                  }
+                  if(data_decrypt[index] == ""){
+                    percent_decrypt = 0;
+                    key_data = "No Data";
+                  }
+                  else{
+                    percent_decrypt = parseFloat(data_decrypt[index]);
+                    key_data = data_decrypt[index-1];
+                  }
+                  
+                  list_decrypt.push([key_data,percent_decrypt]);
+                  isValidData = true;
+              }
+              catch(err){
+                isValidData = false;
+                break;
+              }
+              
             }
-            catch(err){
-              isValidData = false;
-              break;
-            }
-            
           }
         }
           
