@@ -245,14 +245,14 @@
 
   var tx_files_template = '<tr> \
       <td><%= name %>\
-      <a id="a<%= name %>" href="<%= file %>" download hidden></a>\
+      <a id="a<%= id_name %>" href="<%= file %>" download hidden></a>\
       </td>\
       <td>\
       <a class="uk-icon-button" title="Dowload file: <%= name %>" \
       uk-icon="ratio: 1.2; icon: cloud-download" \
-      onclick="download_url(\'<%= name %>\')"></a>\
-      <a class="uk-icon-button" title="Dowload and Decrypt file: <%= name %>"\
-          uk-icon="ratio: 1.2; icon: unlock" onclick="pincode_for_file(\'<%= name %>\')"></a>\
+      onclick="download_url(\'<%= id_name %>\')"></a>\
+      <a class="uk-icon-button" title="Dowload and Decrypt file: <%= id_name %>"\
+          uk-icon="ratio: 1.2; icon: unlock" onclick="pincode_for_file(\'<%= id_name %>\')"></a>\
         </td> \
       </tr>'
 
@@ -869,6 +869,8 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
       var decrypted_file = null;
       var new_pub_key = $("#newpubkey").val();
       var new_key_file_list = {};
+      var filename = "";
+      var old_name = "";
       
       /* the initialization of uploaded_list is made here so we can have right away the complete list of files to upload not depending on the asynchronous operations*/
       $('#alert').html( alert_success+'<p id="alert">Successfully started the transference'
@@ -877,7 +879,13 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
 
       $.each(key_file_list, function(i, key_file){
         if(i!= 0){
-          var filename = Date.now();
+          
+          var old_name = key_file.split("/")[4];
+          old_name = decodeURIComponent(old_name);
+          var new_name = old_name.split("|")[1];
+
+          var filename = Date.now()+"|"+ new_name.split(".")[0];
+
           var _filetemplate = _.template(file_template);
           var _filecompiled = _filetemplate({"data":{"filename":filename}});
           $('#uploaded_list').append(_filecompiled);
@@ -885,6 +893,7 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
         }
 
       }); 
+   
 
       $.each(new_key_file_list, function(filename, key_file){
 
@@ -896,6 +905,7 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
           Bucket: AWS_BucketName,
           Key: name       
         };
+
         /* The following example retrieves an object for an S3 bucket. */
         bucket.getObject(params, function(err, data) {
           if (err){
@@ -1109,10 +1119,10 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
     var _compiled = _template({"data":data});
     $('#tx_table_content').append(_compiled);
   }
-  function add_tx_files(item_file, name){
+  function add_tx_files(item_file, name, id_name){
     // add a file on markup
     var _template = _.template(tx_files_template);
-    var _compiled = _template({"file":item_file, "name": name});
+    var _compiled = _template({"file":item_file, "name": name, "id_name": id_name});
     $('#tx_table_files').append(_compiled);
   }
 
@@ -1156,10 +1166,11 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
                 }
                 else{
                   // Render the item file
-                  name = item_file.split("/");
-                  name = name.pop() || name.pop(); // handle potential trailing slash
-                  name = decodeURIComponent(name);
-                  add_tx_files(item_file, name);
+                  var id_name = item_file.split("/");
+                  id_name = id_name.pop() || id_name.pop(); // handle potential trailing slash
+                  id_name = decodeURIComponent(id_name);
+                  name = id_name.split("|")[1];
+                  add_tx_files(item_file, name, id_name);
                 }
                 
                 });

@@ -835,9 +835,9 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
     read.readAsText(file);
     read.onload = function(e) {
       var content = e.target.result;
-      var filename = Date.now();//CryptoJS.SHA256(content) + Date.now();
-      var file_id = 'genofile'+file_count;
-      //files_list.push(content);
+
+      var filename = Date.now()+"|"+ file.name.split(".")[0];
+
       files_list[filename] = content;
       
       $('#alert_new').html(alert_success+'<p id="alert_new">File Loaded, waiting to Upload it...'+alert_end);
