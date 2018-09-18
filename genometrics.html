@@ -217,9 +217,9 @@
     };
     var numPartsLeft = 0;
     var multipartResponse = null;
-    var file_template ='<p id="<%= data.filename %>" style="color:#fff;"><%= data.filename %>.txt <span uk-icon="icon: upload"\ style="color:#fff;margin-left:10px;margin-right:10px;"></span><button onclick="remove_file(<%= data.filename %>)" uk-icon="icon:close"\ style="color:#fff;margin-right:10px;"></button></p>';
-    var file_uploaded_template ='<%= data.filename %>.txt <span uk-icon="icon: check"\ style="color:#fff;margin-left:10px;margin-right:10px;"></span>';
-    var file_working_template ='<%= data.filename %>.txt <div style="color:#fff;margin-left:10px;margin-right:10px;" uk-spinner="ratio: 0.5"></div>';
+    var file_template ='<p id="<%= data.filename %>" style="color:#fff;"><%= data.id_name %>.txt <span uk-icon="icon: upload"\ style="color:#fff;margin-left:10px;margin-right:10px;"></span><button onclick="remove_file(<%= data.filename %>)" uk-icon="icon:close"\ style="color:#fff;margin-right:10px;"></button></p>';
+    var file_uploaded_template ='<%= data.id_name %>.txt <span uk-icon="icon: check"\ style="color:#fff;margin-left:10px;margin-right:10px;"></span>';
+    var file_working_template ='<%= data.id_name %>.txt <div style="color:#fff;margin-left:10px;margin-right:10px;" uk-spinner="ratio: 0.5"></div>';
     // Tx template
     var tx_template = '<a id="genome" href="genodetails.html?hash_id=<%= tx.hash_id %>"> \
         <div class="uk-margin"> \
@@ -543,7 +543,7 @@
   }
 
     //Upload file to s3 functions>>>>>>>>
-function completeMultipartUpload(doneParams, fileKey) {
+function completeMultipartUpload(doneParams, fileKey, id_name) {
   //complete the upload of a file when we get to the end
   bucket.completeMultipartUpload(doneParams, function(err, data) {
     if (err) {
@@ -556,7 +556,7 @@ function completeMultipartUpload(doneParams, fileKey) {
       console.log('Final upload');
       try{
           var _filetemplate = _.template(file_uploaded_template);
-          var _filecompiled = _filetemplate({"data":{"filename":fileKey}});
+          var _filecompiled = _filetemplate({"data":{"filename":fileKey, "id_name": id_name}});
           document.getElementById(fileKey).innerHTML = _filecompiled;
           url_files_list.push(decodeURIComponent(data.Location));
           finish_uploads();
@@ -568,7 +568,7 @@ function completeMultipartUpload(doneParams, fileKey) {
     }
   });
 }
-function uploadPart(multipart, partParams, fileKey, tryNum) {
+function uploadPart(multipart, partParams, fileKey, tryNum, id_name) {
   //upload a part from a file sliced by 5mb
     var fileName = AWS_Folder +fileKey+'.txt';
     var tryNum = tryNum || 1;
@@ -597,11 +597,11 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
         UploadId: multipart.UploadId
       };
       console.log("Completing upload...");
-      completeMultipartUpload(doneParams, fileKey);
+      completeMultipartUpload(doneParams, fileKey, id_name);
     });
   }
   
-  function uploadMultipart(fileKey, fileData) {
+  function uploadMultipart(fileKey, fileData, id_name) {
     //upload a file by parts because of the size
     var fileName = AWS_Folder +fileKey+'.txt';
     var fileLength = fileData.length;
@@ -626,7 +626,7 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
                   UploadId: multipart.UploadId
                 };
                 // Send a single part
-                uploadPart(multipart, partParams, fileKey);
+                uploadPart(multipart, partParams, fileKey, id_name);
             }
           }
           catch(err){
@@ -642,7 +642,7 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
       }
     });
   }
-  function uploadNormal(myfile, fileName){
+  function uploadNormal(myfile, fileName, id_name){
      // See the Configuring section to configure credentials in the SDK
     var today = new Date();
     var fileNameNew = AWS_Folder +fileName+'.txt';
@@ -659,7 +659,7 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
       if(data){
         try{
           var _filetemplate = _.template(file_uploaded_template);
-          var _filecompiled = _filetemplate({"data":{"filename":fileName}});
+          var _filecompiled = _filetemplate({"data":{"filename":fileName,"id_name": id_name}});
           document.getElementById(fileName).innerHTML = _filecompiled;
           url_files_list.push(data.Location);
           finish_uploads();
@@ -787,16 +787,17 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
     encryption_secret_key = encrypt_string(new_key, pub_key);
 
     $.each(my_files_list, function(key, value) {
+      var id_name = key.split("|")[1];
       var _filetemplate = _.template(file_working_template);
-      var _filecompiled = _filetemplate({"data":{"filename":key}});
+      var _filecompiled = _filetemplate({"data":{"filename":key, "id_name": id_name}});
       document.getElementById(key).innerHTML = _filecompiled;
 
       encrypted_file = ecrypt_file_symm(value, new_key); 
       if(encrypted_file.length > partSize){
-        uploadMultipart(key, encrypted_file);
+        uploadMultipart(key, encrypted_file, id_name);
       }
       else{
-        uploadNormal(encrypted_file, key);
+        uploadNormal(encrypted_file, key, id_name);
       }
     });
     
@@ -835,14 +836,15 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
     read.readAsText(file);
     read.onload = function(e) {
       var content = e.target.result;
-      var filename = Date.now();//CryptoJS.SHA256(content) + Date.now();
-      var file_id = 'genofile'+file_count;
-      //files_list.push(content);
+      var id_name = file.name.split(".")[0];
+
+      var filename = Date.now()+"|"+ id_name ;
+
       files_list[filename] = content;
       
       $('#alert_new').html(alert_success+'<p id="alert_new">File Loaded, waiting to Upload it...'+alert_end);
       var _filetemplate = _.template(file_template);
-      var _filecompiled = _filetemplate({"data":{"filename":filename}});
+      var _filecompiled = _filetemplate({"data":{"filename":filename, "id_name": id_name}});
       $('#uploaded_list').append(_filecompiled);
       file_count++;      
       
