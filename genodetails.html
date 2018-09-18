@@ -1156,20 +1156,28 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
               // Add tx to template
               add_tx_markup(item);
             });
+
             if (data.files != null || data.files != {}){
                TX_FILE_LIST= data.files;
 
                data.files.forEach(function(item_file, i){
                 var name = "";
-                if(i == 0){
+                if(data.readable == true && i == 0){
                   actual_secret_key = item_file; // we save the encrypted key to decrypt this files
                 }
                 else{
-                  // Render the item file
-                  var id_name = item_file.split("/");
-                  id_name = id_name.pop() || id_name.pop(); // handle potential trailing slash
-                  id_name = decodeURIComponent(id_name);
-                  name = id_name.split("|")[1];
+                  var id_name="";
+                  if(item_file.indexOf("/") > 0){
+                    // Render the item file
+                    id_name = item_file.split("/");
+                    id_name = id_name.pop() || id_name.pop(); // handle potential trailing slash
+                    id_name = decodeURIComponent(id_name);
+                    name = id_name.split("|")[1];
+                    
+                  }
+                  else{
+                    id_name = name = item_file;
+                  }
                   add_tx_files(item_file, name, id_name);
                 }
                 
