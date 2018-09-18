@@ -245,13 +245,13 @@
 
   var tx_files_template = '<tr> \
       <td><%= name %>\
-      <a id="a<%= id_name %>" href="<%= file %>" download hidden></a>\
+      <a href="<%= file %>" id="a<%= id_name %>"  download="<%= name %>"></a>\
       </td>\
       <td>\
       <a class="uk-icon-button" title="Dowload file: <%= name %>" \
       uk-icon="ratio: 1.2; icon: cloud-download" \
       onclick="download_url(\'<%= id_name %>\')"></a>\
-      <a class="uk-icon-button" title="Dowload and Decrypt file: <%= id_name %>"\
+      <a class="uk-icon-button" title="Dowload and Decrypt file: <%= name %>"\
           uk-icon="ratio: 1.2; icon: unlock" onclick="pincode_for_file(\'<%= id_name %>\')"></a>\
         </td> \
       </tr>'
@@ -883,8 +883,9 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
           var old_name = key_file.split("/")[4];
           old_name = decodeURIComponent(old_name);
           var new_name = old_name.split("|")[1];
+          var id_name = new_name.split(".")[0];
 
-          var filename = Date.now()+"|"+ new_name.split(".")[0];
+          var filename = Date.now()+"|"+ id_name;
 
           var _filetemplate = _.template(file_template);
           var _filecompiled = _filetemplate({"data":{"filename":filename}});
@@ -1031,6 +1032,10 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
     var privkey = null;
     var decrypted_file = "";
     var pin_flag = true;
+    var id_name =  "";
+    if(filename.indexOf("|") > 0){
+      id_name = filename.split("|")[1];
+    }
 
     if(global_file_name != ""){
       if (global_pin_code.length==4){
@@ -1070,7 +1075,7 @@ function uploadPart(multipart, partParams, fileKey, tryNum) {
             var cipherfile = data.Body.toString('utf-8');
             var decrypted_secret_key = decrypt_string(actual_secret_key, privkey);
             decrypted_file = decrypt_file_symm(cipherfile, decrypted_secret_key); 
-            download_file(decrypted_file, filename, "text/plain");
+            download_file(decrypted_file, id_name, "text/plain");
 
           }
           catch(err){
