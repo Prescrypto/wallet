@@ -560,18 +560,13 @@
         </div>';
 
       var index = 1;
-      var data_payload = [];
+      var data_payload = {};
       var payload = new Object();
       var form_pin = ($('#pin').val()).toString();
       var form_memo = $('#memo').val();
 
       if (validate_key("#newpubkey") && validate_key("#priv_key")){
-        for (index; index<list_decrypt.length; index++){
-          var index2 = 0
-            var templist = list_decrypt[index]
-            data_payload.push({"country_name":templist[0],"percentage":templist[1]});
-        }
-        
+        data_payload = DATA;
         var prk = $('#priv_key').val();
         var privkey = null;
         var pin_flag = true;
@@ -604,15 +599,9 @@
           var txid = searchParams.get('hash_id');
           payload.previous_hash = txid;
         }
-        if(form_memo.length > 0){
-          payload.memo = encrypt.encrypt(form_memo);
-        }
 
         encrypt.setPublicKey(new_pub_key);
-        for (index_encrypt; index_encrypt<data_payload.length; index_encrypt++){
-          data_payload[index_encrypt].country_name = encrypt.encrypt(data_payload[index_encrypt].country_name);
-          data_payload[index_encrypt].percentage = encrypt.encrypt(data_payload[index_encrypt].percentage.toString());
-        }
+     
 
 
         // Make payload
