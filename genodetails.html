@@ -158,6 +158,7 @@
   var global_pin_code = "";
   var global_file_name = "";
   var list_decrypt = [];
+  var DATA = {};
 
   var encryption_secret_key = ""; // the new key to decrypt the files
   var actual_secret_key = ""; //the encrypted key to decrypt the files
@@ -213,26 +214,103 @@
     var pin_hash = pin.toString(CryptoJS.enc.b64);  
     return pin_hash
   }
-  function decrypt_json(jsondata, sub_fields_list){
 
-    if($.isArray(jsondata)){
-      $.each(jsondata, function(i, jsonitem){
-        $.each(jsonitem, function(key, value){
-          //if(sub_fields_list.length > 0 && ) 
+  function decrypt_json(jsondata, sub_fields_list, decrypt_fields_list){
+      var new_jsondata = {};
+
+      if(!validate_key("#priv_key")){
+        console.log("No Priv Key found");
+        $('#alert-page').html(alert_not_found);
+        document.getElementById("transferaction").disabled = true;
+        return null;
+
+      }
+      else{
+
+        var privkey_encrypt =  $("#priv_key").val(); 
+        var pin_flag = true;
+        var privkey = null;
+        var decrypt = new JSEncrypt();
+        
+        if (global_pin_code.length==4){
+          if (validate_pin(global_pin_code)){
+            var privkey_decrypt = CryptoJS.AES.decrypt(privkey_encrypt, hash_string(global_pin_code));
+            try{
+              privkey = privkey_decrypt.toString(CryptoJS.enc.Utf8);
+              pin_flag = false
+            }catch(err){
+              alert("PIN CODE invalid");
+
+              console.log(err);
+              //return null;  
+            }                            
+          }
+        }else{
+          document.getElementById("transferaction").disabled = true;
+          alert("PIN CODE invalid");
+          return null;
+        }
+
+        if(privkey == null){
+          document.getElementById("transferaction").disabled = true;
+          alert("Private key invalid");
+          return null;
+        }
+
+        decrypt.setPrivateKey(privkey);
+
+        global_pin_code = "";
+        var jsonvalue = {};
+        
+        $.each(jsondata, function(key, value){
+          
+          if(sub_fields_list.includes(key)){
+            var sub_array = [];
+            if(Array.isArray(value)){
+              $.each(value, function(i, subjson){
+                var sub_jsonvalue = {};
+                $.each(subjson, function(subkey, subvalue){
+              
+                  if(decrypt_fields_list.includes(subkey)){
+                    sub_jsonvalue[subkey] = decrypt.decrypt(subvalue);
+                
+                  }
+                  else{
+                    sub_jsonvalue[subkey] = subvalue;
+                  }
+                  
+                  sub_array.push(sub_jsonvalue);
+
+                });
+                
+              });
+              jsonvalue[key] = sub_array;
+
+            }
+           
+          }
+          else{
+            if(decrypt_fields_list.includes(key)){
+              jsonvalue[key] = decrypt.decrypt(value);
+    
+            }
+            else{
+               jsonvalue[key] = value;
+            }
+          
+          }
+
+          
 
         });
-        
-      });
-
-    }else{
-      $.each(jsondata, function(key, value){
-        console.log(key);
-        console.log(value);
 
 
-      });
+      }//if private key is ok
+      
+      add_tx_markup(jsonvalue);
 
-    }
+
+
 
     
 
@@ -622,6 +700,7 @@
   function add_tx_markup(data){
     // A tx data provided compile and render item
     $('#non-item').remove();
+    $('#datajson').empty();
     var _template = _.template(tx_data_template);
     var _compiled = _template({"data":JSON.stringify(data,null, 2)});
     $('#datajson').append(_compiled);
@@ -642,43 +721,39 @@
 
       };
 
-  function getTxData(){
+    function getTxData(){
         // Render Tx Data on form
-        var searchParams = new URLSearchParams(window.location.search);
-        var url = window.baseurl + "api/v1/rx-endpoint/"
-        if(searchParams.has("hash_id")){
-          url += searchParams.get('hash_id');
-          console.log(url);
-          $.get(url, function(data) {
-          // Get data from server
-          if (data.length == 0){
-            // Render no tx label
-            $("#datajson").html("<span id='non-item'>Without data :( Something missing!</span>");
-          }else{
-            add_tx_markup(data.data);
-
-            decrypt_json(data.data, []);
-
-            var color= "#fff";
-            if(data.readable == true){
-              color= "#d9f7ec";
-            }
-            else{
-              color= "#f5c5d2";
-            }
-
-            $("#readable_status").html('<div id="readable_status"><p style="background-color:'+color+';color:#000">Readable: '+data.readable+'</p></div>');
-            genomic_status = data.readable;
-          }
-          console.log("Finish get!");
-        });
-        }
-      };
-      setKeys();
-      getTxData();
+          // Render Tx Data on form
+      var searchParams = new URLSearchParams(window.location.search);
+      var url = window.baseurl + "api/v1/rx-endpoint/"
+      if(searchParams.has("hash_id")){
+        url = url+ searchParams.get('hash_id') + "/";
+      }
+      else{
+        return null;
+      }
 
 
-    })($, localforage);
+      var geting = $.get(url);
+      geting.done(function(data, text_status){
+        DATA = data;
+        add_tx_markup(data);
+      });
+      geting.fail(function(xhr, textStatus, errorThrown){
+            console.log(errorThrown, textStatus, xhr);
+      });
+        
+    };
+    setKeys();
+    getTxData();
+
+
+  })($, localforage);
+
+                
+
+               
+
 
     // Functions
 
@@ -694,14 +769,10 @@
     .addEventListener('change', read_pubkey_file, false);
 
     $('#transferdata').on('click', function(){
-       if($('p', '#uploaded_list').length < 1){
+      
         //if there are no files then upload the percentages
         transfer_data();
-      }
-      else{
-        //if there are files then upload it first
-        start_transfering_files();
-      }
+      
       
       
       
@@ -750,7 +821,10 @@
         // custome js code
         global_pin_code = $('#pin_code1').val();
         //var pin_code = prompt("Please, enter your PIN CODE");
-        data_country = decrypt_data();
+        var sub_fields = ["medications"];
+        var decrypt_fields = ["medic_name","medic_cedula","patient_name","patient_age","diagnosis"];
+        decrypt_json(DATA, sub_fields, decrypt_fields);
+        //data_country = decrypt_data();
         
         
         
