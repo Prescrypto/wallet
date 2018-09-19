@@ -221,12 +221,12 @@
     var file_uploaded_template ='<%= data.id_name %>.txt <span uk-icon="icon: check"\ style="color:#fff;margin-left:10px;margin-right:10px;"></span>';
     var file_working_template ='<%= data.id_name %>.txt <div style="color:#fff;margin-left:10px;margin-right:10px;" uk-spinner="ratio: 0.5"></div>';
     // Tx template
-    var tx_template = '<a id="genome" href="genodetails.html?hash_id=<%= tx.hash_id %>"> \
+    var tx_template = '<a id="genome" href="genodetails.html?hash_id=<%= tx.rxid %>"> \
         <div class="uk-margin"> \
           <div class="uk-card uk-card-default uk-card-body uk-card-small" > \
             <div class="uk-column-1-2"> \
               <img align="center" src="media/dna-icon.png" style="background-color: <%= txcolor %>;color:#fff"> \
-              <p id="geno_p"><span id="genotitle"><%= tx.timestamp %> Readable: <%= tx.readable %></span><br><%= tx.hash_id %></p> \
+              <p id="geno_p"><span id="genotitle"><%= tx.timestamp %> Readable: <%= tx.readable %></span><br><%= tx.rxid %></p> \
             </div> \
           </div> \
         </div> \
