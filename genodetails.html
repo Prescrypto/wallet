@@ -159,6 +159,8 @@
   var global_file_name = "";
   var list_decrypt = [];
   var DATA = {};
+  var DATA_DECRYPTED = {};
+  var RSA_ALG = "RSAOAEP"; //this is the RSA standar for encryptation
 
   var encryption_secret_key = ""; // the new key to decrypt the files
   var actual_secret_key = ""; //the encrypted key to decrypt the files
@@ -215,83 +217,158 @@
     return pin_hash
   }
 
-  function decrypt_json(jsondata, sub_fields_list, decrypt_fields_list){
+  function decrypt_json(jsondata, sub_fields_list, decrypt_fields_list, privkey){
       var new_jsondata = {};
+      var rsa = new RSAKey();
 
-      if(!validate_key("#priv_key")){
-        console.log("No Priv Key found");
-        $('#alert-page').html(alert_not_found);
-        document.getElementById("transferaction").disabled = true;
-        return null;
+      
 
+      if(privkey != null && privkey != ""){
+        console.log("private key already loaded");
       }
       else{
 
-        var privkey_encrypt =  $("#priv_key").val(); 
-        var pin_flag = true;
-        var privkey = null;
-        var decrypt = new JSEncrypt();
-        
-        if (global_pin_code.length==4){
-          if (validate_pin(global_pin_code)){
-            var privkey_decrypt = CryptoJS.AES.decrypt(privkey_encrypt, hash_string(global_pin_code));
-            try{
-              privkey = privkey_decrypt.toString(CryptoJS.enc.Utf8);
-              pin_flag = false
-            }catch(err){
-              alert("PIN CODE invalid");
+        if(!validate_key("#priv_key")){
+          console.log("No Priv Key found");
+          $('#alert-page').html(alert_not_found);
+          document.getElementById("transferaction").disabled = true;
+          return null;
 
-              console.log(err);
-              //return null;  
-            }                            
+        }
+        else{
+
+          var privkey_encrypt =  $("#priv_key").val(); 
+          var pin_flag = true;
+          privkey = null;
+          
+          
+          if (global_pin_code.length==4){
+            if (validate_pin(global_pin_code)){
+              var privkey_decrypt = CryptoJS.AES.decrypt(privkey_encrypt, hash_string(global_pin_code));
+              try{
+                privkey = privkey_decrypt.toString(CryptoJS.enc.Utf8);
+                pin_flag = false
+              }catch(err){
+                alert("PIN CODE invalid");
+                document.getElementById("transferaction").disabled = true;
+                console.log(err);
+                return null;  
+              }                            
+            }
+          }else{
+            document.getElementById("transferaction").disabled = true;
+            alert("PIN CODE invalid");
+            return null;
           }
-        }else{
-          document.getElementById("transferaction").disabled = true;
-          alert("PIN CODE invalid");
-          return null;
+
+          if(privkey == null){
+            document.getElementById("transferaction").disabled = true;
+            alert("Private key invalid");
+            return null;
+          }
+
+       }
+     }//if private key is already defined
+
+      rsa.readPrivateKeyFromPEMString(privkey);
+
+
+      global_pin_code = "";
+      var jsonvalue = {};
+      
+      $.each(jsondata, function(key, value){
+        
+        if(sub_fields_list.includes(key)){
+          var sub_array = [];
+          if(Array.isArray(value)){
+
+            
+            $.each(value, function(i, subjson){
+              var sub_jsonvalue = {};
+              $.each(subjson, function(subkey, subvalue){
+                
+                if(decrypt_fields_list.includes(subkey)){
+                  sub_jsonvalue[subkey] = KJUR.crypto.Cipher.decrypt(value, rsa, RSA_ALG);
+              
+                }
+                else{
+                  sub_jsonvalue[subkey] = subvalue;
+                }
+
+
+              });
+              sub_array.push(sub_jsonvalue);
+              
+            });
+
+            jsonvalue[key] = sub_array;
+
+          }
+         
+        }
+        else{
+          if(decrypt_fields_list.includes(key)){
+
+            jsonvalue[key] = KJUR.crypto.Cipher.decrypt(value, rsa, RSA_ALG);
+
+  
+          }
+          else{
+             jsonvalue[key] = value;
+          }
+        
         }
 
-        if(privkey == null){
-          document.getElementById("transferaction").disabled = true;
-          alert("Private key invalid");
-          return null;
-        }
+        
 
-        decrypt.setPrivateKey(privkey);
+      });
 
-        global_pin_code = "";
-        var jsonvalue = {};
+
+      
+      return jsonvalue;
+
+  }
+
+  function encrypt_payload(jsondata, sub_fields_list, encrypt_fields_list, pubkey){
+    //var rsa = new RSAKey();
+    var jsonvalue = {};
+    var rsa = KEYUTIL.getKey(pubkey);
+
+
+    console.log("encryption");
         
         $.each(jsondata, function(key, value){
           
           if(sub_fields_list.includes(key)){
             var sub_array = [];
             if(Array.isArray(value)){
+              
               $.each(value, function(i, subjson){
                 var sub_jsonvalue = {};
                 $.each(subjson, function(subkey, subvalue){
               
-                  if(decrypt_fields_list.includes(subkey)){
-                    sub_jsonvalue[subkey] = decrypt.decrypt(subvalue);
-                
+                  if(encrypt_fields_list.includes(subkey)){
+                    sub_jsonvalue[subkey] = KJUR.crypto.Cipher.encrypt(subvalue, rsa, RSA_ALG);
                   }
                   else{
                     sub_jsonvalue[subkey] = subvalue;
                   }
                   
-                  sub_array.push(sub_jsonvalue);
+                  
 
                 });
+                sub_array.push(sub_jsonvalue);
                 
               });
-              jsonvalue[key] = sub_array;
+              jsonvalue[key] = JSON.stringify(sub_array);
 
             }
            
           }
           else{
-            if(decrypt_fields_list.includes(key)){
-              jsonvalue[key] = decrypt.decrypt(value);
+            if(encrypt_fields_list.includes(key)){
+
+              jsonvalue[key] = KJUR.crypto.Cipher.encrypt(value, rsa, RSA_ALG);
     
             }
             else{
@@ -303,16 +380,57 @@
           
 
         });
+        return jsonvalue;
+  }
 
+  function filter_keys(jsondata, discard_key_list, sub_fields_list){
+    var jsonvalue = {};
+        
+        $.each(jsondata, function(key, value){
+          
+          if(sub_fields_list.includes(key)){
+            var sub_array = [];
+            if(Array.isArray(value)){
 
-      }//if private key is ok
-      
-      add_tx_markup(jsonvalue);
+              $.each(value, function(i, subjson){
+                var sub_jsonvalue = {};
+                $.each(subjson, function(subkey, subvalue){
+              
+                  if(discard_key_list.includes(subkey)){
+                    //discard this key and value
+                    console.log(subkey);
+                
+                  }
+                  else{
+                    sub_jsonvalue[subkey] = subvalue;
+                  }
+                  
+                  
 
+                });
+                sub_array.push(sub_jsonvalue);
+                
+              });
+              jsonvalue[key] = sub_array;
 
+            }
+           
+          }
+          else{
+             if(discard_key_list.includes(key)){
+                    //discard this key and value
+                  console.log(key);
+            }
+            else{
+               jsonvalue[key] = value;
+            }
+          
+          }
 
+          
 
-    
+        });
+        return jsonvalue;
 
   }
 
@@ -456,8 +574,8 @@
 
 
   function validate_transfer(){
-    var transfer_button = '<button id="transferdata" onclick="start_transfering_files()" class="uk-button uk-button-default" style="font-weight: 700;background-color: #3C3C3C; color:#fff;"> Transfer </button>';
-    var transfer_button_disabled = '<button id="transferdata" onclick="start_transfering_files()" class="uk-button uk-button-default" style="font-weight: 700;background-color: #fff; color:#3C3C3C;" disabled> Transfer </button>';
+    var transfer_button = '<button id="transferdata" onclick="transfer_data()" class="uk-button uk-button-default" style="font-weight: 700;background-color: #3C3C3C; color:#fff;"> Transfer </button>';
+    var transfer_button_disabled = '<button id="transferdata" onclick="transfer_data()" class="uk-button uk-button-default" style="font-weight: 700;background-color: #fff; color:#3C3C3C;" disabled> Transfer </button>';
 
     var alert_key = '<div  class="uk-alert-danger" uk-alert>\
       <a class="uk-alert-close" uk-close></a>\
@@ -560,18 +678,18 @@
         </div>';
 
       var index = 1;
-      var data_payload = {};
+      var new_payload = {};
       var payload = new Object();
       var form_pin = ($('#pin').val()).toString();
       var form_memo = $('#memo').val();
 
       if (validate_key("#newpubkey") && validate_key("#priv_key")){
-        data_payload = DATA;
+        
         var prk = $('#priv_key').val();
         var privkey = null;
         var pin_flag = true;
 
-        while (pin_flag){
+
           if(form_pin.length == 4){
             var privkey_decrypt = CryptoJS.AES.decrypt(prk, hash_string(form_pin));
             try{
@@ -586,40 +704,53 @@
             alert("PIN CODE invalid. Please enter a PIN with four digits, try again.");
             return;
           }
-        }   
+          
 
         // Encrypt data
         var encrypt = new JSEncrypt();
         var index_encrypt = 0;
         var new_pub_key = $("#newpubkey").val();
 
-        var searchParams = new URLSearchParams(window.location.search);
-
-        if(searchParams.has("hash_id")){
-          var txid = searchParams.get('hash_id');
-          payload.previous_hash = txid;
-        }
+        
 
         encrypt.setPublicKey(new_pub_key);
+        var discard_key_list=["id","drug_upc","public_key", "signature", "location","is_valid","transaction","readable","rxid","raw_size"];
+        var sub_fields = ["medications"];
+        var decrypt_fields = ["medic_name","medic_cedula","patient_name","patient_age","diagnosis"];
+
      
+        new_payload = filter_keys(DATA_DECRYPTED, discard_key_list, sub_fields);
+        
+
+        new_payload = encrypt_payload(new_payload, sub_fields, decrypt_fields, new_pub_key);
+        
 
 
         // Make payload
         var today = new Date();
         var times = today.toISOString();
 
-        payload.timestamp = times;
-        payload.public_key = encrypt.getPublicKeyB64();
-        payload.data = JSON.stringify(data_payload);
-        payload.location = "Mexico";
+        var searchParams = new URLSearchParams(window.location.search);
 
-        var msg = payload.data;
+        if(searchParams.has("hash_id")){
+          var txid = searchParams.get('hash_id');
+          console.log(txid);
+          new_payload["previous_hash"] = txid;
+        }
+
+        new_payload["timestamp"] = times;
+        new_payload["public_key"] = encrypt.getPublicKeyB64();
+        new_payload["location"] = "Mexico";
+
+        var msg = JSON.stringify(new_payload);
         var hash_alg = 'sha1';
 
-        payload.signature = sign(msg, privkey, hash_alg);
+        new_payload["signature"] = sign(msg, privkey, hash_alg);
+
+        console.log(new_payload);
 
         // Make POST
-        var posting = $.post(window.baseurl + "api/v1/rx-endpoint/", payload);
+        var posting = $.post(window.baseurl + "api/v1/rx-endpoint/", new_payload);
 
         posting.done(function(data, text_status){
           console.log("Transfer success!");
@@ -812,7 +943,10 @@
         //var pin_code = prompt("Please, enter your PIN CODE");
         var sub_fields = ["medications"];
         var decrypt_fields = ["medic_name","medic_cedula","patient_name","patient_age","diagnosis"];
-        decrypt_json(DATA, sub_fields, decrypt_fields);
+        DATA_DECRYPTED = decrypt_json(DATA, sub_fields, decrypt_fields, "");
+
+        document.getElementById("transferaction").disabled = false;
+        add_tx_markup(DATA_DECRYPTED);
         //data_country = decrypt_data();
         
         
