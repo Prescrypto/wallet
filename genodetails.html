@@ -151,6 +151,7 @@
   <script src="js/jsQR.js"></script>
   <script src="https://sdk.amazonaws.com/js/aws-sdk-2.7.18.min.js"></script>
   <script src="js/config_aws.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script>
   // Global variables
 
@@ -221,8 +222,6 @@
       var new_jsondata = {};
       var rsa = new RSAKey();
 
-      
-
       if(privkey != null && privkey != ""){
         console.log("private key already loaded");
       }
@@ -270,61 +269,36 @@
        }
      }//if private key is already defined
 
-      rsa.readPrivateKeyFromPEMString(privkey);
+     try{
 
+      rsa.readPrivateKeyFromPEMString(privkey);
 
       global_pin_code = "";
       var jsonvalue = {};
       
       $.each(jsondata, function(key, value){
         
-        if(sub_fields_list.includes(key)){
-          var sub_array = [];
-          if(Array.isArray(value)){
-
-            
-            $.each(value, function(i, subjson){
-              var sub_jsonvalue = {};
-              $.each(subjson, function(subkey, subvalue){
-                
-                if(decrypt_fields_list.includes(subkey)){
-                  sub_jsonvalue[subkey] = KJUR.crypto.Cipher.decrypt(value, rsa, RSA_ALG);
-              
-                }
-                else{
-                  sub_jsonvalue[subkey] = subvalue;
-                }
-
-
-              });
-              sub_array.push(sub_jsonvalue);
-              
-            });
-
-            jsonvalue[key] = sub_array;
-
-          }
-         
-        }
-        else{
+       
           if(decrypt_fields_list.includes(key)){
 
             jsonvalue[key] = KJUR.crypto.Cipher.decrypt(value, rsa, RSA_ALG);
 
-  
           }
           else{
              jsonvalue[key] = value;
           }
-        
-        }
-
-        
 
       });
 
+    }
+    catch(err){
+      console.log(err);
+       $('#alert-page').html( alert_error+'<p id="alert-page">Unable to decrypt the data'+ alert_end);
+           document.getElementById("transferaction").disabled = true;
+        jsonvalue = DATA;
 
-      
+    }
+
       return jsonvalue;
 
   }
@@ -333,53 +307,21 @@
     //var rsa = new RSAKey();
     var jsonvalue = {};
     var rsa = KEYUTIL.getKey(pubkey);
-
-
-    console.log("encryption");
         
         $.each(jsondata, function(key, value){
           
-          if(sub_fields_list.includes(key)){
-            var sub_array = [];
-            if(Array.isArray(value)){
-              
-              $.each(value, function(i, subjson){
-                var sub_jsonvalue = {};
-                $.each(subjson, function(subkey, subvalue){
-              
-                  if(encrypt_fields_list.includes(subkey)){
-                    sub_jsonvalue[subkey] = KJUR.crypto.Cipher.encrypt(subvalue, rsa, RSA_ALG);
-                  }
-                  else{
-                    sub_jsonvalue[subkey] = subvalue;
-                  }
-                  
-                  
-
-                });
-                sub_array.push(sub_jsonvalue);
-                
-              });
-              jsonvalue[key] = JSON.stringify(sub_array);
-
-            }
-           
-          }
-          else{
             if(encrypt_fields_list.includes(key)){
-
               jsonvalue[key] = KJUR.crypto.Cipher.encrypt(value, rsa, RSA_ALG);
-    
             }
             else{
+
                jsonvalue[key] = value;
             }
-          
-          }
-
-          
 
         });
+
+        jsonvalue["medications"] = jsonvalue.medications;
+
         return jsonvalue;
   }
 
@@ -398,35 +340,27 @@
               
                   if(discard_key_list.includes(subkey)){
                     //discard this key and value
-                    console.log(subkey);
-                
                   }
                   else{
                     sub_jsonvalue[subkey] = subvalue;
                   }
-                  
-                  
-
                 });
                 sub_array.push(sub_jsonvalue);
                 
               });
               jsonvalue[key] = sub_array;
-
             }
            
           }
           else{
              if(discard_key_list.includes(key)){
                     //discard this key and value
-                  console.log(key);
             }
             else{
                jsonvalue[key] = value;
             }
           
           }
-
           
 
         });
@@ -711,20 +645,14 @@
         var index_encrypt = 0;
         var new_pub_key = $("#newpubkey").val();
 
-        
-
         encrypt.setPublicKey(new_pub_key);
         var discard_key_list=["id","drug_upc","public_key", "signature", "location","is_valid","transaction","readable","rxid","raw_size"];
         var sub_fields = ["medications"];
         var decrypt_fields = ["medic_name","medic_cedula","patient_name","patient_age","diagnosis"];
-
      
         new_payload = filter_keys(DATA_DECRYPTED, discard_key_list, sub_fields);
-        
 
         new_payload = encrypt_payload(new_payload, sub_fields, decrypt_fields, new_pub_key);
-        
-
 
         // Make payload
         var today = new Date();
@@ -734,7 +662,6 @@
 
         if(searchParams.has("hash_id")){
           var txid = searchParams.get('hash_id');
-          console.log(txid);
           new_payload["previous_hash"] = txid;
         }
 
@@ -747,23 +674,18 @@
 
         new_payload["signature"] = sign(msg, privkey, hash_alg);
 
-        console.log(new_payload);
-
-        // Make POST
-        var posting = $.post(window.baseurl + "api/v1/rx-endpoint/", new_payload);
-
-        posting.done(function(data, text_status){
-          console.log("Transfer success!");
-          window.open("./genometrics.html", "_self");
-        });
-
-        posting.fail(function(xhr, textStatus, errorThrown){
-          console.log("Transfer has been failed");
-          $('#alert').html(alert_fail);
-        });
-        posting.always(function(){
-          // Finish POST!
-          console.log("Finish Transfer!");
+        var url_ = window.baseurl + "api/v1/rx-endpoint/";
+        
+        axios({
+          method:'post',
+          url: url_,
+          headers: {
+              'Content-Type': 'application/json'
+          },
+          data: new_payload
+        }).then(function(response) {
+          //the transference was done correctly
+          //console.log(response.data);
         });
 
       }
@@ -775,8 +697,6 @@
       }
 
   }
-
-  
    
 
   function download_file(text, name, type) {
@@ -940,16 +860,13 @@
     $('#pincode_modal').on('hide.uk.modal', function(){
         // custome js code
         global_pin_code = $('#pin_code1').val();
-        //var pin_code = prompt("Please, enter your PIN CODE");
+
         var sub_fields = ["medications"];
         var decrypt_fields = ["medic_name","medic_cedula","patient_name","patient_age","diagnosis"];
         DATA_DECRYPTED = decrypt_json(DATA, sub_fields, decrypt_fields, "");
 
         document.getElementById("transferaction").disabled = false;
         add_tx_markup(DATA_DECRYPTED);
-        //data_country = decrypt_data();
-        
-        
         
     });
 
