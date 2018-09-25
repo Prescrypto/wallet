@@ -572,29 +572,24 @@
     return decrypt.decrypt(mystring);
   }
   function get_pub_key_from_addr(pb_address){
-      var geting = $.get(window.baseurl + "api/v1/address/"+pb_address);
-
-      geting.done(function(data, text_status){
-        // when its done
-        if(data == null || data == ""){
+      var url_ = window.baseurl + "api/v1/address/"+pb_address+"/";
+        axios({
+          method:'get',
+          url: url_,
+          headers: {
+              'Content-Type': 'application/json'
+          }
+        }).then(function(response) {
+          var data = response.data;
+          if(data == null || data == ""){
           console.log("incorrect QR code");
           $('#alert').html(alert_error+'<p id="alert">Error, Incorrect QR! '+alert_end);
-
         }
         else{
           $("#newpubkey").val(data.pub_key);
           validate_transfer();
         }
-        
-      });
-      geting.fail(function(xhr, textStatus, errorThrown){
-        console.log(xhr.responseText);
-        $('#alert').html(alert_error+'<p id="alert">Error, Incorrect QR! '+alert_end);
-      });
-      geting.always(function(){
-        // Finish POST!
-      });
-
+        });
     }
 
 
