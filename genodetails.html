@@ -10,7 +10,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.5/js/uikit.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.5/js/uikit-icons.min.js"></script>
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
- 
+
 </head>
 <body>
   <!-- Main menu -->
@@ -102,7 +102,7 @@
                   <div id="transfer_button">
                     <button id="transferdata"  class="uk-button uk-button-default" style="font-weight: 700;background-color: #fff; color:#3C3C3C;" disabled> Transfer </button>
                   </div>
-                
+
             </div>
         </div>
       </div>
@@ -173,7 +173,7 @@
 
   var tx_data_template = '<pre><%= data %></pre>'
 
- 
+
   $(document).ready(function() {
     var searchParams = new URLSearchParams(window.location.search);
 
@@ -214,7 +214,7 @@
   function hash_string(value){
     //This method calculate hash for the  value from pin
     var pin = CryptoJS.SHA256(value);
-    var pin_hash = pin.toString(CryptoJS.enc.b64);  
+    var pin_hash = pin.toString(CryptoJS.enc.b64);
     return pin_hash
   }
 
@@ -236,11 +236,11 @@
         }
         else{
 
-          var privkey_encrypt =  $("#priv_key").val(); 
+          var privkey_encrypt =  $("#priv_key").val();
           var pin_flag = true;
           privkey = null;
-          
-          
+
+
           if (global_pin_code.length==4){
             if (validate_pin(global_pin_code)){
               var privkey_decrypt = CryptoJS.AES.decrypt(privkey_encrypt, hash_string(global_pin_code));
@@ -251,8 +251,8 @@
                 alert("PIN CODE invalid");
                 document.getElementById("transferaction").disabled = true;
                 console.log(err);
-                return null;  
-              }                            
+                return null;
+              }
             }
           }else{
             document.getElementById("transferaction").disabled = true;
@@ -275,10 +275,10 @@
 
       global_pin_code = "";
       var jsonvalue = {};
-      
+
       $.each(jsondata, function(key, value){
-        
-       
+
+
           if(decrypt_fields_list.includes(key)){
 
             jsonvalue[key] = KJUR.crypto.Cipher.decrypt(value, rsa, RSA_ALG);
@@ -307,9 +307,9 @@
     //var rsa = new RSAKey();
     var jsonvalue = {};
     var rsa = KEYUTIL.getKey(pubkey);
-        
+
         $.each(jsondata, function(key, value){
-          
+
             if(encrypt_fields_list.includes(key)){
               jsonvalue[key] = KJUR.crypto.Cipher.encrypt(value, rsa, RSA_ALG);
             }
@@ -327,9 +327,9 @@
 
   function filter_keys(jsondata, discard_key_list, sub_fields_list){
     var jsonvalue = {};
-        
+
         $.each(jsondata, function(key, value){
-          
+
           if(sub_fields_list.includes(key)){
             var sub_array = [];
             if(Array.isArray(value)){
@@ -337,7 +337,7 @@
               $.each(value, function(i, subjson){
                 var sub_jsonvalue = {};
                 $.each(subjson, function(subkey, subvalue){
-              
+
                   if(discard_key_list.includes(subkey)){
                     //discard this key and value
                   }
@@ -346,11 +346,11 @@
                   }
                 });
                 sub_array.push(sub_jsonvalue);
-                
+
               });
               jsonvalue[key] = sub_array;
             }
-           
+
           }
           else{
              if(discard_key_list.includes(key)){
@@ -359,9 +359,9 @@
             else{
                jsonvalue[key] = value;
             }
-          
+
           }
-          
+
 
         });
         return jsonvalue;
@@ -385,7 +385,7 @@
 
       }
       else{
-        
+
 
         // Make list for graph
         var index = 1;
@@ -394,13 +394,13 @@
 
 
         var decrypt = new JSEncrypt();
-        
-        var privkey_encrypt =  $("#priv_key").val(); 
+
+        var privkey_encrypt =  $("#priv_key").val();
         var pin_flag = true;
         var privkey = null;
 
 
-        
+
         if (global_pin_code.length==4){
           if (validate_pin(global_pin_code)){
             var privkey_decrypt = CryptoJS.AES.decrypt(privkey_encrypt, hash_string(global_pin_code));
@@ -411,8 +411,8 @@
               alert("PIN CODE invalid");
 
               console.log(err);
-              //return null;  
-            }                            
+              //return null;
+            }
           }
         }else{
           document.getElementById("transferaction").disabled = true;
@@ -432,8 +432,8 @@
 
         $.each(tx_json, function(){
           var value_input = $(this).html();
-          // Decrypt data      
-          if(value_input != null){    
+          // Decrypt data
+          if(value_input != null){
             if(value_input == ""){
               $(this).html("");
             }
@@ -448,13 +448,13 @@
                 $(this).html(decrypted_input);
               }
             }
-              
+
               // Create list with decrypt data
               data_decrypt.push($(this).html());
           }
-          
+
         });
-        
+
         //we push the genomic data into list_decrypt for further uses (transference)
         var percent_decrypt = 0;
         var key_data = "";
@@ -480,7 +480,7 @@
                     percent_decrypt = parseFloat(data_decrypt[index]);
                     key_data = data_decrypt[index-1];
                   }
-                  
+
                   list_decrypt.push([key_data,percent_decrypt]);
                   isValidData = true;
               }
@@ -488,21 +488,21 @@
                 isValidData = false;
                 break;
               }
-              
+
             }
           }
         }
-          
+
         if (!isValidData){
            $('#alert-page').html( alert_error+'<p id="alert-page">Unable to decrypt the data'+ alert_end);
            document.getElementById("transferaction").disabled = true;
           return null;
         }
-        
+
         // Here we enable the transfer button and disable de decrypt button
          $("#decrypt").attr("disabled", "true");
         document.getElementById("transferaction").disabled = false;
-        return list_decrypt; 
+        return list_decrypt;
       }
     }
 
@@ -613,7 +613,7 @@
       var form_memo = $('#memo').val();
 
       if (validate_key("#newpubkey") && validate_key("#priv_key")){
-        
+
         var prk = $('#priv_key').val();
         var privkey = null;
         var pin_flag = true;
@@ -627,13 +627,13 @@
             }catch(err){
               alert("PIN CODE invalid, try again.");
               console.log(err);
-              return; 
-            } 
+              return;
+            }
           }else{
             alert("PIN CODE invalid. Please enter a PIN with four digits, try again.");
             return;
           }
-          
+
 
         // Encrypt data
         var encrypt = new JSEncrypt();
@@ -676,7 +676,7 @@
         new_payload["signature"] = sign(msg, privkey, hash_alg);
 
         var url_ = window.baseurl + "api/v1/rx-endpoint/";
-        
+
         axios({
           method:'post',
           url: url_,
@@ -698,7 +698,7 @@
       }
 
   }
-   
+
 
   function download_file(text, name, type) {
     var file = new Blob([text], {type: type});
@@ -711,7 +711,7 @@
   function download_url(name) {
     if(genomic_status == true){
       var download_a = document.getElementById("a"+name);
-      download_a.click(); 
+      download_a.click();
     }
     else{
        $('#alert-page').html( alert_error+'<p id="alert-page">The files have been transfered already'+ alert_end);
@@ -783,7 +783,7 @@
       geting.fail(function(xhr, textStatus, errorThrown){
             console.log(errorThrown, textStatus, xhr);
       });
-        
+
     };
     setKeys();
     getTxData();
@@ -791,32 +791,32 @@
 
   })($, localforage);
 
-                
 
-               
+
+
 
 
     // Functions
 
-  
+
     // Events
     $('#decrypt').on('click', function(){
       UIkit.modal($('#pincode_modal')).show();
-      
-      
+
+
     });
 
     document.getElementById('pubkey_file')
     .addEventListener('change', read_pubkey_file, false);
 
     $('#transferdata').on('click', function(){
-      
+
         //if there are no files then upload the percentages
         transfer_data();
-      
-      
-      
-      
+
+
+
+
     });
 
     // Make Map, pie chart and data responsive.
@@ -824,7 +824,7 @@
 
     });
   });
-    
+
     //Qr reader code
     var video = document.createElement("video");
     var canvasElement = document.getElementById("canvas");
@@ -833,7 +833,7 @@
     var outputContainer = document.getElementById("output");
     var outputMessage = document.getElementById("outputMessage");
     var outputData = document.getElementById("outputData");
-    
+
 
 
     $('#modal-transact').on('hide.uk.modal', function(){
@@ -868,12 +868,12 @@
 
         document.getElementById("transferaction").disabled = false;
         add_tx_markup(DATA_DECRYPTED);
-        
+
     });
 
 
     $('#modal-transact').on('show.uk.modal', function(){
-        
+
       function drawLine(begin, end, color) {
         canvas.beginPath();
         canvas.moveTo(begin.x, begin.y);
@@ -911,7 +911,7 @@
             outputData.parentElement.hidden = false;
 
             get_pub_key_from_addr(code.data);
-            
+
 
           } else {
             outputMessage.hidden = false;
