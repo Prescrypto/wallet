@@ -308,21 +308,23 @@
     var jsonvalue = {};
     var rsa = KEYUTIL.getKey(pubkey);
 
-        $.each(jsondata, function(key, value){
+    // Get only data json
+    _data = jsondata.data;
 
-            if(encrypt_fields_list.includes(key)){
-              jsonvalue[key] = KJUR.crypto.Cipher.encrypt(value, rsa, RSA_ALG);
-            }
-            else{
+    $.each(_data, function(key, value){
+      if(encrypt_fields_list.includes(key)){
+        jsonvalue[key] = KJUR.crypto.Cipher.encrypt(value, rsa, RSA_ALG);
 
-               jsonvalue[key] = value;
-            }
+      }else{
+         jsonvalue[key] = value;
+      }
 
-        });
+    });
 
-        jsonvalue["medications"] = jsonvalue.medications;
+    // This code snippet was necesary just to check medications
+    // jsonvalue["medications"] = jsonvalue.medications;
 
-        return jsonvalue;
+    return jsonvalue;
   }
 
   function filter_keys(jsondata, discard_key_list, sub_fields_list){
