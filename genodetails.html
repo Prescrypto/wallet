@@ -180,7 +180,7 @@
     if(searchParams.has("hash_id")){
             var txid = searchParams.get('hash_id');
             $('#hash_id_label').append('<pre>'+txid+'</pre>');
-            $('#tx_link').attr("href", window.baseurl+'?hash_id='+txid);
+            $('#tx_link').attr("href", window.baseurl + 'hash/'+txid);
     }
 
   });
