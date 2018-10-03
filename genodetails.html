@@ -592,6 +592,22 @@
         });
     }
 
+  function sortOnKeys(dict) {
+    // Awesome function sorter with javascript
+    // https://stackoverflow.com/questions/10946880/sort-a-dictionary-or-whatever-key-value-data-structure-in-js-on-word-number-ke
+    var sorted = [];
+    for(var key in dict) {
+        sorted[sorted.length] = key;
+    }
+    sorted.sort();
+
+    var tempDict = {};
+    for(var i = 0; i < sorted.length; i++) {
+        tempDict[sorted[i]] = dict[sorted[i]];
+    }
+
+    return tempDict;
+  }
 
 
   function transfer_data(){
