@@ -677,21 +677,30 @@
         var today = new Date();
         var times = today.toISOString();
 
-        var searchParams = new URLSearchParams(window.location.search);
-
-        if(searchParams.has("hash_id")){
-          var txid = searchParams.get('hash_id');
-          new_payload["previous_hash"] = txid;
-        }
 
         new_payload["timestamp"] = times;
         new_payload["public_key"] = encrypt.getPublicKeyB64();
         new_payload["location"] = "Mexico";
+        new_payload = sortOnKeys(new_payload)
 
         var msg = JSON.stringify(new_payload);
         var hash_alg = 'sha1';
 
-        new_payload["signature"] = sign(msg, privkey, hash_alg);
+        // Changes are needed
+        var previous_hash = "";
+        var searchParams = new URLSearchParams(window.location.search);
+
+        if(searchParams.has("hash_id")){
+          var txid = searchParams.get('hash_id');
+          previous_hash = txid;
+        }
+
+        _payload = {
+          "data": new_payload,
+          "signature": sign(msg, privkey, hash_alg),
+          "previous_hash": previous_hash
+        }
+
 
         var url_ = window.baseurl + "api/v1/rx-endpoint/";
 
@@ -701,11 +710,16 @@
           headers: {
               'Content-Type': 'application/json'
           },
-          data: new_payload
-        }).then(function(response) {
+          data: _payload
+        })
+        .then(function(response) {
         	console.log("Transfer success!");
-          	window.open("./genometrics.html", "_self");
-        });
+          window.open("./genometrics.html", "_self");
+        })
+        .catch(function (error) {
+          console.log("TRANSACTION ERROR!")
+          console.log(error);
+        })
 
       }
       else{
