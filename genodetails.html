@@ -777,6 +777,7 @@
 
       var geting = $.get(url);
       geting.done(function(data, text_status){
+        // Assign Tx details json to "DATA" public var
         DATA = data;
         add_tx_markup(data);
       });
@@ -864,9 +865,14 @@
 
         var sub_fields = ["medications"];
         var decrypt_fields = ["medic_name","medic_cedula","patient_name","patient_age","diagnosis"];
-        DATA_DECRYPTED = decrypt_json(DATA, sub_fields, decrypt_fields, "");
+
+        // Assign data decrypt
+        _DATA_FOR_SIGN = DATA.data;
+        _DATA_DECRYPTED = decrypt_json(_DATA_FOR_SIGN, sub_fields, decrypt_fields, "");
 
         document.getElementById("transferaction").disabled = false;
+        DATA.data = _DATA_DECRYPTED
+        DATA_DECRYPTED = DATA
         add_tx_markup(DATA_DECRYPTED);
 
     });
