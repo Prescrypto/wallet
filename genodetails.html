@@ -641,10 +641,16 @@
         var new_pub_key = $("#newpubkey").val();
 
         encrypt.setPublicKey(new_pub_key);
-        var discard_key_list=["id","drug_upc","public_key", "signature", "location","is_valid","transaction","readable","rxid","raw_size"];
+        var discard_key_list=[];
         var sub_fields = ["medications"];
-        var decrypt_fields = ["medic_name","medic_cedula","patient_name","patient_age","diagnosis"];
-     
+        var decrypt_fields = [
+              "medic_name",
+              "medic_cedula",
+              "patient_name",
+              "patient_age",
+              "diagnosis"
+        ];
+
         new_payload = filter_keys(DATA_DECRYPTED, discard_key_list, sub_fields);
 
         new_payload = encrypt_payload(new_payload, sub_fields, decrypt_fields, new_pub_key);
