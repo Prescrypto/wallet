@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Sequentia Wallet</title>
+  <title>RexChain Wallet</title>
   <link rel="stylesheet" type="text/css" href="css/genometrics.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.5/css/uikit.min.css" />
   <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,900" rel="stylesheet">
@@ -15,7 +15,7 @@
   <nav class="uk-navbar-container" uk-navbar="boundary-align: true; align: right;">
     <div class="uk-navbar-left">
       <ul class="uk-navbar-nav">
-        <li><a class="uk-navbar-item uk-logo" href="index.html"> SequentiaWallet </a></li>
+        <li><a class="uk-navbar-item uk-logo" href="index.html"> RexChain Wallet </a></li>
       </ul>
     </div>
     <div class="uk-navbar-right">
@@ -47,7 +47,7 @@
   </aside>
   <!-- END Aside pub and private keys -->
   <div class="grey-background" align="center">
-    <h2 style="color:#fff!important;padding-bottom:30px;">Genomic Datasets</h2>
+    <h2 style="color:#fff!important;padding-bottom:30px;">Blockchainized Data</h2>
   </div>
   <div  style=" position:fixed;bottom:1;left:0;padding-left:20%;" >
     <a class="uk-icon-button" title="previous"
@@ -76,7 +76,7 @@
     <div class="uk-navbar-container uk-navbar-transparent">
     <a id="link" href="#" download hidden></a>
 
-    <button id="recieve_button" class="footer-btn uk-button uk-button-default" type="button" uk-toggle="target: #modal-receive" title="Receive a genomic dataset">Receive Genomic Data</button>
+    <button id="recieve_button" class="footer-btn uk-button uk-button-default" type="button" uk-toggle="target: #modal-receive" title="Receive a genomic dataset">Receive Data</button>
     <button id="js-modal-dialog"  class="footer-btn uk-button uk-button-default" title="Export your public and private keys" type="button">Export keys</button>
   </div>
 <!-- This is the fullscreen Create New Modal-->
@@ -86,7 +86,7 @@
     <div class="uk-grid-collapse uk-child-width-1-2@s" uk-grid>
       <div style="height:80vh!important; min-height:80vh!important;background-color:#303030;padding:100px 80px 40px 80px;">
           <h2 id="light-h2">Upload File</h2>
-          <h3 id="light-h2">Please upload your Geno file</h3>
+          <h3 id="light-h2">Please upload your files</h3>
           <form class="uk-form-stacked">
             <div id="alert_new"></div>
             <div id="uploaded_list"></div>
@@ -107,37 +107,7 @@
 
       <!--Right column Modal (White)-->
       </div>
-        <div style="padding:100px 80px 40px 80px;min-height:80vh!important;height:80vh!important;">
-          <h2>Or create New Genomic</h2>
-          <div id='fields'>
-              <div id="formcontent">
-                <div id="inputGroup1">
-                  <form id="inputGroup" class="uk-grid-small" uk-grid action="" method="post">
-                    <table id="table_fields" class="uk-table uk-table-responsive">
-                      <thead>
-                        <tr>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td>
-                            <input class="uk-input" type="text" placeholder=" Country" required>
-                          </td>
-                          <td>
-                            <input class="uk-input" type="number" placeholder="Percentage (Only numbers)" required>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </form>
-                </div>
-              </div>
-              <div id="formButtons">
-                <button name="add_field" id="add_field" class="uk-button uk-button-default" type="button" uk-icon="icon:plus"> Add New  </button>
-                <button name="remove_field" id="remove_field" class="uk-button uk-button-default" type="button" uk-close> Remove  </button>
-              </div>
-        </div>
-      </div> <!--Closing right modal-->
+       
     </div>
     <!--Modal footer-->
     <div style="background-color:#1a1a1a;color:#fff;margin-bottom: -10px;padding-bottom: 10px;" class="uk-modal-footer">
@@ -225,7 +195,7 @@
         <div class="uk-margin"> \
           <div class="uk-card uk-card-default uk-card-body uk-card-small" > \
             <div class="uk-column-1-2"> \
-              <img align="center" src="media/dna-icon.png" style="background-color: <%= txcolor %>;color:#fff"> \
+              <img width="50px" align="center" src="media/rexgoogle.png" style="background-color: <%= txcolor %>;color:#fff"> \
               <p id="geno_p"><span id="genotitle"><%= tx.timestamp %> Readable: <%= tx.readable %></span><br><%= tx.hash_id %></p> \
             </div> \
           </div> \

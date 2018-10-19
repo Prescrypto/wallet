@@ -1,9 +1,9 @@
 (function (window){
   function set_baseurl(baseurl){
     // Set base url to Genobank Navigator, produdccion or developtment server
-    window.baseurl = (window.location.protocol === "https:") ? "https://genobank.herokuapp.com/" : baseurl;
+    window.baseurl = (window.location.protocol === "https:") ? "https://www.rexchain.io/" : baseurl;
   };
-  set_baseurl("http://127.0.0.1:8000/");
+  set_baseurl("http://127.0.0.1:8000");
 })(window);
 
 function save_key(private_key, public_key){
