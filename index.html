@@ -54,14 +54,27 @@
     <div>
       <progress id="js-progressbar" class="uk-progress" value="10" max="100"></progress>
       <script>
+        var page_width = window.screen.availWidth;
+
         UIkit.util.ready(function () {
           var bar = document.getElementById('js-progressbar');
-          var animate = setInterval(function () {
+          if(page_width < 700){
+            document.getElementById("greytxt").innerHTML = "Entropy generated! please click on 'Create'";
+            bar.value = 100;
+            document.entropy = Math.floor((Math.random() * 2000) + 1201);
+            $("#create_keys").removeAttr("disabled");
+          }
+          else{
+            var animate = setInterval(function () {
             bar.value += 10;
-            if(document.entropy >= 1200) {
-                bar.value=100;
-            }
-          }, 5000);
+              if(document.entropy >= 1200) {
+                  bar.value=100;
+              }
+            }, 5000);
+
+          }
+          
+          
         });
       </script>
     </div>
