@@ -9,6 +9,7 @@
   <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,900" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.5/js/uikit.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.5/js/uikit-icons.min.js"></script>
+  <script src="js/modernizr-custom.js"></script>
 </head>
 <body>
 <!-- Main menu -->
@@ -56,9 +57,21 @@
       <script>
         var page_width = window.screen.availWidth;
 
+        var deviceAgent = navigator.userAgent.toLowerCase();
+
+        var isTouchDevice = Modernizr.touch || 
+        (deviceAgent.match(/(iphone|ipod|ipad)/) ||
+        deviceAgent.match(/(android)/)  || 
+        deviceAgent.match(/(iemobile)/) || 
+        deviceAgent.match(/iphone/i) || 
+        deviceAgent.match(/ipad/i) || 
+        deviceAgent.match(/ipod/i) || 
+        deviceAgent.match(/blackberry/i) || 
+        deviceAgent.match(/bada/i));
+
         UIkit.util.ready(function () {
           var bar = document.getElementById('js-progressbar');
-          if(page_width < 700){
+          if(isTouchDevice ){
             document.getElementById("greytxt").innerHTML = "Entropy generated! please click on 'Create'";
             bar.value = 100;
             document.entropy = Math.floor((Math.random() * 2000) + 1201);
