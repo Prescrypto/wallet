@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RexChain Wallet</title>
+  <link rel="stylesheet" type="text/css" href="css/genometrics.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.5/css/uikit.min.css" />
+  <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,900" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.5/js/uikit.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.5/js/uikit-icons.min.js"></script>
+</head>
+<body>
+  <!-- Main menu -->
+  <nav class="uk-navbar-container" uk-navbar="boundary-align: true; align: right;">
+    <div class="uk-navbar-left">
+      <ul class="uk-navbar-nav">
+        <li><a class="uk-navbar-item uk-logo" href="index.html"> RexChain Wallet </a></li>
+      </ul>
+    </div>
+    <div class="uk-navbar-right">
+      <ul class="uk-navbar-nav">
+        <li>
+          <a class="uk-navbar-toggle" uk-navbar-toggle-icon href=""></a>
+          <div class="uk-navbar-dropdown">
+            <ul class="uk-nav uk-navbar-dropdown-nav">
+              <li id="menu_item"><a href="mailto:hola@prescrypto.com?Subject=RexChain-Contact">Contact</a></li>
+            </ul>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </nav>
+  <!-- Closing Main menu -->
+
+  <!-- BEGIN Aside pub and private keys -->
+  <aside style="display:none;">
+    <textarea id="pub_key"></textarea>
+    <textarea id="priv_key"></textarea>
+  </aside>
+  <!-- END Aside pub and private keys -->
+  <div class="grey-background" align="center">
+    <h2 style="color:#fff!important;padding-bottom:30px;">Blockchainized Data</h2>
+  </div>
+  <div  style=" position:fixed;bottom:1;left:0;padding-left:20%;" >
+    <a class="uk-icon-button" title="previous"
+    uk-icon="ratio: 4; icon: chevron-left" onclick="" id="genoprevious" disabled></a>
+  </div>
+  <div  style=" position: fixed;bottom:1;right:0;padding-right:20%;" >
+    <a class="uk-icon-button" title="next" uk-icon="ratio: 4; icon: chevron-right"
+    id="genonext" onclick="" disabled></a>
+  </div>
+
+  <div class="uk-grid-medium" align="center">
+    <div class="uk-child-width-1-1@s" uk-grid>
+      <div>
+
+        <div id="genocontent" uk-sortable="group: sortable-group">
+          <!-- Initial Items -->
+        </div>
+        <br>
+      </div>
+    </div>
+  </div>
+
+
+  <br>
+  <footer class="footer">
+    <div class="uk-navbar-container uk-navbar-transparent">
+    <a id="link" href="#" download hidden></a>
+
+    <button id="recieve_button" class="footer-btn uk-button uk-button-default" type="button" uk-toggle="target: #modal-receive" title="Receive a genomic dataset">Receive Data</button>
+    <button id="js-modal-dialog"  class="footer-btn uk-button uk-button-default" title="Export your public and private keys" type="button">Export keys</button>
+  </div>
+<!-- This is the fullscreen Create New Modal-->
+<div id="modal-full" class="uk-modal-full" style="background-color:#1a1a1a;color:#fff;margin-bottom: -10px;padding-bottom: -10px;" uk-modal>
+  <div class="uk-modal-dialog" >
+    <button class="uk-modal-close-full uk-close-large" type="button" uk-close></button>
+    <div class="uk-grid-collapse uk-child-width-1-2@s" uk-grid>
+      <div style="height:80vh!important; min-height:80vh!important;background-color:#303030;padding:100px 80px 40px 80px;">
+          <h2 id="light-h2">Upload File</h2>
+          <h3 id="light-h2">Please upload your files</h3>
+          <form class="uk-form-stacked">
+            <div id="alert_new"></div>
+            <div id="uploaded_list"></div>
+            <div class="uk-margin-large">
+              <div class="uk-form-controls">
+                <!--Upload section-->
+                <div class="js-upload uk-placeholder uk-text-center">
+                  <span uk-icon="icon: cloud-upload"></span>
+                  <span class="uk-text-middle">Attach your FILE Key by dropping it here or</span>
+                  <div uk-form-custom>
+                    <input id="fileobj" type="file">
+                    <span id="upload_link" class="uk-link">Select your FILE from computer</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+
+      <!--Right column Modal (White)-->
+      </div>
+       
+    </div>
+    <!--Modal footer-->
+    <div style="background-color:#1a1a1a;color:#fff;margin-bottom: -10px;padding-bottom: 10px;" class="uk-modal-footer">
+      <div id="modal-footer" class="uk-child-width-expand@s" uk-grid>
+        <div class="modal-footer-left txt-center">
+          <h2 id="light-h2"><img style="height:30px;margin-bottom:10px;" src="media/light-locker.svg" alt=""> PIN</h2>
+          <div class="uk-form-controls">
+            <input style="width:150px;" id="pin_code" name="pin_code" class="uk-input" type="password" maxlength="4" pattern="[0-9]*" placeholder="Enter PIN code" required/>
+          </div>
+        </div>
+        <div class="txt-center">
+          <button id="send_data" style="background-color:#1a1a1a;color:#fff;" class="uk-button uk-button-default" type="submit" disabled> Submit </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!--Closing fullscreen Modal-->
+
+<!-- This is the Receive modal -->
+<div id="modal-receive" uk-modal>
+  <div class="uk-modal-dialog uk-modal-body uk-margin-auto-vertical">
+    <h2 class="uk-modal-title" style="text-align: center;" >Public Keys</h2>
+    <p>If someone wishes to send you encrypted data, you must provide them with your public key.</p>
+    <div class="uk-margin uk-grid" style="padding-left: 13% !important;">
+      <div style="padding-bottom: 2.5em;">
+        <div  id="qrcode">
+        </div>
+      </div>
+      <div>
+        <textarea style="width:100%" id="pubkey" name="pubkey" class="uk-input" type="text" placeholder="---Public Key---" ></textarea>
+      </div>
+    </div>
+  </div>
+</div>
+<!--Closing receive Modal-->
+
+  </footer>
+  <script src="js/localforage.min.js"></script>
+  <script src="https://code.jquery.com/jquery-1.8.3.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/components/core-min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/components/sha256.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/components/enc-base64.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/components/hmac.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/components/pbkdf2.js"></script>
+  <script type="text/javascript" src="js/jquery.qrcode.min.js"></script>
+  <script src="js/jsencrypt.js"></script>
+  <script src="js/jsrsasign-all-min.js"></script>
+  <script src="js/underscore-min.js"></script>
+  <script src="js/wallet.js"></script>
+  <script src="https://sdk.amazonaws.com/js/aws-sdk-2.7.18.min.js"></script>
+  <script src="js/config_aws.js"></script>
+  <script>
+    //variables
+    //Variables
+    var alert_success = '<div  class="uk-alert-success" uk-alert>\
+      <a class="uk-alert-close" uk-close></a>';
+    var alert_error = '<div  class="uk-alert-danger" uk-alert>\
+      <a class="uk-alert-close" uk-close></a>';
+    var alert_end ='</p></div>';
+    var local_file_url = '#';
+    var file_count = 0;
+    var files_list = {};
+    var url_files_list = [];
+    var encryption_secret_key = "";
+    AWS.config.region = AWS_Region;
+    var AWS_AccessKeyId = decrypt_file_symm(conf_AWS_AccessKeyId, Unlock_k);
+    var AWS_SecretAccessKey = decrypt_file_symm(conf_AWS_SecretAccessKey, Unlock_k);
+    var AWS_BucketName = decrypt_file_symm(conf_AWS_BucketName, Unlock_k);
+    AWS.config.update({accessKeyId: AWS_AccessKeyId, secretAccessKey: AWS_SecretAccessKey}); //login to aws with credentials
+    var bucket = new AWS.S3({params: {Bucket: AWS_BucketName}, apiVersion: '2006-03-01'});
+    // Upload
+    var startTime = new Date();
+    var partSize = 1024 * 1024 * 5;// Minimum 5MB per chunk (except the last part) http://docs.aws.amazon.com/AmazonS3/latest/API/mpUploadComplete.html
+    var maxUploadTries = 3;
+    var multipartMap = {
+        Parts: []
+    };
+    var numPartsLeft = 0;
+    var multipartResponse = null;
+    var file_template ='<p id="<%= data.filename %>" style="color:#fff;"><%= data.id_name %>.txt <span uk-icon="icon: upload"\ style="color:#fff;margin-left:10px;margin-right:10px;"></span><button onclick="remove_file(<%= data.filename %>)" uk-icon="icon:close"\ style="color:#fff;margin-right:10px;"></button></p>';
+    var file_uploaded_template ='<%= data.id_name %>.txt <span uk-icon="icon: check"\ style="color:#fff;margin-left:10px;margin-right:10px;"></span>';
+    var file_working_template ='<%= data.id_name %>.txt <div style="color:#fff;margin-left:10px;margin-right:10px;" uk-spinner="ratio: 0.5"></div>';
+    // Tx template
+    var tx_template = '<a id="genome" href="genodetails.html?hash_id=<%= tx.hash_id %>"> \
+        <div class="uk-margin"> \
+          <div class="uk-card uk-card-default uk-card-body uk-card-small" > \
+            <div class="uk-column-1-2"> \
+              <img width="50px" align="center" src="media/rexgoogle.png" style="background-color: <%= txcolor %>;color:#fff"> \
+              <p id="geno_p"><span id="genotitle"><%= tx.timestamp %> Readable: <%= tx.readable %></span><br><%= tx.hash_id %></p> \
+            </div> \
+          </div> \
+        </div> \
+        </a>';
+
+
+  function add_tx_markup(data, color){
+    // A tx data provided compile and render item
+    $('#non-item').remove();
+    var _template = _.template(tx_template);
+    var _compiled = _template({"tx":data, "txcolor":color});
+    $('#genocontent').append(_compiled);
+  }
+  function clean_tx_markups(){
+    // A tx data provided compile and render item
+    $('#genocontent').empty();
+  }
+  function validate_pin(pin){
+    if (!/^([0-9])*$/.test(pin)){
+      return false
+    }else{
+      return true
+    }
+  }
+
+  function hash_string(value){
+  //This method calculate hash for the  value from pin
+  var pin = CryptoJS.SHA256(value);
+  var pin_hash = pin.toString(CryptoJS.enc.b64);
+  return pin_hash
+  }
+  function doVerify(signature, msg, pubkey) {
+
+    var spubkey =   KEYUTIL.getKey(pubkey);
+    var isValid = spubkey.verify(msg, signature);
+
+    // display verification result
+    if (isValid) {
+      return "valid";
+    } else {
+      return "invalid";
+    }
+  }
+  function get_addr_from_pub_key(pb_key){
+    var encrypt = new JSEncrypt();
+    encrypt.setPublicKey(pb_key);
+    var value_b64 = encrypt.getPublicKeyB64();
+    var pubkey_uri= encodeURIComponent(value_b64).replace(/'/g,"%27").replace(/"/g,"%22");
+    var full_uri = window.baseurl + "api/v1/address/?public_key="+pubkey_uri;
+
+    var geting = $.get(full_uri);
+      geting.done(function(data, text_status){
+        // when its done
+        if(data == null || data == ""){
+          console.log("incorrect QR code");
+          $('#alert').html(alert_error+'<p id="alert">Error, Incorrect Public Key! '+alert_end);
+           return null;
+
+        }
+        else{
+         if(data.results[0].address != ""){
+
+            $('#qrcode').qrcode(data.results[0].address);
+            $('#pubkey').val($('#pub_key').val());
+
+          }
+          else{
+            console.log("error  getting address")
+            $('#alert').html(alert_error+'<p id="alert">Error, Incorrect QR! '+alert_end);
+            return null
+
+          }
+
+        }
+
+      });
+      geting.fail(function(xhr, textStatus, errorThrown){
+        console.log(xhr.responseText);
+        $('#alert').html(alert_error+'<p id="alert">Error, Incorrect Public Key! '+alert_end);
+      });
+      geting.always(function(){
+        // Finish POST!
+      });
+
+    }
+  function repost(new_url){
+    clean_tx_markups();
+
+    $.get(new_url, function(data) {
+      // Get data from server
+      if (data.results.length == 0){
+        // Render no tx label
+        $("#genocontent").html("<span id='non-item'>Without Txs :( Start creating new one!</span>");
+      }
+      else{
+
+        if(data.next != null){
+          $("#genonext").removeAttr("disabled");
+          $("#genonext").attr("onclick", 'repost("'+data.next+'")');
+        }
+        else{
+          document.getElementById("genonext").disabled = true;
+        }
+        if(data.previous != null){
+          $("#genoprevious").removeAttr("disabled");
+          $("#genoprevious").attr("onclick", 'repost("'+data.previous+'")');
+
+        }
+        else{
+          document.getElementById("genoprevious").disabled = true;
+        }
+
+
+        data.results.forEach(function(item) {
+          // Add tx to template
+          var color= "#fff";
+          if(item.readable == true){
+            color= "#d9f7ec";
+          }
+          else{
+            color= "#f5c5d2";
+          }
+          add_tx_markup(item, color);
+
+        });
+      }
+      // Finish get
+    });
+
+  }
+    $(document).ready(function() {
+      (function ($, localforage){
+        function setKeys(){
+          // Set the keys on textarea onload page
+          localforage.getItem('privatekey', function(err, value){
+            $('#priv_key').val(value);
+          });
+          localforage.getItem('publickey', function(err, value){
+            $('#pub_key').val(value);
+            var encrypt = new JSEncrypt();
+            encrypt.setPublicKey(value);
+            var value_b64 = encrypt.getPublicKeyB64();
+            // Get Txs when load page!
+            var list_rx = [];
+            var pubkey_uri= encodeURIComponent(value_b64).replace(/'/g,"%27").replace(/"/g,"%22");
+            var url = window.baseurl +"api/v1/rx-endpoint/?public_key=" + pubkey_uri;
+            $.get(url, function(data) {
+              // Get data from server
+              if (data.results.length == 0){
+                // Render no tx label
+                $("#genocontent").html("<span id='non-item'>Without Txs :( Start creating new one!</span>");
+              }else{
+
+                if(data.next != null){
+                  $("#genonext").removeAttr("disabled");
+                  $("#genonext").attr("onclick", 'repost("'+data.next+'")');
+                }
+                else{
+                  document.getElementById("genonext").disabled = true;
+                }
+                if(data.previous != null){
+                  $("#genoprevious").removeAttr("disabled");
+                  $("#genoprevious").attr("onclick", 'repost("'+data.previous+'")');
+
+                }
+                else{
+                  document.getElementById("genoprevious").disabled = true;
+                }
+
+                data.results.forEach(function(item) {
+                  // Add tx to template
+                  var color= "#fff";
+                  if(item.readable == true){
+                    color= "#d9f7ec";
+                  }
+                  else{
+                    color= "#f5c5d2";
+                  }
+                  add_tx_markup(item, color);
+
+                });
+              }
+              // Finish get
+            });
+          });
+
+        };
+        setKeys();
+      })($, localforage);
+    });
+    // Functions
+    function sign(msg, priv_key, hash_alg){
+      //Create a signature of payload
+      var rsa = new RSAKey();
+      rsa.readPrivateKeyFromPEMString(priv_key);
+      var sign_msg = rsa.sign(msg, hash_alg);
+      return sign_msg;
+    }
+
+    function read_input(){
+      // Read all the inputs in form and make a list
+      var list_input = [];
+      $.each($('#table_fields td').children(), function(){
+        value_input = $(this).val();
+        list_input.push(value_input);
+      });
+      return list_input;
+    }
+
+    function create_payload(){
+      // Make data and make a POST
+
+      // Make data
+      var index = 1;
+      var data_payload = [];
+      var list_input = read_input();
+      var payload = new Object();
+
+      for (index; index<list_input.length; index++){
+        if (index%2){
+          if(list_input[index] == "" ||  list_input[index-1] == ""){
+            console.log("no data");
+          }
+          else{
+            data_payload.push({"country_name":list_input[index-1],"percentage":list_input[index]});
+          }
+
+        }
+      }
+
+      // Encrypt data
+      var encrypt = new JSEncrypt();
+      var index_encrypt = 0;
+      var pubkey =  $("#pub_key").val();
+
+      var privkey = null;
+      var pin_attempts = 3;
+      var privkey_encrypt =  $("#priv_key").val();
+      var pin_flag = true;
+      var static_pin_code = $('#pin_code').val();
+      if((static_pin_code == null)|| (static_pin_code == '') || (static_pin_code.length != 4)){
+        $('#alert_new').html(alert_error+'<p id="alert_new">PIN CODE invalid, enter the code again'+alert_end);
+        $('#pin_code').val('');
+        return;
+      }
+      else{
+          try{
+            var privkey_decrypt = CryptoJS.AES.decrypt(privkey_encrypt, hash_string(static_pin_code));
+            privkey = privkey_decrypt.toString(CryptoJS.enc.Utf8);
+
+          }catch(err){
+            $('#alert_new').html(alert_error+'<p id="alert_new">PIN CODE invalid, enter the code again'+alert_end);
+            $('#pin_code').val('');
+            console.log(err);
+            return;
+          }
+
+      }
+
+
+
+      encrypt.setPublicKey(pubkey);
+
+      for (index_encrypt; index_encrypt<data_payload.length; index_encrypt++){
+        data_payload[index_encrypt].country_name = encrypt.encrypt(data_payload[index_encrypt].country_name);
+        data_payload[index_encrypt].percentage = encrypt.encrypt(data_payload[index_encrypt].percentage);
+      }
+
+      // Make payload
+      var today = new Date();
+      var times = today.toISOString();
+
+      payload.timestamp = times;
+      payload.public_key = encrypt.getPublicKeyB64();
+      payload.data = JSON.stringify(data_payload);
+      payload.location = "Mexico";
+
+      if(url_files_list.length > 0){//we add the secret encrypted key to the payload
+        url_files_list.unshift(encryption_secret_key);
+      }
+
+      payload.files = JSON.stringify(url_files_list);
+
+
+      var msg = payload.data;
+      var hash_alg = 'sha1';
+
+      payload.signature = sign(msg, privkey, hash_alg);
+
+      // Make POST
+      var posting = $.post(window.baseurl + "api/v1/rx-endpoint/",
+                      payload);
+
+      posting.done(function(data, text_status){
+        // reload page to see new items
+        location.reload();
+      });
+      posting.fail(function(xhr, textStatus, errorThrown){
+        console.log(xhr.responseText);
+      });
+      posting.always(function(){
+        // Finish POST!
+      });
+    }
+
+  function finish_uploads(){
+
+      if(url_files_list.length == $('p', '#uploaded_list').length){
+        $('#alert_new').html( alert_success+'<p id="alert_new">Finish uploading all files'+ alert_end);
+
+          create_payload();
+      }
+
+  }
+
+    //Upload file to s3 functions>>>>>>>>
+function completeMultipartUpload(doneParams, fileKey, id_name) {
+  //complete the upload of a file when we get to the end
+  bucket.completeMultipartUpload(doneParams, function(err, data) {
+    if (err) {
+      console.log("An error occurred while completing the multipart upload");
+      console.log(err);
+      $('#alert_transfer').html(alert_error+'<p id="alert_transfer">Filed on Upload '+alert_end);
+    } else {
+      var delta = (new Date() - startTime) / 1000;
+      console.log('Completed upload in', delta, 'seconds');
+      console.log('Final upload');
+      try{
+          var _filetemplate = _.template(file_uploaded_template);
+          var _filecompiled = _filetemplate({"data":{"filename":fileKey, "id_name": id_name}});
+          document.getElementById(fileKey).innerHTML = _filecompiled;
+          url_files_list.push(decodeURIComponent(data.Location));
+          finish_uploads();
+
+        }
+        catch(err){
+          console.log(err);
+        }
+    }
+  });
+}
+function uploadPart(multipart, partParams, fileKey, tryNum, id_name) {
+  //upload a part from a file sliced by 5mb
+    var fileName = AWS_Folder +fileKey+'.txt';
+    var tryNum = tryNum || 1;
+    bucket.uploadPart(partParams, function(multiErr, mData) {
+      if (multiErr){
+        console.log('multiErr, upload part error:', multiErr);
+        if (tryNum < maxUploadTries) {
+          console.log('Retrying upload of part: #', partParams.PartNumber);
+          uploadPart(multipart, partParams, tryNum + 1);
+        } else {
+          console.log('Failed uploading part: #', partParams.PartNumber);
+        }
+        return;
+      }
+      console.log(this.request.params.PartNumber);
+      multipartMap.Parts[this.request.params.PartNumber - 1] = {
+        ETag: mData.ETag,
+        PartNumber: Number(this.request.params.PartNumber)
+      };
+      console.log("Completed part", this.request.params.PartNumber);
+      if (--numPartsLeft > 0) return; // complete only when all parts uploaded
+      var doneParams = {
+        Bucket: AWS_BucketName,
+        Key: fileName,
+        MultipartUpload: multipartMap,
+        UploadId: multipart.UploadId
+      };
+      console.log("Completing upload...");
+      completeMultipartUpload(doneParams, fileKey, id_name);
+    });
+  }
+
+  function uploadMultipart(fileKey, fileData, id_name) {
+    //upload a file by parts because of the size
+    var fileName = AWS_Folder +fileKey+'.txt';
+    var fileLength = fileData.length;
+    var partNum = 0;
+    multipartMap = {
+      Parts: []
+    };
+    numPartsLeft = Math.ceil(fileLength / partSize);
+    bucket.createMultipartUpload({ Bucket: AWS_BucketName, Key: fileName,ContentType: fileData.type, ACL:AWS_ACL }, function(mpErr, multipart) {
+      if(!mpErr){
+
+          try{
+            for (var rangeStart = 0; rangeStart < fileLength; rangeStart += partSize) {
+
+                partNum++;
+                var end = Math.min(rangeStart + partSize, fileLength);
+                var partParams = { //create the part
+                  Body: fileData.slice(rangeStart, end),
+                  Bucket: AWS_BucketName,
+                  Key: fileName,
+                  PartNumber: String(partNum),
+                  UploadId: multipart.UploadId
+                };
+                // Send a single part
+                uploadPart(multipart, partParams, fileKey, id_name);
+            }
+          }
+          catch(err){
+            console.log(err);
+            $('#alert').html(alert_error+'Error on Upload!'+alert_end);
+            return;
+          }
+
+      }else{
+        console.log(mpErr);
+        $('#alert').html(alert_error+'Error on Upload!'+alert_end);
+        return;
+      }
+    });
+  }
+  function uploadNormal(myfile, fileName, id_name){
+     // See the Configuring section to configure credentials in the SDK
+    var today = new Date();
+    var fileNameNew = AWS_Folder +fileName+'.txt';
+    var timestamp = today.toISOString();
+    var parameters = {Key: fileNameNew,
+        Body: myfile,
+        ContentType: myfile.type,
+        ACL: AWS_ACL};
+    bucket.upload(parameters, function (err, data) {
+      if (err){
+        console.log(err);
+        $('#alert_new').html(alert_error+'<p id="alert_new">Error on Upload!'+alert_end);
+      }
+      if(data){
+        try{
+          var _filetemplate = _.template(file_uploaded_template);
+          var _filecompiled = _filetemplate({"data":{"filename":fileName,"id_name": id_name}});
+          document.getElementById(fileName).innerHTML = _filecompiled;
+          url_files_list.push(data.Location);
+          finish_uploads();
+
+        }
+        catch(err){
+          console.log("finishing upload on normal upload");
+          console.log(err);
+        }
+      }
+
+    });
+  }
+ function toWordArray(str){
+    //convert string to word array
+        return CryptoJS.enc.Utf8.parse(str);
+  }
+  function toString(words){
+    //convert word array to string
+        return CryptoJS.enc.Utf8.stringify(words);
+  }
+  function toBase64String(words){
+    //convert word array to string base 64
+        return CryptoJS.enc.Base64.stringify(words);
+  }
+  function decrypt_file_symm(cipherfile, symm_key){
+      // convert payload encoded in base64 to words
+    var iv = CryptoJS.lib.WordArray.random(16);
+    var decrypted = CryptoJS.AES.decrypt(cipherfile, symm_key, {iv: iv});
+    return toString(decrypted);
+  }
+  function ecrypt_file_symm(myfile, symm_key){
+      //encrypt file with a symmetric key
+     var iv = CryptoJS.lib.WordArray.random(16);
+    var encryptedfile = CryptoJS.AES.encrypt(myfile, symm_key, {iv: iv});
+      // encode in base64
+    return encryptedfile.toString();
+  }
+  function encrypt_file(myfile){
+    // Encrypt data
+    var encrypt = new JSEncrypt();
+    var index_encrypt = 0;
+    //var pub_key = $("#pubkey").val();
+    encrypt.setPublicKey(pub_key);
+    var encrypted_file = encrypt.encrypt(myfile);
+    return encrypted_file;
+  }
+  function download_file(text, name, type) {
+    var file = new Blob([text], {type: type});
+    var download_link = document.getElementById("link");
+    local_file_url = URL.createObjectURL(file);
+    download_link.href = local_file_url;
+    download_link.download = name;
+  }
+  function generateECDSA() {
+    var curve = 'secp256r1';
+    var ec = new KJUR.crypto.ECDSA({"curve": curve});
+    var keypair = ec.generateKeyPairHex();
+    // this generates a key pair named keypair.ecpubhex and keypair.ecprvhex
+
+    return keypair;
+  }
+  function encrypt_string(mystring, public_key){
+    // Encrypt data
+    var encrypt = new JSEncrypt();
+    encrypt.setPublicKey(public_key);
+
+    return encrypt.encrypt(mystring);
+  }
+  function decrypt_string(mystring, private_key){
+    // Encrypt data
+    var decrypt = new JSEncrypt();
+    decrypt.setPrivateKey(private_key);
+
+    return decrypt.decrypt(mystring);
+  }
+
+  function encrypt_and_upload_files(my_files_list){
+    // Variables
+    var encrypted_file = null;
+    var today = new Date();
+    var timestamp = today.toISOString();
+    var new_key = "";
+    var pub_key = $('#pub_key').val();
+    var priv_key = null;
+    var pin_attempts = 3;
+    var privkey_encrypt = $("#priv_key").val();
+    var pin_flag = true;
+    var static_pin_code = $('#pin_code').val();
+    if((static_pin_code == null)|| (static_pin_code == '') || (static_pin_code.length != 4)){
+      $('#alert_new').html(alert_error+'<p id="alert_new">PIN CODE invalid, enter the code again'+alert_end);
+      $('#pin_code').val('');
+      return;
+    }
+    else{
+        try{
+          var privkey_decrypt = CryptoJS.AES.decrypt(privkey_encrypt, hash_string(static_pin_code));
+          priv_key = privkey_decrypt.toString(CryptoJS.enc.Utf8);
+
+        }catch(err){
+          $('#alert_new').html(alert_error+'<p id="alert_new">PIN CODE invalid, enter the code again'+alert_end);
+          $('#pin_code').val('');
+          console.log(err);
+          return;
+        }
+
+    }
+
+    if((priv_key == null)||(priv_key.length < 1)||(pub_key.length < 1)){
+      $('#alert_new').html(alert_error+'<p id="alert_new">No private or public keys'+alert_end);
+      $('#pin_code').val('');
+      console.log("no private or public keys");
+      return;
+    }
+
+    $('#alert_new').html(alert_success+'<p id="alert_new">PIN CODE correct, Uploading the files!'+alert_end);
+
+    var keypair = generateECDSA();
+    if(pub_key.length < 512){
+      console.log("this is a short public key");
+      new_key = keypair.ecprvhex.slice(0, 50);    }
+    else{
+      new_key = keypair.ecprvhex;
+    }
+    encryption_secret_key = encrypt_string(new_key, pub_key);
+
+    $.each(my_files_list, function(key, value) {
+      var id_name = key.split("|")[1];
+      var _filetemplate = _.template(file_working_template);
+      var _filecompiled = _filetemplate({"data":{"filename":key, "id_name": id_name}});
+      document.getElementById(key).innerHTML = _filecompiled;
+
+      encrypted_file = ecrypt_file_symm(value, new_key);
+      if(encrypted_file.length > partSize){
+        uploadMultipart(key, encrypted_file, id_name);
+      }
+      else{
+        uploadNormal(encrypted_file, key, id_name);
+      }
+    });
+
+
+  }
+  function remove_field(table_id){
+      // Remove a field in table
+      $(table_id+' tr:last').remove();
+  }
+  function add_field(){
+    // Add a field in table
+    $('#table_fields tr:last').after('\
+      <tr>\
+        <td>\
+          <input class="uk-input" type="text" placeholder=" Country" required>\
+        </td>\
+        <td>\
+          <input class="uk-input" type="number" placeholder="   Percentage (Only numbers)" required>\
+        </td>\
+      </tr>');
+  }
+  function remove_file(pid){
+    $('#'+pid).remove();
+    delete files_list[pid];
+
+  }
+  function upload_file(e) {
+    //uploads a file from local storage to memory
+    var file = e.target.files[0];
+    //Small Validation
+    if (!file) {
+      return;
+    }
+    //Read file
+    var read = new FileReader();
+    read.readAsText(file);
+    read.onload = function(e) {
+      var content = e.target.result;
+      var id_name = file.name.split(".")[0];
+
+      var filename = Date.now()+"|"+ id_name ;
+
+      files_list[filename] = content;
+
+      $('#alert_new').html(alert_success+'<p id="alert_new">File Loaded, waiting to Upload it...'+alert_end);
+      var _filetemplate = _.template(file_template);
+      var _filecompiled = _filetemplate({"data":{"filename":filename, "id_name": id_name}});
+      $('#uploaded_list').append(_filecompiled);
+      file_count++;
+
+    };
+
+  }
+
+  function decrypt_from_file(e) {
+    //decrypts the content of a file
+    // Variables
+    var encrypted_file = null;
+    var rawdata = null;
+    var today = new Date();
+    var timestamp = today.toISOString();
+    var pub_key = $('#pub_key').val();
+
+    //change the status of the alert
+     $('#alert_decrypt').html(alert_success+'<p id="alert_decrypt"><div style="color:#000;margin-left:1px;" uk-spinner="ratio: 1"></div> Loading the file'+alert_end);
+
+    var file = e.target.files[0];
+    var priv_key = null;
+    var pin_attempts = 3;
+    var privkey_encrypt = $("#priv_key").val();
+    var pin_flag = true;
+    while (pin_flag){
+      pin_attempts = pin_attempts - 1 ;
+      var pin_code = "";
+      var pin_code = prompt("Please, enter your PIN CODE");
+      if (pin_attempts < 0){
+        alert("You have no more attempts");
+        return window.open("./genometrics.html","_self");
+      }else if (pin_code.length==4){
+        if (validate_pin(pin_code)){
+          var privkey_decrypt = CryptoJS.AES.decrypt(privkey_encrypt, hash_string(pin_code));
+          try{
+            priv_key = privkey_decrypt.toString(CryptoJS.enc.Utf8);
+            pin_flag = false;
+          }catch(err){
+            alert("PIN CODE invalid,  remaining attempts: "+ pin_attempts);
+            console.log(err);
+          }
+        }
+      }else{
+        alert("PIN CODE invalid,  remaining attempts: "+ pin_attempts);
+      }
+
+    }//finish while
+
+    if((priv_key.length < 1)||(pub_key.length < 1)){
+      console.log("no private or public keys");
+      $('#alert_decrypt').html(alert_error+"<p id='alert_decrypt'>Didn't find valid Keys"+alert_end);
+    }
+
+
+    //Small Validation
+    if (!file) {
+      $('#alert_decrypt').html(alert_error+'<p id="alert_decrypt">No file found'+alert_end);
+    }
+    //Read file
+    var read = new FileReader();
+    read.readAsText(file);
+    read.onload = function(e) {
+      var content = e.target.result;
+      try{
+        var decrypted_content = decrypt_file_symm(content, "sec_key");
+        download_file(decrypted_content, "mydecryptedfile.txt", "text/plain");
+        document.getElementById('decrypt_button').disabled = false;
+        $('#alert_decrypt').html(alert_success+'<p id="alert_decrypt">File loaded correctly yo can decrypt now'+alert_end);
+
+
+      }
+      catch(err){
+        console.log(err);
+        $('#alert_decrypt').html(alert_error+'<p id="alert_decrypt">Failed to decrypt the file'+alert_end);
+      }
+
+
+     };
+
+  }
+
+  function download_keys(){
+    //This method download keys files
+    //Read keys
+    var privatekey = $('#priv_key').val();
+    var publickey = $('#pub_key').val();
+
+    //Make a list for create the download link
+    var files = [privatekey, publickey]
+    var names_files = ["Pivate_Key.pem", "Public_Key.pem"]
+    var link = document.getElementById('link');
+
+    for (var i=0; i<files.length; i++){
+      // Add attributes to label type a
+      link.download = names_files[i]
+      link.href = 'data:application/octet-stream,'+ encodeURIComponent(files[i]);
+      link.click();
+    }
+  }
+
+    // Events---->>>>
+
+    //Export Keys Alert Modal
+    UIkit.util.on('#js-modal-dialog', 'click', function (e) {
+      download_keys();
+      e.preventDefault();
+      e.target.blur();
+      UIkit.modal.dialog('<p class="uk-modal-body">Your keys are now being exported!</p>');
+    });
+
+    //closing Export keys modal alert-->
+
+    function enable_upload(){
+      document.getElementById('send_data').disabled = false;
+    }
+
+    document.getElementById('pin_code')
+    .addEventListener('change', enable_upload, false);
+
+    document.getElementById('fileobj')
+    .addEventListener('change', upload_file, false);
+
+    $('#add_field').on('click', function(){
+      add_field();
+    });
+
+    $('#remove_field').on('click',function(){
+      var length_table = $('#table_fields tr').length;
+      if(length_table >= 3){
+        remove_field('#table_fields');
+      }
+    });
+    $('#remove_file').on('click',function(){
+      preventDefault();
+      var uploaded_length = $('#uploaded_list').length;
+      if(uploaded_length > 0){
+        files_list.pop();
+        $('#uploaded_list p:last').remove();
+        file_count--;
+      }
+    });
+
+    $('#send_data').on('click', function(){
+      $(this).attr("disabled","disabled");
+
+      if($('p', '#uploaded_list').length < 1){
+        //if there are no files then upload the percentages
+        create_payload();
+      }
+      else{
+        //if there are files then upload it first
+        encrypt_and_upload_files(files_list);
+      }
+
+    });
+
+     $('#modal-full').on('hide.uk.modal', function(){
+      //clean the modal for new genomics
+        url_files_list = [];
+        uploaded_list =  {};
+        $('#pin_code').val('');
+         $(this).find("input,textarea").val('').end();
+
+        document.getElementById('send_data').disabled = true;
+        $('#alert_new').html('<p id="alert_transfer"></p></div>');
+        $('#uploaded_list').html('<div id="uploaded_list"></div>');
+    });
+    $('#modal-receive').on('show.uk.modal', function(){
+      //Receive Modal data
+      get_addr_from_pub_key($('#pub_key').val());
+
+    });
+
+    $('#modal-receive').on('hide.uk.modal', function(){
+      //
+      $('#qrcode').empty();
+    });
+
+
+  </script>
+</body>
+</html>
