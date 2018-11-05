@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Rexchain Wallet</title>
+  <link rel="stylesheet" type="text/css" href="css/sequentiawallet.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.5/css/uikit.min.css" />
+  <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,900" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.5/js/uikit.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.5/js/uikit-icons.min.js"></script>
+</head>
+<body>
+<!-- Main menu -->
+<nav class="uk-navbar-container" uk-navbar="boundary-align: true; align: right;">
+  <div class="uk-navbar-left">
+  	<ul class="uk-navbar-nav">
+  	  <li><a class="uk-navbar-item uk-logo" href="index.html"> RexChain Wallet </a></li>
+    </ul>
+  </div>
+  <div class="uk-navbar-right">
+    <ul class="uk-navbar-nav">
+      <li>
+        <a class="uk-navbar-toggle" uk-navbar-toggle-icon href=""></a>
+        <div class="uk-navbar-dropdown">
+          <ul class="uk-nav uk-navbar-dropdown-nav">
+            <li id="menu_item"><a href="mailto:hola@prescrypto.com?Subject=RexChain-Contact">Contact</a></li>
+          </ul>
+        </div>
+      </li>
+    </ul>
+  </div>
+</nav>
+<!-- Closing Main menu -->
+
+<div id="index_content">
+  <div class="grey-background">
+    <div class="uk-grid-medium" style="width:30%;padding-bottom:20px;">
+      <h1 class="welcome">Welcome<br>to <strong> Rexchain Wallet</strong> </h1>
+      <p class="main-subtitle">Access to your information</p>
+    </div>
+  </div>
+  <br>
+  <div class="uk-grid-medium" style="width:30%; padding-top:0;">
+    <a class="main-button uk-button uk-button-default uk-width-1-1 uk-margin-small-bottom" href="enterkeys.html">Enter your keys</a>
+    <a id="create_entropy" class=" main-button uk-button uk-button-default uk-width-1-1 uk-margin-small-bottom" >Create new keys</a>
+  </div>
+<!-- Move mouse for 5 secs -->
+<div id="modal-example" uk-modal>
+  <div class="createkeys-modal uk-modal-dialog uk-modal-body uk-margin-auto-vertical">
+    <h2 class="uk-modal-title">Create your keys!</h2>
+    <p id="greytxt">Please move your mouse cursor, to activate the button "Create"</p>
+    <p class="uk-text-right">
+    <div>
+      <progress id="js-progressbar" class="uk-progress" value="10" max="100"></progress>
+      <script>
+        var page_width = window.screen.availWidth;
+
+        UIkit.util.ready(function () {
+          var bar = document.getElementById('js-progressbar');
+          if(page_width < 700){
+            document.getElementById("greytxt").innerHTML = "Entropy generated! please click on 'Create'";
+            bar.value = 100;
+            document.entropy = Math.floor((Math.random() * 2000) + 1201);
+            $("#create_keys").removeAttr("disabled");
+          }
+          else{
+            var animate = setInterval(function () {
+            bar.value += 10;
+              if(document.entropy >= 1200) {
+                  bar.value=100;
+              }
+            }, 5000);
+
+          }
+          
+          
+        });
+      </script>
+    </div>
+    <button id="create_keys" class="uk-button uk-button-default" href="createkeys.html" disabled>Create</button>
+    </p>
+  </div>
+</div>
+
+</div>
+
+<script src="js/localforage.min.js"></script>
+<script src="https://code.jquery.com/jquery-1.8.3.min.js"></script>
+<script src="js/jsencrypt.js"></script>
+<script src="js/wallet.js"></script>
+<script>
+  // Functions
+  function save_keys(private_key, public_key){
+    //Save keys in localforage
+    localforage.setItem('privatekey', private_key).then(function(value){
+      // set privatekey
+      localforage.setItem('publickey', public_key).then(function(value){
+        console.log("Success Generated Keys!");
+        window.open("./createkeys.html","_self");
+      });
+    }).catch(function(e){
+      console.log(e);
+    });
+  }
+
+  function create_keys(){
+    // Create RSA keysan and save in local forage
+    var crypt = new JSEncrypt({default_key_size: 2048});
+    crypt.getKey();
+    var private_key = crypt.getPrivateKey();
+    var public_key = crypt.getPublicKey();
+    save_keys(private_key, public_key);
+  }
+
+  // Events
+  $('#create_entropy').on('click', function() {
+    UIkit.modal($("#modal-example")).show();
+    setInterval(function(){
+      if(document.entropy >= 1200){
+        $("#create_keys").removeAttr("disabled");
+      }
+    }, 1000);
+  });
+
+  $('#create_keys').on('click', function(e) {
+    e.preventDefault();
+    create_keys();
+  });
+</script>
+</body>
+</html>
