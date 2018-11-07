@@ -7,6 +7,8 @@
   <link rel="stylesheet" type="text/css" href="css/genometrics.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.5/css/uikit.min.css" />
   <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,900" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/styles/default.min.css">
+  <link rel="stylesheet" title="Monokai" href="https://highlightjs.org/static/demo/styles/obsidian.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.5/js/uikit.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.5/js/uikit-icons.min.js"></script>
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
@@ -137,6 +139,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/components/sha256.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/components/enc-base64.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/highlight.min.js"></script>
   <script src="js/jsencrypt.js"></script>
   <script src="js/jsrsasign-all-min.js"></script>
   <script src="js/underscore-min.js"></script>
@@ -164,7 +167,11 @@
       <a class="uk-alert-close" uk-close></a>';
   var alert_end ='</p></div>';
 
-  var tx_data_template = '<pre><%= data %></pre>'
+  var tx_data_template = '<pre>\
+  <code class="json hljs">\
+  <%= data %></code></pre>'
+
+  var decrypted_template= "<span style='font-weight: bold !important;color:#00ff6a !important;' class='hljs-literal'><%= myvar %></span>"
 
 
   $(document).ready(function() {
@@ -213,6 +220,7 @@
 
   function decrypt_json(jsondata, sub_fields_list, decrypt_fields_list, privkey){
       var new_jsondata = {};
+      var hgl_data = {};
       var rsa = new RSAKey();
 
       if(privkey != null && privkey != ""){
@@ -263,6 +271,8 @@
      }//if private key is already defined
 
      try{
+      var hgl_template = _.template(decrypted_template);
+      var _compiled  = "";
 
       rsa.readPrivateKeyFromPEMString(privkey);
 
@@ -276,9 +286,13 @@
 
             jsonvalue[key] = KJUR.crypto.Cipher.decrypt(value, rsa, RSA_ALG);
 
+            _compiled = hgl_template({"myvar":jsonvalue[key]});
+            hgl_data[key] = _compiled;
+
           }
           else{
              jsonvalue[key] = value;
+             hgl_data[key] = value;
           }
 
       });
@@ -289,10 +303,11 @@
        $('#alert-page').html( alert_error+'<p id="alert-page">Unable to decrypt the data'+ alert_end);
            document.getElementById("transferaction").disabled = true;
         jsonvalue = DATA;
+        hgl_data = DATA;
 
     }
 
-      return jsonvalue;
+      return [jsonvalue, hgl_data];
 
   }
 
@@ -894,11 +909,17 @@
         // Assign data decrypt
         _DATA_FOR_SIGN = DATA.data;
         _DATA_DECRYPTED = decrypt_json(_DATA_FOR_SIGN, sub_fields, decrypt_fields, "");
+        _HIGHLIGTH_DATA_DECRYPTED = _DATA_DECRYPTED[1]
 
         document.getElementById("transferaction").disabled = false;
-        DATA.data = _DATA_DECRYPTED
+        DATA.data = _DATA_DECRYPTED[1]
+        _HIGHLIGTH_DATA_DECRYPTED = DATA
+        add_tx_markup(_HIGHLIGTH_DATA_DECRYPTED);
+        DATA.data = _DATA_DECRYPTED[0]
         DATA_DECRYPTED = DATA
-        add_tx_markup(DATA_DECRYPTED);
+        
+
+        
 
     });
 
