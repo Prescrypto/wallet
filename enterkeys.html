@@ -268,6 +268,9 @@
   document.getElementById('privkey_file')
   .addEventListener('change', read_privkey_file, false);
 
+  document.getElementById('key_one_file')
+  .addEventListener('change', read_key_onefile, false);
+
   //Validation for Pin code
   $(function(){
     $('#pin_code').keypress(function(e) {
