@@ -206,9 +206,13 @@
   }
 
   function read_key_onefile(e){
-    //Variable
+    /* This method reading and save in input the public key and
+    private key from one file is necessary that the keys are separated 
+    through "\n".   
+    */
+  
     var file = e.target.files[0]
-    //Small Validation
+    //Small Validation if file is empty
     if (!file) {
       return;
     }
@@ -216,13 +220,14 @@
     var read = new FileReader();
     read.onload = function(e) {
       var content = e.target.result;
+      //Find if file has a public key  
       var position_pubkey = content.search("-----END PUBLIC KEY-----");
-      console.log(position_pubkey);
-      var position_end_pubkey = position_pubkey + 24;
       if (position_pubkey > 0){
-        var public_key = content.substring(0,position_end_pubkey);
+        //Take the public key from file, where "-----END PUBLIC KEY-----".lenght = 24  
+        var public_key = content.substring(0,position_pubkey + 24);
         $("#pubkey").html(public_key);
-        var private_key = content.substring(position_end_pubkey+1, content.length);
+        //Take the encrypt private key from file
+        var private_key = content.substring(position_pubkey + 25, content.length);
         $("#privkey").html(private_key);
       }else{
         console.log("You file do not contains a keys");
