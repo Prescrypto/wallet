@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sequentia Wallet</title>
+  <link rel="stylesheet" type="text/css" href="css/sequentiawallet.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.5/css/uikit.min.css" />
+  <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,900" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.5/js/uikit.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.5/js/uikit-icons.min.js"></script>
+</head>
+<body>
+  <!-- Main menu -->
+  <nav class="uk-navbar-container" uk-navbar="boundary-align: true; align: right;">
+    <div class="uk-navbar-left">
+      <ul class="uk-navbar-nav">
+        <li><a class="uk-navbar-item uk-logo" href="index.html"> SequentiaWallet </a></li>
+      </ul>
+    </div>
+    <div class="uk-navbar-right">
+      <ul class="uk-navbar-nav">
+        <li>
+          <a class="uk-navbar-toggle" uk-navbar-toggle-icon href=""></a>
+          <div class="uk-navbar-dropdown">
+            <ul class="uk-nav uk-navbar-dropdown-nav">
+              <li id="menu_item"><a href="https://genobank.herokuapp.com/">Go to Navigator</a></li>
+              <li id="menu_item">
+                <form class="uk-search uk-search-default">
+                  <span class="uk-search-icon-flip" uk-search-icon></span>
+                  <input class="uk-search-input" type="search" placeholder="Search...">
+                </form>
+              </li>
+              <li id="menu_item"><a href="#">Contact</a></li>
+            </ul>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </nav>
+  <!-- Closing Main menu -->
+
+ <!-- BEGIN Aside pub and private keys -->
+  <aside style="display:none;">
+    <textarea id="pubkey"></textarea>
+    <textarea id="privkey"></textarea>
+  </aside>
+  <!-- END Aside pub and private keys -->
+    <div class="grey-background" align="center" style="padding:150px 0 20px 0;">
+      <div id="box_pin_code" class="uk-margin" align="center">
+        <h2 style="color:#fff"><img style="height:40px;margin-bottom:10px;" src="media/light-locker.svg" alt=""> PIN</h2>
+        <p style="color:#fff"><strong>Enter a 4 digits pin code</strong><br>Make sure you remember it, you’ll need it for all your transactions.</p>
+        <div class="uk-form-controls">
+          <input id="pin_code" name="pin_code" class="uk-input" type="text" maxlength="4" placeholder="Enter PIN code" required />
+        </div>
+      </div>
+    </div>
+    <div align="center" id="success_button" >
+      <button class="uk-button uk-button-default" id="encrypt_privkey"> NEXT </button>
+    </div>
+
+ 
+<script src="js/localforage.min.js"></script>
+<script src="https://code.jquery.com/jquery-1.8.3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/components/core-min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/components/sha256.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
+<script src="js/jsencrypt.js"></script>
+<script src="js/wallet.js"></script>
+<script>
+    $(document).ready(function() {
+      (function ($, localforage){
+          function setKeys(){
+          // Get the keys from localforage
+          localforage.getItem('privatekey', function(err, value){
+            $('#privkey').val(value);
+          });
+          localforage.getItem('publickey', function(err, value){
+            $('#pubkey').val(value);
+          });
+        };
+        setKeys();
+      })($, localforage);
+    });
+
+    //Variables
+    var alert_success = '<div  class="uk-alert-success" uk-alert>\
+      <a class="uk-alert-close" uk-close></a>\
+      <p id="alert">';
+    var alert_error = '<div  class="uk-alert-danger" uk-alert>\
+      <a class="uk-alert-close" uk-close></a>\
+      <p id="alert">';
+    var alert_end ='</p></div>';
+
+    //Functions
+    function verify_lenght(field){
+      //This method verify if length of a fields is empty 
+      if (field.length == 4){
+        return true
+      }else {
+        $('#alert').html(alert_error+'ERROR. Please enter a pin from four digits; Please try again. '+alert_end);
+        return false
+      }
+    }
+
+
+    function hash_string(){
+      //This method calculate hash for the  value from pin
+      var pin = CryptoJS.SHA256($('#pin_code').val());
+      var pin_hash = pin.toString(CryptoJS.enc.b64);  
+      return pin_hash
+    }
+    
+    function save_encrypt_privkey(){
+      //Encrypt private key and save in localforage
+      var privatekey = $('#privkey').val();
+      //Encrypt private key
+      var encrypt = CryptoJS.AES.encrypt(privatekey, hash_string());
+      var encrypt_b64 =  encrypt.toString(CryptoJS.enc.b64);
+      //Save encrypt private key in localforage
+      localforage.setItem('privatekey', encrypt_b64).then(function(value){
+        $('#privkey').val(value);
+        console.log("Success Generated Keys!");
+        window.open("./genometrics.html","_self");  
+      }).catch(function(e){
+        console.log(e);
+      });
+    }
+
+    //Events
+    $('#encrypt_privkey').click(function(){
+      if (verify_lenght($('#pin_code').val())){
+        save_encrypt_privkey();    
+      }
+    });
+    
+    //Validation for Pin code
+    $(function(){
+      $('#pin_code').keypress(function(e) {
+        if(isNaN(this.value + String.fromCharCode(e.charCode))) 
+          return false;
+      })
+    });
+
+
+</script>
+</body>
+</html>
