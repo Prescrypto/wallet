@@ -3,19 +3,19 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Sequentia Wallet</title>
+  <title>Rexchain Wallet</title>
   <link rel="stylesheet" type="text/css" href="css/sequentiawallet.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.5/css/uikit.min.css" />
   <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,900" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.5/js/uikit.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.5/js/uikit-icons.min.js"></script>
 </head>
-<body>
+<body style="background-color: #fff;">
 <!-- Main menu -->
 <nav class="uk-navbar-container" uk-navbar="boundary-align: true; align: right;">
   <div class="uk-navbar-left">
     <ul class="uk-navbar-nav">
-      <li><a class="uk-navbar-item uk-logo" href="index.html"> SequentiaWallet </a></li>
+      <li><a class="uk-navbar-item uk-logo" href="index.html"> Rexchain Wallet </a></li>
     </ul>
   </div>
   <div class="uk-navbar-right">
@@ -24,14 +24,7 @@
         <a class="uk-navbar-toggle" uk-navbar-toggle-icon href=""></a>
         <div class="uk-navbar-dropdown">
           <ul class="uk-nav uk-navbar-dropdown-nav">
-            <li id="menu_item"><a href="https://genobank.herokuapp.com/">Go to Navigator</a></li>
-            <li id="menu_item">
-              <form class="uk-search uk-search-default">
-                <span class="uk-search-icon-flip" uk-search-icon></span>
-                <input class="uk-search-input" type="search" placeholder="Search...">
-              </form>
-            </li>
-            <li id="menu_item"><a href="#">Contact</a></li>
+            <li id="menu_item"><a href="mailto:hola@prescrypto.com?Subject=RexChain-Contact">Contact</a></li>
           </ul>
         </div>
       </li>
@@ -44,19 +37,23 @@
     <form class="uk-form-horizontal uk-margin-large"> <!--Enterkeys form-->
       <!-- Alert Invalid Keys-->
       <div id="alert"></div>
+      <!-- Import keys inputs -->
+      <div class="uk-margin">
+        <label class="uk-form-label" for="form-horizontal-text">Import your keys</label>
+        <div class="js-upload uk-placeholder uk-text-center">
+          <span uk-icon="icon: cloud-upload"></span>
+          <span class="uk-text-middle">Attach your Keys from one file by dropping it here or</span>
+          <div uk-form-custom>
+            <input id="key_one_file" type="file">
+            <span id="upload_link" class="uk-link">Select your Key file from computer</span>
+          </div>
+        </div>
+      </div>
       <!--Private keys-->
       <div class="uk-margin">
         <label class="uk-form-label" for="form-horizontal-text">Private Keys</label>
         <div class="uk-form-controls">
           <textarea id="privkey" name="privkey" class="uk-input" id="form-horizontal-text" type="text" placeholder="Paste keys"></textarea>
-        </div>
-        <div class="js-upload uk-placeholder uk-text-center">
-          <span uk-icon="icon: cloud-upload"></span>
-          <span class="uk-text-middle">Attach your PRIVATE Key by dropping it here or</span>
-          <div uk-form-custom>
-            <input id="privkey_file" type="file">
-            <span id="upload_link" class="uk-link">Select your PRIVATE Key from computer</span>
-          </div>
         </div>
       </div>
       <!--Public keys-->
@@ -65,15 +62,8 @@
         <div class="uk-form-controls">
           <textarea id="pubkey" name="pubkey" class="uk-input" id="form-horizontal-text" type="text" placeholder="Paste keys"></textarea>
         </div>
-        <div class="js-upload uk-placeholder uk-text-center">
-          <span uk-icon="icon: cloud-upload"></span>
-          <span class="uk-text-middle">Attach your PUBLIC Key by dropping it here or</span>
-          <div uk-form-custom>
-            <input id="pubkey_file" type="file">
-            <span id="upload_link" class="uk-link">Select your PUBLIC Key from computer</span>
-          </div>
-        </div>
       </div>
+
     </form>
   </div> <!--Closing Medium size div-->
 </div>
@@ -168,10 +158,14 @@
     }
   }
 
-  function read_pubkey_file(e) {
-    // Variable
-    var file = e.target.files[0];
-    //Small Validation
+  function read_key_onefile(e){
+    /* This method reading and save in input the public key and
+    private key from one file is necessary that the keys are separated 
+    through "\n".   
+    */
+  
+    var file = e.target.files[0]
+    //Small Validation if file is empty
     if (!file) {
       return;
     }
@@ -179,23 +173,24 @@
     var read = new FileReader();
     read.onload = function(e) {
       var content = e.target.result;
-      $("#pubkey").html(content);
-    };
-    read.readAsText(file);
-  }
-
-  function read_privkey_file(e) {
-    // Variable
-    var file = e.target.files[0];
-    //Small Validation
-    if (!file) {
-      return;
-    }
-    //Read file
-    var read = new FileReader();
-    read.onload = function(e) {
-      var content = e.target.result;
-      $("#privkey").html(content);
+      //Find if file has a public key
+      var position_pubkey_start = content.search("-----BEGIN PUBLIC KEY-----");
+      var position_pubkey_end = content.search("-----END PUBLIC KEY-----");
+      //Take the encrypt private key from file
+      var position_prikey_start = content.search("-----BEGIN ENCRYPTED PRIVATE KEY-----");
+      var position_prikey_end = content.search("-----END ENCRYPTED PRIVATE KEY-----");
+      
+      if (position_pubkey_start > 0 & position_prikey_start > 0){
+        //Take the public key from file, where "-----END PUBLIC KEY-----".lenght = 24
+        var public_key = content.substring(position_pubkey_start,position_pubkey_end + 24);
+        $("#pubkey").html(public_key);
+        //Take the private key from file
+        var private_key = content.substring(position_prikey_start + 39, position_prikey_end - 1);
+        $("#privkey").html(private_key);
+      }else{
+        console.log("You file do not contains a keys");
+        return;
+      }
     };
     read.readAsText(file);
   }
@@ -257,11 +252,8 @@
     verify_files_keys();
   });
 
-  document.getElementById('pubkey_file')
-  .addEventListener('change', read_pubkey_file, false);
-
-  document.getElementById('privkey_file')
-  .addEventListener('change', read_privkey_file, false);
+  document.getElementById('key_one_file')
+  .addEventListener('change', read_key_onefile, false);
 
   //Validation for Pin code
   $(function(){
