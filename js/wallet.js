@@ -1,7 +1,7 @@
 (function (window){
   function set_baseurl(baseurl){
     // Set base url to Rexchain Navigator, produdccion or developtment server
-    window.baseurl = (window.location.protocol === "https:") ? "https://rexchain-dev-pr-42.herokuapp.com/" : baseurl;
+    window.baseurl = (window.location.protocol === "https:") ? "https://www.rexchain.io/" : baseurl;
   };
   //set_baseurl("https://www.rexchain.io/");
   set_baseurl("https://rexchain-dev-pr-42.herokuapp.com/");
