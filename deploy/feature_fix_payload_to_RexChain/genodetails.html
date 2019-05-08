@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Rexchain Wallet</title>
+  <link rel="stylesheet" type="text/css" href="css/genometrics.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.5/css/uikit.min.css" />
+  <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,900" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/styles/default.min.css">
+  <link rel="stylesheet" title="Monokai" href="https://highlightjs.org/static/demo/styles/obsidian.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.5/js/uikit.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.5/js/uikit-icons.min.js"></script>
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+</head>
+<body>
+  <!-- Main menu -->
+  <nav class="uk-navbar-container" uk-navbar="boundary-align: true; align: right;">
+    <div class="uk-navbar-left">
+      <ul class="uk-navbar-nav">
+        <li><a class="uk-navbar-item uk-logo" href="index.html"> Rexchain Wallet </a></li>
+      </ul>
+    </div>
+    <div class="uk-navbar-right">
+      <ul class="uk-navbar-nav">
+        <li>
+          <a class="uk-navbar-toggle" uk-navbar-toggle-icon href=""></a>
+          <div class="uk-navbar-dropdown">
+            <ul class="uk-nav uk-navbar-dropdown-nav">
+              <li id="menu_item"><a href="mailto:hola@prescrypto.com?Subject=RexChain-Contact">Contact</a></li>
+            </ul>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </nav>
+  <!-- Closing Main menu -->
+
+  <!-- Aside pub and private keys -->
+  <aside style="display:none;">
+    <textarea id="pub_key"></textarea>
+    <textarea id="priv_key"></textarea>
+  </aside>
+
+  <!-- Aside pub and private keys -->
+
+<div class="uk-child-width-expand@s" uk-grid>
+  <div class="uk-grid-item-match">
+    <div class="uk-card uk-card-default uk-card-body">
+      <div class="uk-inline" style="width: 100%">
+        <button id="decrypt" class="uk-button uk-button-default" style="font-weight: 700;background-color: white">Decrypt</button>
+        <!-- Transfer Data button calling modal-->
+        <button id="transferaction" name="transferaction" class="uk-button uk-button-default" uk-toggle="target: #modal-transact" style="font-weight: 700;background-color: #4AD991; color:#fff;" disabled>Transfer Data</button>
+        <a id="backbtn" class="uk-button uk-button-default"  href="genometrics.html">Back</a>
+        <!-- This is Transfer Data Modal-->
+        <div id="modal-transact" uk-modal>
+            <div class="uk-modal-dialog uk-modal-body">
+                <h2 class="uk-modal-title">Transfer your Data</h2>
+                  <div id="video"></div>
+                  <div class="uk-margin">
+                    <div id="uploaded_list"></div>
+                    <div id="alert"></div>
+                    <label class="uk-form-label" for="form-stacked-text">To: </label>
+                    <div class="uk-form-controls">
+                      <textarea id="newpubkey" name="newpubkey" class="uk-input" type="text" placeholder="Paste Public key" onchange="validate_transfer()" required></textarea>
+                      <div id="qr-box">
+                        <p id="message">Or scan Qr Code with your WebCam</p>
+                        <div id="loadingMessage">Unable to access video stream (please make sure you have a webcam enabled)</div>
+                        <canvas id="canvas" hidden></canvas>
+                        <div id="output" hidden>
+                          <div id="outputMessage">No QR code detected.</div>
+                          <div hidden><b>Found it!</b> <span id="outputData"></span></div>
+                        </div>
+                      </div>
+                        <div class="js-upload uk-placeholder uk-text-center">
+                          <span uk-icon="icon: cloud-upload"></span>
+                          <span class="uk-text-middle">Attach your PUBLIC Key by dropping it here or</span>
+                          <div uk-form-custom>
+                            <input id="pubkey_file" type="file">
+                            <span id="upload_link" class="uk-link">Select your PUBLIC Key from computer</span>
+                          </div>
+                        </div>
+                    </div>
+                  </div>
+                  <div class="uk-margin">
+                    <label class="uk-form-label" for="form-text-area">Memo: </label>
+                    <textarea id="memo" name="memo" class="uk-textarea" rows="5" placeholder=""></textarea>
+                  </div>
+                  <div class="uk-margin">
+                    <label class="uk-form-label" for="form-pin">Pin: </label>
+                    <div id="form-pin" class="uk-inline">
+                      <span class="uk-form-icon uk-form-icon-flip" uk-icon="icon: lock"></span>
+                      <input class="uk-input" type="password" maxlength="4" pattern="[0-9]*" name="pin" id="pin" required>
+                    </div>
+                  </div>
+                  <div id="transfer_button">
+                    <button id="transferdata"  class="uk-button uk-button-default" style="font-weight: 700;background-color: #fff; color:#3C3C3C;" disabled> Transfer </button>
+                  </div>
+
+            </div>
+        </div>
+      </div>
+      <h3>Raw dataset</h3>
+      <div style="width:100%">
+        <div id="alert-page"></div>
+        <label id="hash_id_label">Hash Id: </label>
+      </div>
+      <h5 style="width:100%;"><a id="tx_link" href="#" target="_blank"><img style="height:30px;" src="media/navigator.svg"> Show on Navigator</a></h5>
+      <div id="datajson">
+      </div>
+      <div id="readable_status" >
+        <!-- Status of the Transaction-->
+      </div>
+    </div>
+  </div>
+
+  <!-- This is the pincode modal -->
+  <div id="pincode_modal" uk-modal>
+      <div class="uk-modal-dialog uk-modal-body">
+          <h2 class="uk-modal-title">Please enter your pin code</h2>
+          <div class="uk-margin">
+            <input class="uk-input" type="password" maxlength="4" pattern="[0-9]*" id="pin_code1" >
+          </div>
+          <div class="uk-margin">
+            <button class="uk-modal-close uk-button uk-button-default" type="button"
+            style="background-color: #000; color:#fff;" >Ok</button>
+          </div>
+      </div>
+  </div>
+</div>
+
+  <script src="js/localforage.min.js"></script>
+  <script
+  src="https://code.jquery.com/jquery-3.3.1.min.js"
+  integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+  crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/components/core-min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/components/sha256.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/components/enc-base64.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/highlight.min.js"></script>
+  <script src="js/jsencrypt.js"></script>
+  <script src="js/jsrsasign-all-min.js"></script>
+  <script src="js/underscore-min.js"></script>
+  <script src="js/wallet.js"></script>
+  <script src="js/jsQR.js"></script>
+  <script src="https://sdk.amazonaws.com/js/aws-sdk-2.7.18.min.js"></script>
+  <script src="js/config_aws.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script>
+  // Global variables
+
+  var genomic_status = false;
+  var global_pin_code = "";
+  var global_file_name = "";
+  var list_decrypt = [];
+  var DATA = {};
+  var DATA_DECRYPTED = {};
+  var RSA_ALG = "RSAOAEP"; //this is the RSA standar for encryptation
+
+  var encryption_secret_key = ""; // the new key to decrypt the files
+  var actual_secret_key = ""; //the encrypted key to decrypt the files
+  var alert_success = '<div  class="uk-alert-success" uk-alert>\
+      <a class="uk-alert-close" uk-close></a>';
+  var alert_error = '<div  class="uk-alert-danger" uk-alert>\
+      <a class="uk-alert-close" uk-close></a>';
+  var alert_end ='</p></div>';
+
+  var tx_data_template = '<pre>\
+  <code class="json hljs">\
+  <%= data %></code></pre>'
+
+  var decrypted_template= "<span style='font-weight: bold !important;color:#00ff6a !important;' class='hljs-literal'><%= myvar %></span>"
+
+
+  $(document).ready(function() {
+    var searchParams = new URLSearchParams(window.location.search);
+
+    if(searchParams.has("hash_id")){
+            var txid = searchParams.get('hash_id');
+            $('#hash_id_label').append('<pre>'+txid+'</pre>');
+            $('#tx_link').attr("href", window.baseurl + 'hash/'+txid);
+    }
+
+  });
+
+  // Functions
+  function validate_key(key_id){
+    // Verify if the field pubkey is empty
+    if ($(key_id).val().length===0){
+      return false
+    }else{
+      return true
+    }
+  }
+
+  function sign(msg, priv_key, hash_alg){
+    //Create a signature of payload
+    var rsa = new RSAKey();
+    rsa.readPrivateKeyFromPEMString(priv_key);
+    var sign_msg = rsa.sign(msg, hash_alg);
+    return sign_msg;
+  }
+
+  function validate_pin(pin){
+    if (!/^([0-9])*$/.test(pin)){
+      return false
+    }else{
+      return true
+    }
+  }
+
+  function hash_string(value){
+    //This method calculate hash for the  value from pin
+    var pin = CryptoJS.SHA256(value);
+    var pin_hash = pin.toString(CryptoJS.enc.b64);
+    return pin_hash
+  }
+
+  function decrypt_json(jsondata, sub_fields_list, decrypt_fields_list, privkey){
+      var new_jsondata = {};
+      var hgl_data = {};
+      var rsa = new RSAKey();
+
+      if(privkey != null && privkey != ""){
+        console.log("private key already loaded");
+      }
+      else{
+
+        if(!validate_key("#priv_key")){
+          console.log("No Priv Key found");
+          $('#alert-page').html(alert_not_found);
+          document.getElementById("transferaction").disabled = true;
+          return null;
+
+        }
+        else{
+
+          var privkey_encrypt =  $("#priv_key").val();
+          var pin_flag = true;
+          privkey = null;
+
+
+          if (global_pin_code.length==4){
+            if (validate_pin(global_pin_code)){
+              var privkey_decrypt = CryptoJS.AES.decrypt(privkey_encrypt, hash_string(global_pin_code));
+              try{
+                privkey = privkey_decrypt.toString(CryptoJS.enc.Utf8);
+                pin_flag = false
+              }catch(err){
+                alert("PIN CODE invalid");
+                document.getElementById("transferaction").disabled = true;
+                console.log(err);
+                return null;
+              }
+            }
+          }else{
+            document.getElementById("transferaction").disabled = true;
+            alert("PIN CODE invalid");
+            return null;
+          }
+
+          if(privkey == null){
+            document.getElementById("transferaction").disabled = true;
+            alert("Private key invalid");
+            return null;
+          }
+
+       }
+     }//if private key is already defined
+
+     try{
+      var hgl_template = _.template(decrypted_template);
+      var _compiled  = "";
+
+      rsa.readPrivateKeyFromPEMString(privkey);
+
+      global_pin_code = "";
+      var jsonvalue = {};
+
+      $.each(jsondata, function(key, value){
+
+
+          if(decrypt_fields_list.includes(key)){
+
+            jsonvalue[key] = KJUR.crypto.Cipher.decrypt(value, rsa, RSA_ALG);
+
+            _compiled = hgl_template({"myvar":jsonvalue[key]});
+            hgl_data[key] = _compiled;
+
+          }
+          else{
+             jsonvalue[key] = value;
+             hgl_data[key] = value;
+          }
+
+      });
+
+    }
+    catch(err){
+      console.log(err);
+       $('#alert-page').html( alert_error+'<p id="alert-page">Unable to decrypt the data'+ alert_end);
+           document.getElementById("transferaction").disabled = true;
+        jsonvalue = DATA;
+        hgl_data = DATA;
+
+    }
+
+      return [jsonvalue, hgl_data];
+
+  }
+
+  function encrypt_payload(jsondata, sub_fields_list, encrypt_fields_list, pubkey){
+    //var rsa = new RSAKey();
+    var jsonvalue = {};
+    var rsa = KEYUTIL.getKey(pubkey);
+
+    // Get only data json
+    _data = jsondata.data;
+
+    $.each(_data, function(key, value){
+      if(encrypt_fields_list.includes(key)){
+        jsonvalue[key] = KJUR.crypto.Cipher.encrypt(value, rsa, RSA_ALG);
+
+      }else{
+         jsonvalue[key] = value;
+      }
+
+    });
+
+    // This code snippet was necesary just to check medications
+    // jsonvalue["medications"] = jsonvalue.medications;
+
+    return jsonvalue;
+  }
+
+  function filter_keys(jsondata, discard_key_list, sub_fields_list){
+    var jsonvalue = {};
+
+        $.each(jsondata, function(key, value){
+
+          if(sub_fields_list.includes(key)){
+            var sub_array = [];
+            if(Array.isArray(value)){
+
+              $.each(value, function(i, subjson){
+                var sub_jsonvalue = {};
+                $.each(subjson, function(subkey, subvalue){
+
+                  if(discard_key_list.includes(subkey)){
+                    //discard this key and value
+                  }
+                  else{
+                    sub_jsonvalue[subkey] = subvalue;
+                  }
+                });
+                sub_array.push(sub_jsonvalue);
+
+              });
+              jsonvalue[key] = sub_array;
+            }
+
+          }
+          else{
+             if(discard_key_list.includes(key)){
+                    //discard this key and value
+            }
+            else{
+               jsonvalue[key] = value;
+            }
+
+          }
+
+
+        });
+        return jsonvalue;
+
+  }
+
+  function decrypt_data(){
+       // Decrypt data and create list
+      var data_decrypt = [];
+      var isValidData = false;
+      var alert_not_found = '<div  class="uk-alert-danger" uk-alert>\
+      <a class="uk-alert-close" uk-close></a>\
+      <p id="alert-page">Error. No Private key found.</p>\
+      </div>'
+
+      if(!validate_key("#priv_key")){
+        console.log("No Priv Key found");
+        $('#alert-page').html(alert_not_found);
+        document.getElementById("transferaction").disabled = true;
+        return null;
+
+      }
+      else{
+
+
+        // Make list for graph
+        var index = 1;
+        list_decrypt = [['Country', 'Popularity'],];
+        var tx_json = $("#datajson");
+
+
+        var decrypt = new JSEncrypt();
+
+        var privkey_encrypt =  $("#priv_key").val();
+        var pin_flag = true;
+        var privkey = null;
+
+
+
+        if (global_pin_code.length==4){
+          if (validate_pin(global_pin_code)){
+            var privkey_decrypt = CryptoJS.AES.decrypt(privkey_encrypt, hash_string(global_pin_code));
+            try{
+              privkey = privkey_decrypt.toString(CryptoJS.enc.Utf8);
+              pin_flag = false
+            }catch(err){
+              alert("PIN CODE invalid");
+
+              console.log(err);
+              //return null;
+            }
+          }
+        }else{
+          document.getElementById("transferaction").disabled = true;
+          alert("PIN CODE invalid");
+          return null;
+        }
+
+        if(privkey == null){
+          document.getElementById("transferaction").disabled = true;
+          alert("Private key invalid");
+          return null;
+        }
+
+        decrypt.setPrivateKey(privkey);
+
+        global_pin_code = "";
+
+        $.each(tx_json, function(){
+          var value_input = $(this).html();
+          // Decrypt data
+          if(value_input != null){
+            if(value_input == ""){
+              $(this).html("");
+            }
+            else{
+              var decrypted_input = decrypt.decrypt(value_input);
+
+              if(decrypted_input == "" || decrypted_input == null){
+                 $(this).html(null);
+
+              }
+              else{
+                $(this).html(decrypted_input);
+              }
+            }
+
+              // Create list with decrypt data
+              data_decrypt.push($(this).html());
+          }
+
+        });
+
+        //we push the genomic data into list_decrypt for further uses (transference)
+        var percent_decrypt = 0;
+        var key_data = "";
+
+        if(data_decrypt.length < 1){
+          isValidData = true;
+        }
+        else{
+          for (index; index<data_decrypt.length; index++){
+            if (index%2){
+              percent_decrypt = 0;
+              key_data = "";
+              try{
+                  if(data_decrypt[index] == null){
+                    isValidData = false;
+                    break;
+                  }
+                  if(data_decrypt[index] == ""){
+                    percent_decrypt = 0;
+                    key_data = "No Data";
+                  }
+                  else{
+                    percent_decrypt = parseFloat(data_decrypt[index]);
+                    key_data = data_decrypt[index-1];
+                  }
+
+                  list_decrypt.push([key_data,percent_decrypt]);
+                  isValidData = true;
+              }
+              catch(err){
+                isValidData = false;
+                break;
+              }
+
+            }
+          }
+        }
+
+        if (!isValidData){
+           $('#alert-page').html( alert_error+'<p id="alert-page">Unable to decrypt the data'+ alert_end);
+           document.getElementById("transferaction").disabled = true;
+          return null;
+        }
+
+        // Here we enable the transfer button and disable de decrypt button
+         $("#decrypt").attr("disabled", "true");
+        document.getElementById("transferaction").disabled = false;
+        return list_decrypt;
+      }
+    }
+
+
+  function validate_transfer(){
+    var transfer_button = '<button id="transferdata" onclick="transfer_data()" class="uk-button uk-button-default" style="font-weight: 700;background-color: #3C3C3C; color:#fff;"> Transfer </button>';
+    var transfer_button_disabled = '<button id="transferdata" onclick="transfer_data()" class="uk-button uk-button-default" style="font-weight: 700;background-color: #fff; color:#3C3C3C;" disabled> Transfer </button>';
+
+    var alert_key = '<div  class="uk-alert-danger" uk-alert>\
+      <a class="uk-alert-close" uk-close></a>\
+      <p id="alert">Error. You have entered invalid key; Please try again.</p>\
+      </div>';
+
+      if (validate_key("#newpubkey")){
+        $('#transfer_button').html(transfer_button);
+
+      }else{
+        $('#transfer_button').html(transfer_button_disabled);
+        $('#alert').html(alert_key);
+      }
+  }
+  function toWordArray(str){
+    //convert string to word array
+        return CryptoJS.enc.Utf8.parse(str);
+  }
+  function toString(words){
+    //convert word array to string
+        return CryptoJS.enc.Utf8.stringify(words);
+  }
+  function toBase64String(words){
+    //convert word array to string base 64
+        return CryptoJS.enc.Base64.stringify(words);
+  }
+   function decrypt_file_symm(cipherfile, symm_key){
+      // convert payload encoded in base64 to words
+    var iv = CryptoJS.lib.WordArray.random(16);
+    var decrypted = CryptoJS.AES.decrypt(cipherfile, symm_key, {iv: iv});
+    return toString(decrypted);
+  }
+  function ecrypt_file_symm(myfile, symm_key){
+      //encrypt file with a symmetric key
+     var iv = CryptoJS.lib.WordArray.random(16);
+    var encryptedfile = CryptoJS.AES.encrypt(myfile, symm_key, {iv: iv});
+      // encode in base64
+    return encryptedfile.toString();
+  }
+  function generateECDSA() {
+    var curve = 'secp256r1';
+    var ec = new KJUR.crypto.ECDSA({"curve": curve});
+    var keypair = ec.generateKeyPairHex();
+    // this generates a key pair named keypair.ecpubhex and keypair.ecprvhex
+
+    return keypair;
+  }
+  function encrypt_string(mystring, mypub_key){
+    // Encrypt data
+    var encrypt = new JSEncrypt();
+    encrypt.setPublicKey(mypub_key);
+
+    return encrypt.encrypt(mystring);
+  }
+  function decrypt_string(mystring, private_key){
+    // Encrypt data
+    var decrypt = new JSEncrypt();
+    decrypt.setPrivateKey(private_key);
+
+    return decrypt.decrypt(mystring);
+  }
+  function get_pub_key_from_addr(pb_address){
+      var url_ = window.baseurl + "api/v1/address/"+pb_address+"/";
+        axios({
+          method:'get',
+          url: url_,
+          headers: {
+              'Content-Type': 'application/json'
+          }
+        }).then(function(response) {
+          var data = response.data;
+          if(data == null || data == ""){
+          console.log("incorrect QR code");
+          $('#alert').html(alert_error+'<p id="alert">Error, Incorrect QR! '+alert_end);
+        }
+        else{
+          $("#newpubkey").val(data.pub_key);
+          validate_transfer();
+        }
+        });
+    }
+
+  function sortOnKeys(dict) {
+    // Awesome function sorter with javascript
+    // https://stackoverflow.com/questions/10946880/sort-a-dictionary-or-whatever-key-value-data-structure-in-js-on-word-number-ke
+    var sorted = [];
+    for(var key in dict) {
+        sorted[sorted.length] = key;
+    }
+    sorted.sort();
+
+    var tempDict = {};
+    for(var i = 0; i < sorted.length; i++) {
+        tempDict[sorted[i]] = dict[sorted[i]];
+    }
+
+    return tempDict;
+  }
+
+
+  function transfer_data(){
+    //transfer data to the new owner
+     var alert_not_found = '<div  class="uk-alert-danger" uk-alert>\
+        <a class="uk-alert-close" uk-close></a>\
+        <p id="alert">Error. No Public or Private key found.</p>\
+        </div>';
+
+      var alert_fail = '<div  class="uk-alert-danger" uk-alert>\
+        <a class="uk-alert-close" uk-close></a>\
+        <p id="alert">Error. Transference failed.</p>\
+        </div>';
+
+      var index = 1;
+      var new_payload = {};
+      var payload = new Object();
+      var form_pin = ($('#pin').val()).toString();
+      var form_memo = $('#memo').val();
+
+      if (validate_key("#newpubkey") && validate_key("#priv_key")){
+
+        var prk = $('#priv_key').val();
+        var privkey = null;
+        var pin_flag = true;
+
+
+          if(form_pin.length == 4){
+            var privkey_decrypt = CryptoJS.AES.decrypt(prk, hash_string(form_pin));
+            try{
+              privkey = privkey_decrypt.toString(CryptoJS.enc.Utf8);
+              pin_flag = false;
+            }catch(err){
+              alert("PIN CODE invalid, try again.");
+              console.log(err);
+              return;
+            }
+          }else{
+            alert("PIN CODE invalid. Please enter a PIN with four digits, try again.");
+            return;
+          }
+
+
+        // Encrypt data
+        var encrypt = new JSEncrypt();
+        var index_encrypt = 0;
+        var new_pub_key = $("#newpubkey").val();
+
+        encrypt.setPublicKey(new_pub_key);
+        var discard_key_list=[];
+        var sub_fields = ["medications"];
+        var decrypt_fields = [
+              "medic_name",
+              "medic_cedula",
+              "patient_name",
+              "patient_age",
+              "diagnosis"
+        ];
+
+        new_payload = filter_keys(DATA_DECRYPTED, discard_key_list, sub_fields);
+
+        new_payload = encrypt_payload(new_payload, sub_fields, decrypt_fields, new_pub_key);
+
+        // Make payload
+        var today = new Date();
+        var times = today.toISOString();
+
+
+        new_payload["timestamp"] = times;
+        new_payload["location"] = "Mexico";
+        new_payload = sortOnKeys(new_payload)
+
+        var msg = JSON.stringify(new_payload);
+        var hash_alg = 'sha1';
+
+        // Changes are needed
+        var previous_hash = "";
+        var searchParams = new URLSearchParams(window.location.search);
+
+        if(searchParams.has("hash_id")){
+          var txid = searchParams.get('hash_id');
+          previous_hash = txid;
+        }
+
+        _payload = {
+          "data": new_payload,
+          "public_key": encrypt.getPublicKeyB64(),
+          "signature": sign(msg, privkey, hash_alg),
+          "previous_hash": previous_hash
+        }
+
+
+        var url_ = window.baseurl + "api/v1/rx-endpoint/";
+
+        axios({
+          method:'post',
+          url: url_,
+          headers: {
+              'Content-Type': 'application/json'
+          },
+          data: _payload
+        })
+        .then(function(response) {
+        	console.log("Transfer success!");
+          window.open("./genometrics.html", "_self");
+        })
+        .catch(function (error) {
+          console.log("TRANSACTION ERROR!")
+          console.log(error);
+        })
+
+      }
+      else{
+         console.log("No Public Key found");
+          $('#alert').html(alert_not_found);
+          $('#newpubkey').val('');
+          document.getElementById("transferdata").disabled = true;
+      }
+
+  }
+
+
+  function download_file(text, name, type) {
+    var file = new Blob([text], {type: type});
+    var download_link = document.getElementById("link");
+    local_file_url = URL.createObjectURL(file);
+    download_link.href = local_file_url;
+    download_link.download = name;
+    download_link.click();
+  }
+  function download_url(name) {
+    if(genomic_status == true){
+      var download_a = document.getElementById("a"+name);
+      download_a.click();
+    }
+    else{
+       $('#alert-page').html( alert_error+'<p id="alert-page">The files have been transfered already'+ alert_end);
+    }
+  }
+
+
+  function read_pubkey_file(e) {
+    // Variable
+    var file = e.target.files[0];
+
+    //Small Validation
+    if (!file) {
+      return;
+    }
+
+    //Read file
+    var read = new FileReader();
+    read.onload = function(e) {
+      var content = e.target.result;
+      $("#newpubkey").val(content);
+      validate_transfer();
+    };
+    read.readAsText(file);
+
+  }
+  function add_tx_markup(data){
+    // A tx data provided compile and render item
+    $('#non-item').remove();
+    $('#datajson').empty();
+    var _template = _.template(tx_data_template);
+    var _compiled = _template({"data":JSON.stringify(data,null, 2)});
+    $('#datajson').append(_compiled);
+  }
+
+
+  $(document).ready(function() {
+    (function ($, localforage){
+      // Set the keys on textarea onload page
+      var encrypt = new JSEncrypt();
+      function setKeys(){
+        localforage.getItem('privatekey', function(err, value){
+          $('#priv_key').val(value);
+        });
+        localforage.getItem('publickey', function(err, value){
+          $('#pub_key').val(value);
+        });
+
+      };
+
+    function getTxData(){
+        // Render Tx Data on form
+          // Render Tx Data on form
+      var searchParams = new URLSearchParams(window.location.search);
+      var url = window.baseurl + "api/v1/rx-endpoint/"
+      if(searchParams.has("hash_id")){
+        url = url+ searchParams.get('hash_id') + "/";
+      }
+      else{
+        return null;
+      }
+
+
+      var geting = $.get(url);
+      geting.done(function(data, text_status){
+        // Assign Tx details json to "DATA" public var
+        DATA = data;
+        add_tx_markup(data);
+      });
+      geting.fail(function(xhr, textStatus, errorThrown){
+            console.log(errorThrown, textStatus, xhr);
+      });
+
+    };
+    setKeys();
+    getTxData();
+
+
+  })($, localforage);
+
+
+
+
+
+
+    // Functions
+
+
+    // Events
+    $('#decrypt').on('click', function(){
+      UIkit.modal($('#pincode_modal')).show();
+
+
+    });
+
+    document.getElementById('pubkey_file')
+    .addEventListener('change', read_pubkey_file, false);
+
+    $('#transferdata').on('click', function(){
+
+        //if there are no files then upload the percentages
+        transfer_data();
+
+
+
+
+    });
+
+    // Make Map, pie chart and data responsive.
+    $(window).resize(function(){
+
+    });
+  });
+
+    //Qr reader code
+    var video = document.createElement("video");
+    var canvasElement = document.getElementById("canvas");
+    var canvas = canvasElement.getContext("2d");
+    var loadingMessage = document.getElementById("loadingMessage");
+    var outputContainer = document.getElementById("output");
+    var outputMessage = document.getElementById("outputMessage");
+    var outputData = document.getElementById("outputData");
+
+
+
+    $('#modal-transact').on('hide.uk.modal', function(){
+      $(this).find("input,textarea").val('').end();
+      //This method are from MediaStreamTrack.stop documentation
+      function stop_stream(videoElem) {
+        let stream = videoElem.srcObject;
+        let tracks = stream.getTracks();
+
+        tracks.forEach(function(track) {
+          track.stop();
+        });
+        videoElem.srcObject = null;
+      }
+
+      stop_stream(video);
+      url_files_list = [];
+      $('#pin').val('');
+
+      document.getElementById('transfer_button').disabled = true;
+      $('#alert').html('<p id="alert"></p></div>');
+      $('#uploaded_list').html('<div id="uploaded_list"></div>');
+    });
+
+    $('#pincode_modal').on('hide.uk.modal', function(){
+        // custome js code
+        global_pin_code = $('#pin_code1').val();
+
+        var sub_fields = ["medications"];
+        var decrypt_fields = ["medic_name","medic_cedula","patient_name","patient_age","diagnosis"];
+
+        // Assign data decrypt
+        _DATA_FOR_SIGN = DATA.data;
+        _DATA_DECRYPTED = decrypt_json(_DATA_FOR_SIGN, sub_fields, decrypt_fields, "");
+        _HIGHLIGTH_DATA_DECRYPTED = _DATA_DECRYPTED[1]
+
+        document.getElementById("transferaction").disabled = false;
+        DATA.data = _DATA_DECRYPTED[1]
+        _HIGHLIGTH_DATA_DECRYPTED = DATA
+        add_tx_markup(_HIGHLIGTH_DATA_DECRYPTED);
+        DATA.data = _DATA_DECRYPTED[0]
+        DATA_DECRYPTED = DATA
+        
+
+        
+
+    });
+
+
+    $('#modal-transact').on('show.uk.modal', function(){
+
+      function drawLine(begin, end, color) {
+        canvas.beginPath();
+        canvas.moveTo(begin.x, begin.y);
+        canvas.lineTo(end.x, end.y);
+        canvas.lineWidth = 4;
+        canvas.strokeStyle = color;
+        canvas.stroke();
+      }
+      // Use facingMode: environment to attemt to get the front camera on phones
+      navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } }).then(function(stream) {
+        video.srcObject = stream;
+        video.setAttribute("playsinline", true); // required to tell iOS safari we don't want fullscreen
+        video.play();
+        requestAnimationFrame(tick);
+      });
+      function tick() {
+        loadingMessage.innerText = "Loading video..."
+        if (video.readyState === video.HAVE_ENOUGH_DATA) {
+          loadingMessage.hidden = true;
+          canvasElement.hidden = false;
+          outputContainer.hidden = false;
+          canvasElement.height = video.videoHeight;
+          canvasElement.width = video.videoWidth;
+          canvas.drawImage(video, 0, 0, canvasElement.width, canvasElement.height);
+          var imageData = canvas.getImageData(0, 0, canvasElement.width, canvasElement.height);
+          var code = jsQR(imageData.data, imageData.width, imageData.height, {
+            inversionAttempts: "dontInvert",
+          });
+          if (code) {
+            drawLine(code.location.topLeftCorner, code.location.topRightCorner, "#FF3B58");
+            drawLine(code.location.topRightCorner, code.location.bottomRightCorner, "#FF3B58");
+            drawLine(code.location.bottomRightCorner, code.location.bottomLeftCorner, "#FF3B58");
+            drawLine(code.location.bottomLeftCorner, code.location.topLeftCorner, "#FF3B58");
+            outputMessage.hidden = true;
+            outputData.parentElement.hidden = false;
+
+            get_pub_key_from_addr(code.data);
+
+
+          } else {
+            outputMessage.hidden = false;
+            outputData.parentElement.hidden = true;
+          }
+        }
+        requestAnimationFrame(tick);
+      }
+    });
+
+
+  </script>
+</body>
+</html>
