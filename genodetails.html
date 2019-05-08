@@ -687,7 +687,6 @@
 
 
         new_payload["timestamp"] = times;
-        new_payload["public_key"] = encrypt.getPublicKeyB64();
         new_payload["location"] = "Mexico";
         new_payload = sortOnKeys(new_payload)
 
@@ -705,6 +704,7 @@
 
         _payload = {
           "data": new_payload,
+          "public_key": encrypt.getPublicKeyB64(),
           "signature": sign(msg, privkey, hash_alg),
           "previous_hash": previous_hash
         }
